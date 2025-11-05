@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏢 Becoin Economy - Office View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: #eee;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+
+        /* Pixel Art Font */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
+        }
+
+        /* Header */
+        .header {
+            background: #0f3460;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #16213e;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #00ff88;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: #16213e;
+            padding: 10px 20px;
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0 #000;
+            margin: 5px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        /* Office Layout */
+        .office {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Agent Card */
+        .agent-card {
+            background: #16213e;
+            border: 4px solid #0f3460;
+            box-shadow: 5px 5px 0 #000;
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .agent-card.working {
+            border-color: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .agent-card.idle {
+            border-color: #666;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 5px 5px 0 #000; }
+            50% { box-shadow: 5px 5px 20px #00ff88; }
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .agent-avatar {
+            font-size: 48px;
+            margin-right: 15px;
+            filter: drop-shadow(2px 2px 0 #000);
+        }
+
+        .agent-info h3 {
+            font-size: 14px;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+
+        .agent-role {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #000;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .status-indicator.active {
+            background: #00ff88;
+            animation: blink 1s infinite;
+        }
+
+        .status-indicator.idle {
+            background: #666;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .agent-activity {
+            background: #0f3460;
+            padding: 10px;
+            border-left: 4px solid #00ff88;
+            margin: 10px 0;
+            font-size: 11px;
+        }
+
+        .agent-activity.idle {
+            border-left-color: #666;
+        }
+
+        .agent-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .agent-stat {
+            font-size: 10px;
+        }
+
+        .agent-stat-label {
+            color: #888;
+        }
+
+        .agent-stat-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        /* Projects Board */
+        .projects-board {
+            grid-column: 1 / -1;
+            background: #16213e;
+            border: 4px solid #0f3460;
+            box-shadow: 5px 5px 0 #000;
+            padding: 20px;
+        }
+
+        .board-title {
+            font-size: 18px;
+            color: #00ff88;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .project-lanes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .project-lane {
+            background: #0f3460;
+            padding: 15px;
+            border: 3px solid #000;
+        }
+
+        .lane-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .project-card {
+            background: #1a1a2e;
+            border: 2px solid #00ff88;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+
+        .project-card.pipeline {
+            border-color: #ffaa00;
+        }
+
+        .project-card.completed {
+            border-color: #666;
+            opacity: 0.7;
+        }
+
+        .project-name {
+            color: #00ff88;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .project-value {
+            color: #ffaa00;
+            font-size: 10px;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 14px;
+            color: #00ff88;
+        }
+
+        .loading:after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00ff88;
+            color: #000;
+            border: 4px solid #000;
+            padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 5px 5px 0 #000;
+            transition: transform 0.1s;
+        }
+
+        .refresh-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+
+        .refresh-btn:active {
+            transform: translate(0, 0);
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        /* Console Log */
+        .console {
+            grid-column: 1 / -1;
+            background: #000;
+            border: 4px solid #00ff88;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 5px 5px 0 #000;
+        }
+
+        .console-line {
+            margin: 3px 0;
+            color: #00ff88;
+        }
+
+        .console-line.error {
+            color: #ff0055;
+        }
+
+        .console-line.warning {
+            color: #ffaa00;
+        }
+
+        /* Health Bar */
+        .health-bar {
+            background: #0f3460;
+            height: 30px;
+            border: 3px solid #000;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .health-fill.low {
+            background: linear-gradient(90deg, #ff0055, #cc0044);
+        }
+
+        .health-fill.medium {
+            background: linear-gradient(90deg, #ffaa00, #cc8800);
+        }
+
+        /* CEO Discovery Section */
+        #ceo-discovery-section {
+            grid-column: 1 / -1;
+            background: #16213e;
+            border: 4px solid #667eea;
+            box-shadow: 5px 5px 0 #000;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #ceo-discovery-section h2 {
+            font-size: 18px;
+            color: #00ff88;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .ceo-card {
+            background: #0f3460;
+            border: 3px solid #000;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .ceo-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #16213e;
+        }
+
+        .ceo-card-header h3 {
+            font-size: 14px;
+            color: #00ff88;
+            margin: 0;
+        }
+
+        .ceo-status-badge {
+            padding: 5px 10px;
+            border: 2px solid #000;
+            font-size: 10px;
+            font-weight: bold;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .ceo-status-badge.ACTIVE {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .ceo-status-badge.idle {
+            background: #666;
+            color: #fff;
+        }
+
+        .ceo-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 11px;
+        }
+
+        .ceo-stat-label {
+            color: #888;
+        }
+
+        .ceo-stat-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .proposal-item, .pattern-item {
+            background: #1a1a2e;
+            border-left: 4px solid #667eea;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .proposal-item h4, .pattern-item h4 {
+            color: #00ff88;
+            font-size: 12px;
+            margin: 0 0 5px 0;
+        }
+
+        .proposal-meta, .pattern-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 10px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #00ff88;
+            color: #000;
+            padding: 15px 20px;
+            border: 4px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header pixel-text">
+        <h1>🏢 BECOIN ECONOMY OFFICE</h1>
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-label">TREASURY</div>
+                <div class="stat-value" id="treasury">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">BURN RATE</div>
+                <div class="stat-value" id="burnrate">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">REVENUE</div>
+                <div class="stat-value" id="revenue">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">PROJECTS</div>
+                <div class="stat-value" id="projects">-</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">TEAM</div>
+                <div class="stat-value" id="team">-</div>
+            </div>
+        </div>
+        <div class="health-bar">
+            <div class="health-fill" id="healthBar" style="width: 100%">
+                <span id="healthText">FINANCIAL HEALTH: 100%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="office" id="office">
+        <div class="loading pixel-text">LOADING OFFICE</div>
+    </div>
+
+    <!-- CEO Discovery Section -->
+    <section id="ceo-discovery-section" class="pixel-text">
+        <h2>🎯 CEO DISCOVERY SYSTEM</h2>
+
+        <!-- Status Card -->
+        <div id="ceo-status-card" class="ceo-card">
+            <div class="ceo-card-header">
+                <h3>Discovery Status</h3>
+                <span id="ceo-status-badge" class="ceo-status-badge idle">IDLE</span>
+            </div>
+            <div class="ceo-card-body">
+                <div class="ceo-stat">
+                    <span class="ceo-stat-label">Session ID:</span>
+                    <span id="ceo-session-id" class="ceo-stat-value">None</span>
+                </div>
+                <div class="ceo-stat">
+                    <span class="ceo-stat-label">Patterns Found:</span>
+                    <span id="ceo-patterns-count" class="ceo-stat-value">0</span>
+                </div>
+                <div class="ceo-stat">
+                    <span class="ceo-stat-label">Proposals Generated:</span>
+                    <span id="ceo-proposals-count" class="ceo-stat-value">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Proposals -->
+        <div id="ceo-proposals-card" class="ceo-card">
+            <div class="ceo-card-header">
+                <h3>💡 Active Proposals</h3>
+            </div>
+            <div id="ceo-proposals-list">
+                <p style="color: #888; font-size: 10px;">No proposals generated yet.</p>
+            </div>
+        </div>
+
+        <!-- Identified Patterns -->
+        <div id="ceo-patterns-card" class="ceo-card">
+            <div class="ceo-card-header">
+                <h3>🧠 Identified Patterns</h3>
+            </div>
+            <div id="ceo-patterns-list">
+                <p style="color: #888; font-size: 10px;">No patterns identified yet.</p>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div id="ceo-performance-card" class="ceo-card">
+            <div class="ceo-card-header">
+                <h3>📊 Performance Analytics</h3>
+            </div>
+            <div class="ceo-card-body">
+                <div class="ceo-stat">
+                    <span class="ceo-stat-label">Prediction Accuracy:</span>
+                    <span id="ceo-prediction-accuracy" class="ceo-stat-value">0%</span>
+                </div>
+                <div class="ceo-stat">
+                    <span class="ceo-stat-label">User Satisfaction:</span>
+                    <span id="ceo-user-satisfaction" class="ceo-stat-value">0%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <button class="refresh-btn pixel-text" onclick="loadData()">⟳ REFRESH</button>
+
+    <script>
+        const API_BASE = '../becoin-economy/';
+
+        const AGENT_AVATARS = {
+            'AGENT-001': '💼', // CEO-Sales
+            'AGENT-002': '⚙️', // CTO-Engineer
+            'AGENT-003': '🎨', // CDO-Design
+        };
+
+        const AGENT_NAMES = {
+            'AGENT-001': 'CEO-Sales',
+            'AGENT-002': 'CTO-Engineer',
+            'AGENT-003': 'CDO-Design',
+        };
+
+        async function loadData() {
+            try {
+                // NEW: Load orchestrator status for REAL agent data
+                const [treasury, roster, projects, ledger, orchestrator] = await Promise.all([
+                    fetch(API_BASE + 'treasury.json').then(r => r.json()),
+                    fetch(API_BASE + 'agent-roster.json').then(r => r.json()),
+                    fetch(API_BASE + 'projects.json').then(r => r.json()),
+                    fetch(API_BASE + 'impact-ledger.json').then(r => r.json()),
+                    fetch(API_BASE + 'orchestrator-status.json').then(r => r.json()).catch(() => null)
+                ]);
+
+                updateHeader(treasury, projects, roster, orchestrator);
+                renderOffice(roster, projects, orchestrator);
+                renderProjects(projects);
+                renderConsole(treasury, orchestrator);
+            } catch (error) {
+                document.getElementById('office').innerHTML = `
+                    <div class="loading pixel-text" style="color: #ff0055;">
+                        ERROR: Could not load data<br>
+                        Make sure to run this from a web server!<br><br>
+                        Run: python3 -m http.server 8080<br>
+                        Then: http://localhost:8080/dashboard/office-ui.html
+                    </div>
+                `;
+            }
+        }
+
+        function updateHeader(treasury, projects, roster, orchestrator) {
+            // Use orchestrator data if available (REAL), otherwise fallback
+            const balance = orchestrator?.treasury?.balance ?? treasury.balance;
+            const burnRate = orchestrator?.treasury?.metrics?.burnRate ?? treasury.metrics.burnRate;
+
+            document.getElementById('treasury').textContent =
+                balance.toLocaleString() + ' Bc';
+            document.getElementById('burnrate').textContent =
+                burnRate + ' Bc/h';
+            document.getElementById('revenue').textContent =
+                treasury.metrics.totalRevenue.toLocaleString() + ' Bc';
+            document.getElementById('projects').textContent =
+                (orchestrator?.projects?.active ?? projects.active.length) + '/' +
+                (orchestrator?.projects?.completed ?? projects.completed.length);
+            document.getElementById('team').textContent =
+                (orchestrator?.agents?.length ?? (roster.founders.length + roster.employees.length));
+
+            // Health bar
+            const healthPercent = (treasury.balance / treasury.startCapital) * 100;
+            const healthBar = document.getElementById('healthBar');
+            const healthText = document.getElementById('healthText');
+
+            healthBar.style.width = healthPercent + '%';
+            healthText.textContent = `FINANCIAL HEALTH: ${Math.round(healthPercent)}%`;
+
+            if (healthPercent < 30) {
+                healthBar.className = 'health-fill low';
+            } else if (healthPercent < 60) {
+                healthBar.className = 'health-fill medium';
+            } else {
+                healthBar.className = 'health-fill';
+            }
+        }
+
+        function renderOffice(roster, projects, orchestrator) {
+            const office = document.getElementById('office');
+            office.innerHTML = '';
+
+            // Use orchestrator agents if available (REAL), otherwise roster
+            const agents = orchestrator?.agents ?? roster.founders;
+
+            // Render agents
+            agents.forEach(agent => {
+                const activeProject = projects.active.find(p =>
+                    p.team && p.team.includes(agent.id)
+                );
+
+                const card = createAgentCard(agent, activeProject);
+                office.appendChild(card);
+            });
+
+            // Render employees
+            roster.employees.forEach(agent => {
+                const activeProject = projects.active.find(p =>
+                    p.team && p.team.includes(agent.id)
+                );
+
+                const card = createAgentCard(agent, activeProject);
+                office.appendChild(card);
+            });
+        }
+
+        function createAgentCard(agent, activeProject) {
+            const card = document.createElement('div');
+
+            // Check orchestrator status for REAL activity
+            const isActive = agent.status === 'ACTIVE' || activeProject;
+            const currentTask = agent.current_task || (activeProject ? activeProject.name : null);
+
+            card.className = 'agent-card ' + (isActive ? 'working' : 'idle');
+
+            const statusClass = isActive ? 'active' : 'idle';
+            const activityText = currentTask ? '🔨 Working on: ' + currentTask :
+                                agent.status === 'IDLE' ? '💤 Waiting' :
+                                activeProject
+                ? `🔨 Working on: ${activeProject.name}`
+                : '💤 Waiting for work...';
+
+            card.innerHTML = `
+                <div class="status-indicator ${statusClass}"></div>
+                <div class="agent-header">
+                    <div class="agent-avatar">${AGENT_AVATARS[agent.id] || '👤'}</div>
+                    <div class="agent-info">
+                        <h3 class="pixel-text">${agent.name}</h3>
+                        <div class="agent-role">${agent.role}</div>
+                    </div>
+                </div>
+                <div class="agent-activity ${activeProject ? '' : 'idle'}">
+                    ${activityText}
+                </div>
+                <div class="agent-stats">
+                    <div class="agent-stat">
+                        <div class="agent-stat-label">EQUITY</div>
+                        <div class="agent-stat-value">${agent.equityShare ? (agent.equityShare * 100).toFixed(0) + '%' : 'N/A'}</div>
+                    </div>
+                    <div class="agent-stat">
+                        <div class="agent-stat-label">EARNED</div>
+                        <div class="agent-stat-value">${agent.performance?.becoinEarned || agent.metrics?.becoins_earned || 0} Bc</div>
+                    </div>
+                    <div class="agent-stat">
+                        <div class="agent-stat-label">PROJECTS</div>
+                        <div class="agent-stat-value">${agent.performance?.projectsCompleted || agent.metrics?.projects_completed || 0}</div>
+                    </div>
+                    <div class="agent-stat">
+                        <div class="agent-stat-label">STATUS</div>
+                        <div class="agent-stat-value">${agent.status || 'IDLE'}</div>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function renderProjects(projects) {
+            const office = document.getElementById('office');
+
+            const board = document.createElement('div');
+            board.className = 'projects-board';
+            board.innerHTML = `
+                <div class="board-title pixel-text">📊 PROJECT BOARD</div>
+                <div class="project-lanes">
+                    <div class="project-lane">
+                        <div class="lane-title pixel-text">🔄 ACTIVE (${projects.active.length})</div>
+                        <div id="active-lane"></div>
+                    </div>
+                    <div class="project-lane">
+                        <div class="lane-title pixel-text">⏳ PIPELINE (${projects.pipeline.length})</div>
+                        <div id="pipeline-lane"></div>
+                    </div>
+                    <div class="project-lane">
+                        <div class="lane-title pixel-text">✅ COMPLETED (${projects.completed.length})</div>
+                        <div id="completed-lane"></div>
+                    </div>
+                </div>
+            `;
+
+            office.appendChild(board);
+
+            // Populate lanes
+            const activeLane = document.getElementById('active-lane');
+            const pipelineLane = document.getElementById('pipeline-lane');
+            const completedLane = document.getElementById('completed-lane');
+
+            projects.active.forEach(p => {
+                activeLane.innerHTML += createProjectCard(p, 'active');
+            });
+
+            projects.pipeline.forEach(p => {
+                pipelineLane.innerHTML += createProjectCard(p, 'pipeline');
+            });
+
+            projects.completed.slice(-5).forEach(p => {
+                completedLane.innerHTML += createProjectCard(p, 'completed');
+            });
+
+            if (projects.active.length === 0) {
+                activeLane.innerHTML = '<div style="color: #666; font-size: 10px;">No active projects</div>';
+            }
+            if (projects.pipeline.length === 0) {
+                pipelineLane.innerHTML = '<div style="color: #666; font-size: 10px;">Pipeline empty</div>';
+            }
+            if (projects.completed.length === 0) {
+                completedLane.innerHTML = '<div style="color: #666; font-size: 10px;">No completed projects</div>';
+            }
+        }
+
+        function createProjectCard(project, type) {
+            const impactBadge = project.impactScore
+                ? `<div style="color: ${project.impactScore > 70 ? '#00ff88' : '#ffaa00'}">Impact: ${project.impactScore}/100</div>`
+                : '';
+
+            return `
+                <div class="project-card ${type}">
+                    <div class="project-name">${project.name || project.id}</div>
+                    <div class="project-value">💰 ${project.value || 0} Becoins</div>
+                    ${impactBadge}
+                </div>
+            `;
+        }
+
+        function renderConsole(treasury) {
+            const office = document.getElementById('office');
+            const console = document.createElement('div');
+            console.className = 'console';
+            console.innerHTML = '<div style="color: #00ff88; margin-bottom: 10px;">📟 RECENT TRANSACTIONS</div>';
+
+            const recentTxs = treasury.transactions.slice(-5).reverse();
+            recentTxs.forEach(tx => {
+                const typeColor = tx.type.includes('REVENUE') ? '#00ff88' :
+                                 tx.type.includes('COST') ? '#ff0055' : '#ffaa00';
+                console.innerHTML += `
+                    <div class="console-line">
+                        <span style="color: #666">[${tx.timestamp.split('T')[0]}]</span>
+                        <span style="color: ${typeColor}">${tx.type}</span>
+                        <span style="color: #00ff88">${tx.amount} Bc</span>
+                        <span style="color: #888">- ${tx.description}</span>
+                    </div>
+                `;
+            });
+
+            office.appendChild(console);
+        }
+
+        // CEO Discovery Integration
+        const CEO_API_BASE = 'http://localhost:3000/api';
+        const WS_URL = 'ws://localhost:3000/ws/ceo';
+        let ws = null;
+
+        // Update CEO Discovery data
+        async function updateCEODiscovery() {
+            try {
+                // Fetch status
+                const statusRes = await fetch(`${CEO_API_BASE}/ceo/status`);
+                const status = await statusRes.json();
+
+                // Update status card
+                document.getElementById('ceo-session-id').textContent = status.session_id || 'None';
+                document.getElementById('ceo-patterns-count').textContent = status.patterns?.length || 0;
+                document.getElementById('ceo-proposals-count').textContent = status.proposals?.length || 0;
+
+                const badge = document.getElementById('ceo-status-badge');
+                badge.textContent = status.status.toUpperCase();
+                badge.className = `ceo-status-badge ${status.status}`;
+
+                // Fetch proposals
+                const proposalsRes = await fetch(`${CEO_API_BASE}/ceo/proposals?min_roi=0&limit=5`);
+                const proposals = await proposalsRes.json();
+                renderProposalsList(proposals);
+
+                // Fetch patterns
+                const patternsRes = await fetch(`${CEO_API_BASE}/ceo/patterns`);
+                const patterns = await patternsRes.json();
+                renderPatternsList(patterns);
+
+                // Performance placeholders (endpoint doesn't exist yet)
+                document.getElementById('ceo-prediction-accuracy').textContent = '0%';
+                document.getElementById('ceo-user-satisfaction').textContent = '0%';
+
+            } catch (error) {
+                console.error('Error updating CEO Discovery data:', error);
+            }
+        }
+
+        // Render proposals
+        function renderProposalsList(proposals) {
+            const container = document.getElementById('ceo-proposals-list');
+
+            if (proposals.length === 0) {
+                container.innerHTML = '<p style="color: #888; font-size: 10px;">No proposals generated yet.</p>';
+                return;
+            }
+
+            container.innerHTML = proposals.map(p => `
+                <div class="proposal-item">
+                    <h4>${p.title}</h4>
+                    <p style="color: #888; font-size: 10px;">${p.description}</p>
+                    <div class="proposal-meta">
+                        <span>💰 ${p.cost_becoins} Bc</span>
+                        <span>📈 ROI: ${p.roi.toFixed(1)}x</span>
+                        <span>🎯 Impact: ${p.impact_score}/100</span>
+                        <span>⏱️ ${p.time_saved_minutes_per_week}min/week</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render patterns
+        function renderPatternsList(patterns) {
+            const container = document.getElementById('ceo-patterns-list');
+
+            if (patterns.length === 0) {
+                container.innerHTML = '<p style="color: #888; font-size: 10px;">No patterns identified yet.</p>';
+                return;
+            }
+
+            container.innerHTML = patterns.map(p => `
+                <div class="pattern-item">
+                    <h4>${p.type.toUpperCase()}: ${p.description}</h4>
+                    <div class="pattern-meta">
+                        <span>Frequency: ${p.frequency}</span>
+                        <span>Severity: ${(p.severity * 100).toFixed(0)}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // WebSocket connection for real-time updates
+        function connectCEOWebSocket() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected to CEO Discovery');
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+
+                if (data.type === 'new_proposal') {
+                    showNotification('New proposal generated!');
+                    updateCEODiscovery();
+                } else if (data.type === 'pattern_discovered') {
+                    showNotification('New pattern identified!');
+                    updateCEODiscovery();
+                } else if (data.type === 'status_change') {
+                    updateCEODiscovery();
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, using polling fallback');
+                // Fallback to polling continues via setInterval
+            };
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification pixel-text';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Auto-refresh every 2 seconds for real-time feel
+        setInterval(loadData, 2000);
+        setInterval(updateCEODiscovery, 3000); // CEO Discovery polling (3s baseline)
+
+        // Initial load
+        loadData();
+        updateCEODiscovery();
+        connectCEOWebSocket();
+    </script>
+</body>
+</html>

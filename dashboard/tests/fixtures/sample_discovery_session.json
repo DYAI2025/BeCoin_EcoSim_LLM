@@ -1,0 +1,43 @@
+{
+  "session_id": "discovery-1234567890",
+  "start_time": "2025-11-05T10:00:00Z",
+  "status": "active",
+  "patterns": [
+    {
+      "id": "pattern-001",
+      "type": "repetitive",
+      "description": "User frequently runs manual database backups",
+      "frequency": 15,
+      "severity": "high",
+      "examples": [
+        "pg_dump database > backup.sql",
+        "tar -czf backup-$(date +%Y%m%d).tar.gz data/"
+      ]
+    }
+  ],
+  "pain_points": [
+    {
+      "id": "pain-001",
+      "pattern_id": "pattern-001",
+      "title": "Manual Database Backups",
+      "description": "Daily manual database backup consuming 30 minutes",
+      "time_cost_minutes": 30,
+      "frequency_per_week": 7,
+      "severity": 0.85
+    }
+  ],
+  "proposals": [
+    {
+      "id": "proposal-001",
+      "pain_point_id": "pain-001",
+      "title": "Automated Database Backup System",
+      "description": "Implement automated scheduled backups with encryption and cloud storage",
+      "cost_becoins": 287,
+      "timeline": "1-2 weeks",
+      "roi": 4.2,
+      "impact_score": 87,
+      "time_saved_minutes_per_week": 120,
+      "agents": ["Backend-Architect", "DevOps-Automator"]
+    }
+  ]
+}
