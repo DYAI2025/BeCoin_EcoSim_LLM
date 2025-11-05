@@ -62,3 +62,6 @@ scratch/
 notes/
 TODO.md
 NOTES.md
+
+# Git worktrees
+.worktrees/
