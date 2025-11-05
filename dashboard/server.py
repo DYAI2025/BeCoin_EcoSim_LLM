@@ -4,17 +4,22 @@ CEO Discovery Dashboard - FastAPI Server
 This server provides REST and WebSocket APIs for the CEO Discovery Dashboard.
 It integrates with the Becoin Economy system and supports autonomous agent operations.
 """
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from dashboard import __version__
     from dashboard.ceo_data_bridge import CEODataBridge
+    from dashboard.websocket_manager import WebSocketManager
 except ModuleNotFoundError:
     # When running directly, dashboard module not in path
     __version__ = "1.0.0"
     from ceo_data_bridge import CEODataBridge
+    from websocket_manager import WebSocketManager
 
 
 # Initialize FastAPI app
@@ -24,8 +29,9 @@ app = FastAPI(
     version=__version__
 )
 
-# Initialize data bridge
+# Initialize data bridge and WebSocket manager
 ceo_bridge = CEODataBridge()
+ws_manager = WebSocketManager()
 
 # Configure CORS
 app.add_middleware(
@@ -95,6 +101,42 @@ async def get_history(
 ):
     """Get historical discovery sessions."""
     return ceo_bridge.get_history(limit=limit)
+
+
+# WebSocket Endpoint
+
+@app.websocket("/ws/ceo")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time CEO Discovery updates.
+
+    Clients connect to this endpoint to receive live updates about:
+    - New proposals generated
+    - Patterns discovered
+    - Pain points identified
+    - Status changes
+    """
+    await ws_manager.connect(websocket)
+
+    try:
+        while True:
+            # Keep connection alive and listen for any client messages
+            # (currently we only broadcast server->client, but this allows bidirectional)
+            data = await websocket.receive_text()
+            logger.info(f"Received WebSocket message: {data}")
+
+            # Echo back for debugging (can be removed in production)
+            await websocket.send_json({
+                "type": "echo",
+                "message": "Message received",
+                "original": data
+            })
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+        logger.info("WebSocket client disconnected normally")
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+        ws_manager.disconnect(websocket)
 
 
 if __name__ == "__main__":
