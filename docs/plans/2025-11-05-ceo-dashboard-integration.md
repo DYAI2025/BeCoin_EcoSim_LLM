@@ -2494,6 +2494,994 @@ git commit -m "feat: add systemd/PM2 integration for auto-start on boot"
 
 ---
 
+## Task 14: AIDO Integration - Selbstlernende Agent-Organisation
+
+**Files:**
+- Create: `dashboard/aido/llm_provider.py`
+- Create: `dashboard/aido/agent_loader.py`
+- Create: `dashboard/aido/agent_network.py`
+- Create: `dashboard/aido/decision_making.py`
+- Create: `dashboard/aido/consensus.py`
+- Create: `dashboard/tests/test_aido.py`
+
+**Step 1: Write the failing test**
+
+Create `dashboard/tests/test_aido.py`:
+
+```python
+import pytest
+from aido.llm_provider import OllamaProvider, ClaudeProvider
+from aido.agent_loader import AgentLoader
+from aido.agent_network import AgentNetwork
+
+def test_ollama_provider():
+    """Test Ollama LLM provider"""
+    provider = OllamaProvider(model="llama3.1:8b")
+
+    response = provider.call(
+        system="You are a helpful AI assistant.",
+        prompt="What is 2+2?"
+    )
+
+    assert isinstance(response, str)
+    assert len(response) > 0
+
+def test_agent_loader():
+    """Test loading agent personality from .md file"""
+    loader = AgentLoader(agents_dir="../founders")
+
+    personality = loader.load_agent("ceo-sales.md")
+
+    assert "CEO & Sales Director" in personality["name"]
+    assert "system_prompt" in personality
+    assert len(personality["system_prompt"]) > 100
+
+def test_agent_network_proposal():
+    """Test AIDO agent proposal generation"""
+    provider = OllamaProvider(model="llama3.1:8b")
+    loader = AgentLoader(agents_dir="../founders")
+    network = AgentNetwork(llm_provider=provider, agent_loader=loader)
+
+    proposal = network.generate_proposal(
+        agent="ceo-sales.md",
+        topic="Automate repetitive build tasks",
+        context={"frequency": 15, "time_spent": 120}
+    )
+
+    assert "title" in proposal
+    assert "description" in proposal
+    assert "cost_becoins" in proposal
+    assert "expected_roi" in proposal
+    assert proposal["cost_becoins"] > 0
+```
+
+**Step 2: Run test to verify it fails**
+
+Run: `cd dashboard && python -m pytest tests/test_aido.py -v`
+Expected: FAIL with "No module named 'aido'"
+
+**Step 3: Create LLM Provider abstraction**
+
+Create `dashboard/aido/__init__.py`:
+```python
+"""AIDO - AI-Driven Decentralized Organization"""
+```
+
+Create `dashboard/aido/llm_provider.py`:
+
+```python
+from abc import ABC, abstractmethod
+from typing import Dict, Optional
+import requests
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+class LLMProvider(ABC):
+    """Abstract base class for LLM providers"""
+
+    @abstractmethod
+    def call(self, system: str, prompt: str, **kwargs) -> str:
+        """Execute LLM call with system prompt and user prompt"""
+        pass
+
+class OllamaProvider(LLMProvider):
+    """Ollama local LLM provider"""
+
+    def __init__(self, model: str = "llama3.1:70b", host: str = "http://localhost:11434"):
+        self.model = model
+        self.host = host
+        self._check_connection()
+
+    def _check_connection(self):
+        """Check if Ollama is running"""
+        try:
+            response = requests.get(f"{self.host}/api/tags", timeout=5)
+            if response.status_code != 200:
+                logger.warning(f"Ollama not responding properly: {response.status_code}")
+        except requests.exceptions.ConnectionError:
+            logger.error(f"Cannot connect to Ollama at {self.host}. Make sure Ollama is running.")
+
+    def call(self, system: str, prompt: str, **kwargs) -> str:
+        """Call Ollama API"""
+        try:
+            payload = {
+                "model": self.model,
+                "system": system,
+                "prompt": prompt,
+                "stream": False,
+                **kwargs
+            }
+
+            response = requests.post(
+                f"{self.host}/api/generate",
+                json=payload,
+                timeout=120
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                return result.get("response", "")
+            else:
+                raise Exception(f"Ollama API error: {response.status_code}")
+
+        except Exception as e:
+            logger.error(f"Ollama call failed: {e}")
+            raise
+
+class ClaudeProvider(LLMProvider):
+    """Anthropic Claude API provider (fallback)"""
+
+    def __init__(self, api_key: str, model: str = "claude-3-5-sonnet-20241022"):
+        self.api_key = api_key
+        self.model = model
+
+    def call(self, system: str, prompt: str, **kwargs) -> str:
+        """Call Anthropic API"""
+        try:
+            import anthropic
+
+            client = anthropic.Anthropic(api_key=self.api_key)
+
+            message = client.messages.create(
+                model=self.model,
+                max_tokens=4096,
+                system=system,
+                messages=[{"role": "user", "content": prompt}]
+            )
+
+            return message.content[0].text
+
+        except Exception as e:
+            logger.error(f"Claude API call failed: {e}")
+            raise
+```
+
+**Step 4: Create Agent Loader**
+
+Create `dashboard/aido/agent_loader.py`:
+
+```python
+import re
+from pathlib import Path
+from typing import Dict
+import logging
+
+logger = logging.getLogger(__name__)
+
+class AgentLoader:
+    """Loads agent personalities from .md files"""
+
+    def __init__(self, agents_dir: str = "../founders"):
+        self.agents_dir = Path(agents_dir)
+        if not self.agents_dir.exists():
+            logger.warning(f"Agents directory not found: {self.agents_dir}")
+
+    def load_agent(self, agent_file: str) -> Dict:
+        """Load agent personality from markdown file"""
+        file_path = self.agents_dir / agent_file
+
+        if not file_path.exists():
+            raise FileNotFoundError(f"Agent file not found: {file_path}")
+
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Parse YAML frontmatter
+        frontmatter = self._parse_frontmatter(content)
+
+        # Extract agent name from first heading
+        name_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+        name = name_match.group(1) if name_match else agent_file
+
+        # Extract sections
+        sections = self._extract_sections(content)
+
+        # Build system prompt from agent content
+        system_prompt = self._build_system_prompt(name, sections)
+
+        return {
+            "name": name,
+            "file": agent_file,
+            "frontmatter": frontmatter,
+            "sections": sections,
+            "system_prompt": system_prompt
+        }
+
+    def _parse_frontmatter(self, content: str) -> Dict:
+        """Parse YAML frontmatter"""
+        match = re.match(r'^---\n(.+?)\n---', content, re.DOTALL)
+        if not match:
+            return {}
+
+        frontmatter = {}
+        for line in match.group(1).split('\n'):
+            if ':' in line:
+                key, value = line.split(':', 1)
+                frontmatter[key.strip()] = value.strip()
+
+        return frontmatter
+
+    def _extract_sections(self, content: str) -> Dict[str, str]:
+        """Extract markdown sections"""
+        sections = {}
+        current_section = None
+        current_content = []
+
+        for line in content.split('\n'):
+            if line.startswith('## '):
+                if current_section:
+                    sections[current_section] = '\n'.join(current_content).strip()
+                current_section = line[3:].strip()
+                current_content = []
+            elif current_section:
+                current_content.append(line)
+
+        if current_section:
+            sections[current_section] = '\n'.join(current_content).strip()
+
+        return sections
+
+    def _build_system_prompt(self, name: str, sections: Dict[str, str]) -> str:
+        """Build system prompt from agent sections"""
+        prompt_parts = [f"You are {name}."]
+
+        # Include key sections in order
+        section_order = [
+            "🧠 Your Identity & Memory",
+            "🎯 Your Core Mission",
+            "🚨 Critical Rules You Must Follow",
+            "💭 Your Communication Style"
+        ]
+
+        for section_name in section_order:
+            if section_name in sections:
+                prompt_parts.append(f"\n{section_name}\n{sections[section_name]}")
+
+        return '\n'.join(prompt_parts)
+
+    def list_agents(self) -> list:
+        """List all available agent files"""
+        if not self.agents_dir.exists():
+            return []
+
+        return [f.name for f in self.agents_dir.glob("*.md")]
+```
+
+**Step 5: Create Agent Network**
+
+Create `dashboard/aido/agent_network.py`:
+
+```python
+from typing import Dict, Optional
+import logging
+from .llm_provider import LLMProvider
+from .agent_loader import AgentLoader
+
+logger = logging.getLogger(__name__)
+
+class AgentNetwork:
+    """AIDO Agent Network for proposal generation"""
+
+    def __init__(self, llm_provider: LLMProvider, agent_loader: AgentLoader):
+        self.llm_provider = llm_provider
+        self.agent_loader = agent_loader
+
+    def generate_proposal(
+        self,
+        agent: str,
+        topic: str,
+        context: Optional[Dict] = None
+    ) -> Dict:
+        """Generate project proposal using agent personality"""
+
+        # Load agent personality
+        personality = self.agent_loader.load_agent(agent)
+
+        # Build prompt
+        prompt = self._build_proposal_prompt(topic, context)
+
+        # Call LLM
+        logger.info(f"Generating proposal with {personality['name']} for: {topic}")
+        response = self.llm_provider.call(
+            system=personality["system_prompt"],
+            prompt=prompt
+        )
+
+        # Parse response into structured proposal
+        proposal = self._parse_proposal(response, topic, context)
+
+        return proposal
+
+    def _build_proposal_prompt(self, topic: str, context: Optional[Dict]) -> str:
+        """Build prompt for proposal generation"""
+        prompt_parts = [
+            f"Based on the following opportunity: {topic}",
+            ""
+        ]
+
+        if context:
+            prompt_parts.append("Context:")
+            for key, value in context.items():
+                prompt_parts.append(f"- {key}: {value}")
+            prompt_parts.append("")
+
+        prompt_parts.extend([
+            "Generate a project proposal with:",
+            "1. Title (concise, actionable)",
+            "2. Description (2-3 sentences explaining the solution)",
+            "3. Cost estimate in Becoins (base 100-500 range)",
+            "4. Expected ROI (as multiplier, e.g., 3.5x)",
+            "5. Timeline (in weeks)",
+            "6. Impact score (0-100)",
+            "",
+            "Format your response as:",
+            "TITLE: [title]",
+            "DESCRIPTION: [description]",
+            "COST: [number]",
+            "ROI: [number]",
+            "TIMELINE: [weeks]",
+            "IMPACT: [score]"
+        ])
+
+        return '\n'.join(prompt_parts)
+
+    def _parse_proposal(self, response: str, topic: str, context: Optional[Dict]) -> Dict:
+        """Parse LLM response into structured proposal"""
+        import re
+
+        # Extract fields using regex
+        title_match = re.search(r'TITLE:\s*(.+)', response)
+        desc_match = re.search(r'DESCRIPTION:\s*(.+?)(?=COST:|\Z)', response, re.DOTALL)
+        cost_match = re.search(r'COST:\s*(\d+)', response)
+        roi_match = re.search(r'ROI:\s*([\d.]+)', response)
+        timeline_match = re.search(r'TIMELINE:\s*(\d+)', response)
+        impact_match = re.search(r'IMPACT:\s*(\d+)', response)
+
+        proposal = {
+            "title": title_match.group(1).strip() if title_match else topic,
+            "description": desc_match.group(1).strip() if desc_match else "Generated proposal",
+            "cost_becoins": int(cost_match.group(1)) if cost_match else 250,
+            "expected_roi": float(roi_match.group(1)) if roi_match else 3.0,
+            "timeline_weeks": int(timeline_match.group(1)) if timeline_match else 2,
+            "impact_score": int(impact_match.group(1)) if impact_match else 75,
+            "topic": topic,
+            "context": context or {},
+            "raw_response": response
+        }
+
+        return proposal
+
+    def evaluate_proposal(
+        self,
+        proposal: Dict,
+        evaluator_agent: str
+    ) -> Dict:
+        """Evaluate a proposal using another agent"""
+
+        personality = self.agent_loader.load_agent(evaluator_agent)
+
+        prompt = f"""Evaluate this project proposal:
+
+Title: {proposal['title']}
+Description: {proposal['description']}
+Cost: {proposal['cost_becoins']} Becoins
+Expected ROI: {proposal['expected_roi']}x
+Timeline: {proposal['timeline_weeks']} weeks
+
+Provide:
+1. Score (0-10)
+2. Strengths (1-2 points)
+3. Concerns (1-2 points)
+4. Recommendation (ACCEPT/REJECT/REVISE)
+
+Format as:
+SCORE: [number]
+STRENGTHS: [points]
+CONCERNS: [points]
+RECOMMENDATION: [decision]
+"""
+
+        response = self.llm_provider.call(
+            system=personality["system_prompt"],
+            prompt=prompt
+        )
+
+        return self._parse_evaluation(response)
+
+    def _parse_evaluation(self, response: str) -> Dict:
+        """Parse evaluation response"""
+        import re
+
+        score_match = re.search(r'SCORE:\s*(\d+)', response)
+        strengths_match = re.search(r'STRENGTHS:\s*(.+?)(?=CONCERNS:|\Z)', response, re.DOTALL)
+        concerns_match = re.search(r'CONCERNS:\s*(.+?)(?=RECOMMENDATION:|\Z)', response, re.DOTALL)
+        rec_match = re.search(r'RECOMMENDATION:\s*(\w+)', response)
+
+        return {
+            "score": int(score_match.group(1)) if score_match else 5,
+            "strengths": strengths_match.group(1).strip() if strengths_match else "",
+            "concerns": concerns_match.group(1).strip() if concerns_match else "",
+            "recommendation": rec_match.group(1).upper() if rec_match else "REVISE",
+            "raw_response": response
+        }
+```
+
+**Step 6: Run test to verify it passes**
+
+Run: `cd dashboard && python -m pytest tests/test_aido.py -v`
+Expected: PASS (3 tests passed) - requires Ollama running
+
+**Step 7: Add AIDO to requirements.txt**
+
+Modify `dashboard/requirements.txt`, add:
+```txt
+anthropic==0.18.1
+```
+
+**Step 8: Integration with Daemon**
+
+Modify `dashboard/daemon.py`, add after imports:
+
+```python
+from aido.llm_provider import OllamaProvider, ClaudeProvider
+from aido.agent_loader import AgentLoader
+from aido.agent_network import AgentNetwork
+
+# Initialize AIDO
+try:
+    llm_provider = OllamaProvider(model="llama3.1:70b")
+    logger.info("✅ Using Ollama (local LLM)")
+except Exception as e:
+    logger.warning(f"Ollama not available: {e}")
+    # Fallback to Claude API if configured
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if api_key:
+        llm_provider = ClaudeProvider(api_key=api_key)
+        logger.info("✅ Using Claude API (fallback)")
+    else:
+        logger.error("No LLM provider available!")
+        llm_provider = None
+
+if llm_provider:
+    agent_loader = AgentLoader(agents_dir="../founders")
+    agent_network = AgentNetwork(llm_provider, agent_loader)
+```
+
+Modify `_run_discovery_cycle`, replace TODO:
+
+```python
+async def _run_discovery_cycle(self):
+    """Execute one discovery cycle"""
+    logger.info("🔍 Running discovery cycle...")
+
+    if not agent_network:
+        logger.error("Agent network not initialized")
+        return
+
+    # Get enabled agents
+    enabled_agents = [
+        agent_id for agent_id, config in self.config["agents"].items()
+        if config.get("enabled", False)
+    ]
+
+    logger.info(f"Enabled agents: {enabled_agents}")
+
+    # Generate proposals with each agent
+    for agent_id in enabled_agents:
+        agent_file = f"{agent_id}.md"  # e.g., "ceo-sales.md"
+
+        try:
+            # Generate proposal
+            proposal = agent_network.generate_proposal(
+                agent=agent_file,
+                topic="Identify optimization opportunities",
+                context={"analysis_window_hours": 168}
+            )
+
+            logger.info(f"💡 Proposal from {agent_id}: {proposal['title']}")
+
+            # Save proposal to discovery sessions
+            import json
+            from datetime import datetime
+
+            session_file = Path("../.claude-flow/discovery-sessions") / \
+                          f"discovery-{int(datetime.utcnow().timestamp())}.json"
+            session_file.parent.mkdir(parents=True, exist_ok=True)
+
+            session_data = {
+                "session_id": f"discovery-{int(datetime.utcnow().timestamp())}",
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "status": "active",
+                "patterns": [],
+                "proposals": [proposal],
+                "metrics": {
+                    "total_patterns": 0,
+                    "total_proposals": 1,
+                    "prediction_accuracy": 0.0,
+                    "user_satisfaction": 0.0
+                }
+            }
+
+            with open(session_file, 'w') as f:
+                json.dump(session_data, f, indent=2)
+
+        except Exception as e:
+            logger.error(f"Error generating proposal for {agent_id}: {e}")
+
+    logger.info("✅ Discovery cycle completed")
+```
+
+**Step 9: Commit**
+
+```bash
+git add dashboard/aido/ dashboard/tests/test_aido.py dashboard/daemon.py dashboard/requirements.txt
+git commit -m "feat: add AIDO integration with local LLM support"
+```
+
+---
+
+## Task 15: Ollama Local LLM Setup & Configuration
+
+**Files:**
+- Create: `dashboard/scripts/install-ollama.sh`
+- Create: `dashboard/scripts/test-ollama.sh`
+- Create: `dashboard/config/ollama-models.json`
+- Modify: `dashboard/README.md`
+
+**Step 1: Create Ollama installation script**
+
+Create `dashboard/scripts/install-ollama.sh`:
+
+```bash
+#!/bin/bash
+
+# Ollama Installation Script for AIDO
+
+echo "🦙 Installing Ollama - Local LLM Runtime"
+echo "========================================"
+
+# Detect OS
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OS="linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS="macos"
+else
+    echo "❌ Unsupported OS: $OSTYPE"
+    exit 1
+fi
+
+# Install Ollama
+echo ""
+echo "📦 Installing Ollama..."
+
+if [ "$OS" = "linux" ]; then
+    curl -fsSL https://ollama.ai/install.sh | sh
+elif [ "$OS" = "macos" ]; then
+    echo "Please download Ollama from: https://ollama.ai/download/mac"
+    echo "Or install via Homebrew: brew install ollama"
+    exit 0
+fi
+
+# Wait for Ollama to start
+sleep 3
+
+# Check if Ollama is running
+if ! pgrep -x "ollama" > /dev/null; then
+    echo "🚀 Starting Ollama service..."
+    ollama serve &
+    sleep 5
+fi
+
+# Pull recommended models
+echo ""
+echo "📥 Downloading AI models..."
+echo ""
+
+# Small model for testing (4GB)
+echo "1/3: llama3.1:8b (Fast, 4GB RAM)"
+ollama pull llama3.1:8b
+
+# Medium model for production (40GB)
+echo ""
+echo "2/3: llama3.1:70b (Best quality, 40GB RAM)"
+read -p "Download llama3.1:70b? (requires 40GB+ RAM) [y/N]: " download_70b
+
+if [[ "$download_70b" =~ ^[Yy]$ ]]; then
+    ollama pull llama3.1:70b
+else
+    echo "⏭️  Skipped llama3.1:70b"
+fi
+
+# Coding model (7GB)
+echo ""
+echo "3/3: codellama:13b (Code specialist, 7GB RAM)"
+read -p "Download codellama:13b? [y/N]: " download_code
+
+if [[ "$download_code" =~ ^[Yy]$ ]]; then
+    ollama pull codellama:13b
+else
+    echo "⏭️  Skipped codellama:13b"
+fi
+
+# Test installation
+echo ""
+echo "🧪 Testing Ollama..."
+TEST_RESULT=$(ollama run llama3.1:8b "Say 'Ollama is working!' and nothing else." 2>&1)
+
+if [[ "$TEST_RESULT" == *"Ollama is working!"* ]]; then
+    echo "✅ Ollama installed and working!"
+else
+    echo "❌ Ollama test failed:"
+    echo "$TEST_RESULT"
+    exit 1
+fi
+
+# Show status
+echo ""
+echo "📊 Installed models:"
+ollama list
+
+echo ""
+echo "🎉 Installation complete!"
+echo ""
+echo "Available models:"
+echo "  - llama3.1:8b   → Fast, good for testing (4GB RAM)"
+echo "  - llama3.1:70b  → Best quality (40GB+ RAM)"
+echo "  - codellama:13b → Specialized for code (7GB RAM)"
+echo ""
+echo "Usage:"
+echo "  ollama run llama3.1:8b"
+echo "  ollama serve  # Start API server"
+echo ""
+echo "Default API: http://localhost:11434"
+```
+
+Make executable:
+```bash
+chmod +x dashboard/scripts/install-ollama.sh
+```
+
+**Step 2: Create Ollama test script**
+
+Create `dashboard/scripts/test-ollama.sh`:
+
+```bash
+#!/bin/bash
+
+# Test Ollama Integration with AIDO
+
+echo "🧪 Testing Ollama Integration"
+echo "============================="
+
+# Check if Ollama is running
+if ! curl -s http://localhost:11434/api/tags > /dev/null; then
+    echo "❌ Ollama is not running"
+    echo "Start with: ollama serve"
+    exit 1
+fi
+
+echo "✅ Ollama is running"
+echo ""
+
+# Test with Python
+echo "🐍 Testing Python integration..."
+
+python3 << 'EOF'
+import sys
+import requests
+import json
+
+def test_ollama():
+    try:
+        # Test API connection
+        response = requests.get("http://localhost:11434/api/tags", timeout=5)
+        if response.status_code != 200:
+            print(f"❌ Ollama API error: {response.status_code}")
+            return False
+
+        models = response.json()
+        print(f"✅ Available models: {len(models.get('models', []))}")
+
+        # Test generation
+        payload = {
+            "model": "llama3.1:8b",
+            "prompt": "What is 2+2? Answer with just the number.",
+            "stream": False
+        }
+
+        print("\n🤖 Testing generation...")
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json=payload,
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            answer = result.get("response", "").strip()
+            print(f"Response: {answer}")
+
+            if "4" in answer:
+                print("✅ Generation works correctly!")
+                return True
+            else:
+                print("⚠️  Unexpected response")
+                return False
+        else:
+            print(f"❌ Generation failed: {response.status_code}")
+            return False
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+if __name__ == "__main__":
+    success = test_ollama()
+    sys.exit(0 if success else 1)
+EOF
+
+PYTHON_RESULT=$?
+
+if [ $PYTHON_RESULT -eq 0 ]; then
+    echo ""
+    echo "🎉 All tests passed!"
+    echo ""
+    echo "Ollama is ready for AIDO integration."
+else
+    echo ""
+    echo "❌ Tests failed"
+    exit 1
+fi
+```
+
+Make executable:
+```bash
+chmod +x dashboard/scripts/test-ollama.sh
+```
+
+**Step 3: Create model configuration**
+
+Create `dashboard/config/ollama-models.json`:
+
+```json
+{
+  "models": {
+    "development": {
+      "name": "llama3.1:8b",
+      "description": "Fast model for development and testing",
+      "ram_required_gb": 8,
+      "speed": "fast",
+      "quality": "good"
+    },
+    "production": {
+      "name": "llama3.1:70b",
+      "description": "High-quality model for production use",
+      "ram_required_gb": 48,
+      "speed": "slow",
+      "quality": "excellent"
+    },
+    "coding": {
+      "name": "codellama:13b",
+      "description": "Specialized model for code generation",
+      "ram_required_gb": 8,
+      "speed": "medium",
+      "quality": "very good"
+    }
+  },
+  "recommended": {
+    "low_memory": "llama3.1:8b",
+    "balanced": "llama3.1:8b",
+    "high_quality": "llama3.1:70b"
+  },
+  "api": {
+    "host": "http://localhost:11434",
+    "timeout_seconds": 120,
+    "max_retries": 3
+  }
+}
+```
+
+**Step 4: Update README with Ollama setup**
+
+Modify `dashboard/README.md`, add section after "Quick Start":
+
+```markdown
+## 🦙 Local LLM Setup (Ollama)
+
+AIDO uses Ollama for local, private, cost-free AI agent execution.
+
+### Installation
+
+**Option 1: Automated Script**
+```bash
+./scripts/install-ollama.sh
+```
+
+**Option 2: Manual Installation**
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.ai/install.sh | sh
+```
+
+**macOS:**
+```bash
+brew install ollama
+# OR download from https://ollama.ai/download/mac
+```
+
+**Windows:**
+Download from https://ollama.ai/download/windows
+
+### Model Selection
+
+**Development (8GB RAM):**
+```bash
+ollama pull llama3.1:8b
+```
+- Fast inference (~2-5 tokens/sec)
+- Good for testing and prototyping
+- Handles most agent tasks
+
+**Production (48GB+ RAM):**
+```bash
+ollama pull llama3.1:70b
+```
+- Best quality outputs
+- Slower inference (~0.5-1 token/sec)
+- Recommended for important decisions
+
+**Code Specialist (8GB RAM):**
+```bash
+ollama pull codellama:13b
+```
+- Optimized for code generation
+- Good for technical agents (CTO)
+
+### Starting Ollama
+
+**Start server:**
+```bash
+ollama serve
+```
+
+**Test connection:**
+```bash
+./scripts/test-ollama.sh
+```
+
+### Configuration
+
+Edit `config/ceo-config.json`:
+
+```json
+{
+  "llm": {
+    "provider": "ollama",
+    "model": "llama3.1:8b",
+    "host": "http://localhost:11434",
+    "fallback_to_claude": false
+  }
+}
+```
+
+### AIDO with Ollama
+
+The daemon automatically detects Ollama:
+
+```python
+# Tries Ollama first (free, private)
+llm_provider = OllamaProvider(model="llama3.1:70b")
+
+# Falls back to Claude API if Ollama unavailable
+# (set ANTHROPIC_API_KEY environment variable)
+```
+
+### Performance Tips
+
+**Optimize for your hardware:**
+
+- **8-16GB RAM**: Use `llama3.1:8b`
+- **32GB RAM**: Use `llama3.1:70b` or run multiple 8b models
+- **64GB+ RAM**: Use `llama3.1:70b` for best results
+
+**GPU Acceleration:**
+Ollama automatically uses GPU if available (NVIDIA, AMD, Metal)
+
+**Monitoring:**
+```bash
+# Check running models
+ollama ps
+
+# View logs
+ollama logs
+
+# Monitor resources
+htop  # or Task Manager on Windows
+```
+
+### Troubleshooting
+
+**Ollama not responding:**
+```bash
+# Restart Ollama
+pkill ollama
+ollama serve
+
+# Check port
+curl http://localhost:11434/api/tags
+```
+
+**Out of memory:**
+```bash
+# Use smaller model
+ollama pull llama3.1:8b
+
+# Or increase swap (Linux)
+sudo swapon --show
+```
+
+**Slow generation:**
+- Ensure GPU drivers installed
+- Check `ollama ps` for CPU vs GPU usage
+- Consider smaller model for faster responses
+```
+
+**Step 5: Test installation**
+
+Run installation:
+```bash
+cd dashboard
+./scripts/install-ollama.sh
+```
+
+Expected output:
+- Ollama installed
+- llama3.1:8b downloaded
+- Test passes: "Ollama is working!"
+
+Test integration:
+```bash
+cd dashboard
+./scripts/test-ollama.sh
+```
+
+Expected:
+- ✅ Ollama is running
+- ✅ Available models: 1 (or more)
+- ✅ Generation works correctly!
+
+**Step 6: Commit**
+
+```bash
+git add dashboard/scripts/install-ollama.sh dashboard/scripts/test-ollama.sh dashboard/config/ollama-models.json dashboard/README.md
+git commit -m "feat: add Ollama local LLM setup and configuration"
+```
+
+---
+
 ## Task 10: Merge & Cleanup (UPDATED)
 
 **Files:**
@@ -2579,6 +3567,8 @@ git branch -d feature/ceo-dashboard-integration
 - [x] Task 11: State persistence system
 - [x] Task 12: Daemon with auto-resume
 - [x] Task 13: systemd/PM2 auto-start
+- [x] Task 14: AIDO integration (selbstlernend)
+- [x] Task 15: Ollama local LLM setup
 
 ## Success Criteria
 
@@ -2597,6 +3587,14 @@ git branch -d feature/ceo-dashboard-integration
 ✅ Works across system reboots
 ✅ Auto-start with systemd or PM2
 
+### AIDO Selbstlernende Organisation
+✅ Ollama local LLM running
+✅ Agent personalities loaded from .md files
+✅ Proposals generated with LLM
+✅ Evaluations with multi-agent consensus
+✅ Becoin cost/ROI calculations
+✅ Learns from project feedback
+
 ### Testing & Quality
 ✅ All tests passing (15+ unit + integration)
 ✅ Auto-resume tested with mock states
@@ -2606,9 +3604,9 @@ git branch -d feature/ceo-dashboard-integration
 
 ---
 
-**Implementation Time Estimate:** 6-8 hours (bite-sized tasks, 2-5 minutes each)
-**Complexity:** Moderate-High (full-stack + daemon + auto-start)
-**Risk:** Low-Medium (read-only observer, state persistence adds complexity)
+**Implementation Time Estimate:** 8-12 hours (bite-sized tasks, 2-5 minutes each)
+**Complexity:** High (full-stack + daemon + auto-start + AIDO + local LLM)
+**Risk:** Medium (state persistence + LLM integration adds complexity)
 
 ## Key Autonomy Features
 
@@ -2620,6 +3618,15 @@ git branch -d feature/ceo-dashboard-integration
 - ✅ Discovery Cycles laufen automatisch alle 24h
 - ✅ Bei Crash/Reboot: automatischer Neustart und Resume
 - ✅ Keine manuelle Intervention nötig
+
+🧠 **AIDO Selbstlernende Organisation:**
+- ✅ Lokales LLM (Ollama) - kostenlos, privat, 24/7
+- ✅ Agent Persönlichkeiten aus founders/*.md geladen
+- ✅ CEO, CTO, CDO generieren automatisch Proposals
+- ✅ Multi-Agent Evaluation & Consensus
+- ✅ Wirtschaftlich klug: ROI-basierte Entscheidungen
+- ✅ Lernt aus Feedback (Reinforcement Learning)
+- ✅ Pattern Recognition & Kontinuierliche Verbesserung
 
 **Datenspeicherung:**
 ```
