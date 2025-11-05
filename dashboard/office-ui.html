@@ -825,11 +825,142 @@
             office.appendChild(console);
         }
 
+        // CEO Discovery Integration
+        const CEO_API_BASE = 'http://localhost:3000/api';
+        const WS_URL = 'ws://localhost:3000/ws/ceo';
+        let ws = null;
+
+        // Update CEO Discovery data
+        async function updateCEODiscovery() {
+            try {
+                // Fetch status
+                const statusRes = await fetch(`${CEO_API_BASE}/ceo/status`);
+                const status = await statusRes.json();
+
+                // Update status card
+                document.getElementById('ceo-session-id').textContent = status.session_id || 'None';
+                document.getElementById('ceo-patterns-count').textContent = status.patterns?.length || 0;
+                document.getElementById('ceo-proposals-count').textContent = status.proposals?.length || 0;
+
+                const badge = document.getElementById('ceo-status-badge');
+                badge.textContent = status.status.toUpperCase();
+                badge.className = `ceo-status-badge ${status.status}`;
+
+                // Fetch proposals
+                const proposalsRes = await fetch(`${CEO_API_BASE}/ceo/proposals?min_roi=0&limit=5`);
+                const proposals = await proposalsRes.json();
+                renderProposalsList(proposals);
+
+                // Fetch patterns
+                const patternsRes = await fetch(`${CEO_API_BASE}/ceo/patterns`);
+                const patterns = await patternsRes.json();
+                renderPatternsList(patterns);
+
+                // Performance placeholders (endpoint doesn't exist yet)
+                document.getElementById('ceo-prediction-accuracy').textContent = '0%';
+                document.getElementById('ceo-user-satisfaction').textContent = '0%';
+
+            } catch (error) {
+                console.error('Error updating CEO Discovery data:', error);
+            }
+        }
+
+        // Render proposals
+        function renderProposalsList(proposals) {
+            const container = document.getElementById('ceo-proposals-list');
+
+            if (proposals.length === 0) {
+                container.innerHTML = '<p style="color: #888; font-size: 10px;">No proposals generated yet.</p>';
+                return;
+            }
+
+            container.innerHTML = proposals.map(p => `
+                <div class="proposal-item">
+                    <h4>${p.title}</h4>
+                    <p style="color: #888; font-size: 10px;">${p.description}</p>
+                    <div class="proposal-meta">
+                        <span>💰 ${p.cost_becoins} Bc</span>
+                        <span>📈 ROI: ${p.roi.toFixed(1)}x</span>
+                        <span>🎯 Impact: ${p.impact_score}/100</span>
+                        <span>⏱️ ${p.time_saved_minutes_per_week}min/week</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render patterns
+        function renderPatternsList(patterns) {
+            const container = document.getElementById('ceo-patterns-list');
+
+            if (patterns.length === 0) {
+                container.innerHTML = '<p style="color: #888; font-size: 10px;">No patterns identified yet.</p>';
+                return;
+            }
+
+            container.innerHTML = patterns.map(p => `
+                <div class="pattern-item">
+                    <h4>${p.type.toUpperCase()}: ${p.description}</h4>
+                    <div class="pattern-meta">
+                        <span>Frequency: ${p.frequency}</span>
+                        <span>Severity: ${(p.severity * 100).toFixed(0)}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // WebSocket connection for real-time updates
+        function connectCEOWebSocket() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected to CEO Discovery');
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+
+                if (data.type === 'new_proposal') {
+                    showNotification('New proposal generated!');
+                    updateCEODiscovery();
+                } else if (data.type === 'pattern_discovered') {
+                    showNotification('New pattern identified!');
+                    updateCEODiscovery();
+                } else if (data.type === 'status_change') {
+                    updateCEODiscovery();
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, using polling fallback');
+                // Fallback to polling continues via setInterval
+            };
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification pixel-text';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
         // Auto-refresh every 2 seconds for real-time feel
         setInterval(loadData, 2000);
+        setInterval(updateCEODiscovery, 3000); // CEO Discovery polling (3s baseline)
 
         // Initial load
         loadData();
+        updateCEODiscovery();
+        connectCEOWebSocket();
     </script>
 </body>
 </html>
