@@ -17,6 +17,8 @@ prevents catastrophic overspending.
 - **Stress-tested safety rails** – randomized burn/payroll scenarios ensure the
   treasury never silently drops below zero and that hand-offs between components are
   verified by unit tests.
+- **Autonomous agents** – self-executing AI agents powered by local LLMs (Ollama) and
+  51 specialized personalities that can implement entire feature plans autonomously.
 
 ## 🧱 Architecture Overview
 
@@ -54,6 +56,10 @@ prevents catastrophic overspending.
 | `dashboard/websocket_manager.py` | Manages WebSocket clients for live updates. |
 | `dashboard/tests/` | API, WebSocket, and data bridge tests. |
 | `becoin_economy/tests/` | Engine, exporter, and stress simulation tests. |
+| `autonomous_agents/` | Autonomous execution system with local LLMs and specialized agents. |
+| `autonomous_agents/orchestrator.py` | Main orchestrator that executes implementation plans autonomously. |
+| `autonomous_agents/personalities/` | Loads 51 specialized agent personalities from Agency_of_Agents. |
+| `docs/plans/` | Implementation plans in markdown format for autonomous execution. |
 
 ## 🧪 Testing & Quality Gates
 
@@ -94,8 +100,40 @@ pytest
    python3 -m http.server 8080
    ```
 
-4. Open `http://localhost:8080/dashboard/office-ui.html` and watch the BeCoin office
+4. Open `http://localhost:9001/dashboard/office-ui.html` and watch the BeCoin office
    in action. The page polls the FastAPI endpoints and listens for WebSocket events.
+
+## 🤖 Autonomous Agents
+
+The project includes an autonomous execution system that can implement entire feature
+plans independently using local LLMs and specialized agent personalities.
+
+### Quick Start
+
+```bash
+# One-click setup (installs Ollama, downloads Qwen2.5-Coder 7B, loads 51 agent personalities)
+./autonomous_agents/setup_autonomous_agents.sh
+
+# Execute a plan with dry-run (shows what would happen without executing)
+python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md --dry-run
+
+# Execute a plan autonomously
+python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md
+
+# Monitor progress in real-time (separate terminal)
+python3 autonomous_agents/monitor.py -f
+```
+
+### Key Features
+
+- **51 Specialized Agents**: Frontend, Backend, AI/ML, DevOps, Testing, Design, Marketing, etc.
+- **Local LLM**: Runs Qwen2.5-Coder 7B via Ollama (no API keys needed)
+- **Plan-Based Execution**: Reads markdown implementation plans from `docs/plans/`
+- **Automatic Code Generation**: Generates and applies code changes to files
+- **Real-Time Monitoring**: Track execution progress with live log monitoring
+- **Task Routing**: Automatically assigns tasks to appropriate specialized agents
+
+See `autonomous_agents/README.md` for complete documentation.
 
 ## 🛠️ Generating Dashboard Payloads
 
