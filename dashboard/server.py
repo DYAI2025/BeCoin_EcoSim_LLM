@@ -4,12 +4,16 @@ CEO Discovery Dashboard - FastAPI Server
 This server provides REST and WebSocket APIs for the CEO Discovery Dashboard.
 It integrates with the Becoin Economy system and supports autonomous agent operations.
 """
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 import logging
+import os
+import secrets
 
 logger = logging.getLogger(__name__)
+security = HTTPBasic()
 
 try:
     from dashboard import __version__
@@ -20,6 +24,45 @@ except ModuleNotFoundError:
     __version__ = "1.0.0"
     from ceo_data_bridge import CEODataBridge
     from websocket_manager import WebSocketManager
+
+# Load authentication credentials from environment
+AUTH_USERNAME = os.getenv("AUTH_USERNAME", "")
+AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "")
+AUTH_ENABLED = bool(AUTH_USERNAME and AUTH_PASSWORD)
+
+if not AUTH_ENABLED:
+    logger.warning("⚠️  Authentication is DISABLED. Set AUTH_USERNAME and AUTH_PASSWORD environment variables to enable security.")
+else:
+    logger.info("✓ Authentication is ENABLED")
+
+
+def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) -> str:
+    """
+    Verify HTTP Basic Auth credentials.
+
+    Returns the username if valid, raises HTTPException if invalid.
+    """
+    if not AUTH_ENABLED:
+        return "anonymous"
+
+    # Use constant-time comparison to prevent timing attacks
+    username_correct = secrets.compare_digest(
+        credentials.username.encode("utf8"),
+        AUTH_USERNAME.encode("utf8")
+    )
+    password_correct = secrets.compare_digest(
+        credentials.password.encode("utf8"),
+        AUTH_PASSWORD.encode("utf8")
+    )
+
+    if not (username_correct and password_correct):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+    return credentials.username
 
 
 # Initialize FastAPI app
@@ -67,7 +110,7 @@ async def health_check():
 # CEO Discovery Endpoints
 
 @app.get("/api/ceo/status")
-async def get_ceo_status():
+async def get_ceo_status(username: str = Depends(verify_credentials)):
     """Get current CEO Discovery session status."""
     return ceo_bridge.get_current_session()
 
@@ -75,7 +118,8 @@ async def get_ceo_status():
 @app.get("/api/ceo/proposals")
 async def get_proposals(
     min_roi: float = Query(0.0, description="Minimum ROI threshold"),
-    limit: int = Query(10, description="Maximum number of proposals")
+    limit: int = Query(10, description="Maximum number of proposals"),
+    username: str = Depends(verify_credentials)
 ):
     """Get CEO Discovery proposals with optional filtering."""
     return ceo_bridge.get_proposals(min_roi=min_roi, limit=limit)
@@ -83,21 +127,23 @@ async def get_proposals(
 
 @app.get("/api/ceo/patterns")
 async def get_patterns(
-    type: Optional[str] = Query(None, description="Filter by pattern type (repetitive, error, bottleneck, workflow)")
+    type: Optional[str] = Query(None, description="Filter by pattern type (repetitive, error, bottleneck, workflow)"),
+    username: str = Depends(verify_credentials)
 ):
     """Get identified patterns, optionally filtered by type."""
     return ceo_bridge.get_patterns(pattern_type=type)
 
 
 @app.get("/api/ceo/pain-points")
-async def get_pain_points():
+async def get_pain_points(username: str = Depends(verify_credentials)):
     """Get all identified pain points."""
     return ceo_bridge.get_pain_points()
 
 
 @app.get("/api/ceo/history")
 async def get_history(
-    limit: int = Query(10, description="Maximum number of sessions to return")
+    limit: int = Query(10, description="Maximum number of sessions to return"),
+    username: str = Depends(verify_credentials)
 ):
     """Get historical discovery sessions."""
     return ceo_bridge.get_history(limit=limit)
