@@ -1,0 +1,41 @@
+# fly.toml app configuration file generated for becoin-ecosystem
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+
+app = "becoin-ecosystem"
+primary_region = "iad"
+
+[build]
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/status"
+
+[env]
+  PORT = "3000"
+  HOST = "0.0.0.0"
+  PYTHONUNBUFFERED = "1"
+
+# Secrets to be set via: fly secrets set AUTH_USERNAME=your_username AUTH_PASSWORD=your_password
+# Required secrets:
+#   - AUTH_USERNAME: Username for HTTP Basic Auth
+#   - AUTH_PASSWORD: Password for HTTP Basic Auth
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+[mounts]
+  source = "becoin_data"
+  destination = "/app/.claude-flow"
