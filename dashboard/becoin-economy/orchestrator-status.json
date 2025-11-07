@@ -1,0 +1,83 @@
+{
+  "lastUpdate": "2025-11-07T11:42:21Z",
+  "agents": [
+    {
+      "id": "agent-001",
+      "name": "Frontend Developer",
+      "role": "Frontend",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-002",
+      "name": "Backend Architect",
+      "role": "Backend",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-003",
+      "name": "AI Engineer",
+      "role": "AI/ML",
+      "status": "idle",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-004",
+      "name": "DevOps Automator",
+      "role": "DevOps",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    }
+  ],
+  "treasury": {
+    "balance": 8140.0,
+    "metrics": {
+      "burnRate": 5.0,
+      "runwayHours": 1628.0,
+      "profitMargin": -100.0
+    }
+  },
+  "activeProjects": [
+    {
+      "id": "proj-001",
+      "name": "Dashboard Redesign",
+      "stage": "active",
+      "value": 3000,
+      "impactScore": 85,
+      "team": [
+        "agent-001"
+      ]
+    },
+    {
+      "id": "proj-003",
+      "name": "CI/CD Pipeline",
+      "stage": "active",
+      "value": 2700,
+      "impactScore": 78,
+      "team": [
+        "agent-004"
+      ]
+    }
+  ]
+}

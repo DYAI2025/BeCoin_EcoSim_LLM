@@ -1,0 +1,53 @@
+{
+  "founders": [
+    {
+      "id": "agent-001",
+      "name": "Frontend Developer",
+      "role": "Frontend",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-002",
+      "name": "Backend Architect",
+      "role": "Backend",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-003",
+      "name": "AI Engineer",
+      "role": "AI/ML",
+      "status": "idle",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    },
+    {
+      "id": "agent-004",
+      "name": "DevOps Automator",
+      "role": "DevOps",
+      "status": "active",
+      "equityShare": 0.25,
+      "current_task": null,
+      "performance": {
+        "becoinEarned": 0.0,
+        "projectsCompleted": 0
+      }
+    }
+  ],
+  "employees": []
+}

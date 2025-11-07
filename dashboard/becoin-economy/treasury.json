@@ -1,0 +1,41 @@
+{
+  "balance": 8140.0,
+  "startCapital": 10000,
+  "metrics": {
+    "burnRate": 5.0,
+    "runwayHours": 1628.0,
+    "profitMargin": -100.0
+  },
+  "transactions": [
+    {
+      "timestamp": "2025-11-07T11:42:11Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T11:42:16Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T11:42:21Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    }
+  ]
+}

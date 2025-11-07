@@ -7,10 +7,13 @@ It integrates with the Becoin Economy system and supports autonomous agent opera
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Optional
 import logging
 import os
 import secrets
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 security = HTTPBasic()
@@ -85,16 +88,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Get the dashboard directory path
+DASHBOARD_DIR = Path(__file__).parent
+STATIC_DIR = DASHBOARD_DIR / "becoin-economy"
 
-@app.get("/")
+# Mount static files directory if it exists
+if STATIC_DIR.exists():
+    app.mount("/becoin-economy", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    """Root endpoint - provides service information."""
-    return {
-        "message": "CEO Discovery Dashboard API",
-        "version": __version__,
-        "service": "ceo-discovery-dashboard",
-        "status": "operational"
-    }
+    """Serve the main dashboard HTML page."""
+    html_file = DASHBOARD_DIR / "office-ui.html"
+    if html_file.exists():
+        return FileResponse(html_file)
+    else:
+        return {
+            "message": "CEO Discovery Dashboard API",
+            "version": __version__,
+            "service": "ceo-discovery-dashboard",
+            "status": "operational"
+        }
 
 
 @app.get("/api/status")

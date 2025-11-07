@@ -1,0 +1,20 @@
+[Unit]
+Description=BeCoin Autonomous Economy Simulation
+After=network.target
+
+[Service]
+Type=simple
+User=dyai
+WorkingDirectory=/home/dyai/Dokumente/DYAI_home/DEV/AI_LLM/Ecosystem BeCoin/BeCoin_EcoSim_LLM
+ExecStart=/bin/bash /home/dyai/Dokumente/DYAI_home/DEV/AI_LLM/Ecosystem BeCoin/BeCoin_EcoSim_LLM/autonomous_startup.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment
+Environment="PYTHONUNBUFFERED=1"
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,46 @@
+{
+  "active": [
+    {
+      "id": "proj-001",
+      "name": "Dashboard Redesign",
+      "stage": "active",
+      "value": 3000,
+      "impactScore": 85,
+      "team": [
+        "agent-001"
+      ]
+    },
+    {
+      "id": "proj-003",
+      "name": "CI/CD Pipeline",
+      "stage": "active",
+      "value": 2700,
+      "impactScore": 78,
+      "team": [
+        "agent-004"
+      ]
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "proj-004",
+      "name": "LLM Integration",
+      "stage": "pipeline",
+      "value": 4000,
+      "impactScore": 95,
+      "team": []
+    }
+  ],
+  "completed": [
+    {
+      "id": "proj-002",
+      "name": "API Integration",
+      "stage": "completed",
+      "value": 2500,
+      "impactScore": 92,
+      "team": [
+        "agent-002"
+      ]
+    }
+  ]
+}
