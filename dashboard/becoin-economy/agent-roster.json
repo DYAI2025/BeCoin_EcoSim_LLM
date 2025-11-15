@@ -1,51 +1,75 @@
 {
   "founders": [
     {
-      "id": "agent-001",
-      "name": "Frontend Developer",
-      "role": "Frontend",
-      "status": "active",
+      "id": "agent-helio",
+      "name": "Helios Growth",
+      "agent_type": "Chief Expansion Agent",
+      "role": "Growth & Customer Success",
+      "status": "ACTIVE",
+      "activity": "Verhandelt Ausbauplan mit dem Erstkunden",
+      "instance": "Holistic.Matrix.Pod-Alpha",
+      "focus_keys": ["Vertrieb", "Expansion", "Customer Review"],
+      "current_task": "Review-Agenda für IDEA-003 finalisieren",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Mindestens 35% Profit sichern"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 950,
+        "projectsCompleted": 2
       }
     },
     {
-      "id": "agent-002",
-      "name": "Backend Architect",
-      "role": "Backend",
-      "status": "active",
+      "id": "agent-nami",
+      "name": "Nami Build",
+      "agent_type": "Lead Builder",
+      "role": "Produkt & Auslieferung",
+      "status": "BUILDING",
+      "activity": "Implementiert IDEA-002 für produktive Nutzung",
+      "instance": "Matrix.Build.Cell-Beta",
+      "focus_keys": ["Delivery", "Qualität", "Automation"],
+      "current_task": "API-Schicht für Abrechnung deployen",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Nur freigegebene Ideen bauen"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 820,
+        "projectsCompleted": 1
       }
     },
     {
-      "id": "agent-003",
-      "name": "AI Engineer",
-      "role": "AI/ML",
-      "status": "idle",
+      "id": "agent-atlas",
+      "name": "Atlas Treasury",
+      "agent_type": "Finance Steward",
+      "role": "Finanzen & Risikosteuerung",
+      "status": "ACTIVE",
+      "activity": "Steuert Treasury und Burn-Rate für Expansion",
+      "instance": "Holistic.Finance.Stack",
+      "focus_keys": ["Treasury", "Profit", "Runway"],
+      "current_task": "Rebalancing nach Zahlung des Erstkunden",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Liquidität > 45 Tage sicherstellen"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 1040,
+        "projectsCompleted": 3
       }
     },
     {
-      "id": "agent-004",
-      "name": "DevOps Automator",
-      "role": "DevOps",
-      "status": "active",
+      "id": "agent-circe",
+      "name": "Circe Ops",
+      "agent_type": "Operations Orchestrator",
+      "role": "Ops & QA",
+      "status": "REVIEW",
+      "activity": "Bereitet Abnahme-Review mit dem Kunden vor",
+      "instance": "Holistic.Ops.Hub",
+      "focus_keys": ["QA", "Review", "Customer Support"],
+      "current_task": "Abnahmelog für IDEA-001 aktualisieren",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Keine Demos – nur produktive Übergaben"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 1050,
+        "projectsCompleted": 2
       }
     }
   ],

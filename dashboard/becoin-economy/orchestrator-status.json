@@ -1,83 +1,139 @@
 {
-  "lastUpdate": "2025-11-07T11:42:21Z",
+  "lastUpdate": "2025-01-12T10:30:00Z",
+  "treasury": {
+    "balance": 5120.0,
+    "metrics": {
+      "burnRate": 98.0,
+      "runwayHours": 52.2,
+      "profitMargin": 34.0,
+      "totalRevenue": 1800.0
+    }
+  },
+  "customer": {
+    "id": "cust-001",
+    "name": "Founding Customer (You)",
+    "status": "ACTIVE"
+  },
   "agents": [
     {
-      "id": "agent-001",
-      "name": "Frontend Developer",
-      "role": "Frontend",
-      "status": "active",
+      "id": "agent-helio",
+      "name": "Helios Growth",
+      "agent_type": "Chief Expansion Agent",
+      "role": "Growth & Customer Success",
+      "status": "ACTIVE",
+      "activity": "Verhandelt Ausbauplan mit dem Erstkunden",
+      "instance": "Holistic.Matrix.Pod-Alpha",
+      "focus_keys": ["Vertrieb", "Expansion", "Customer Review"],
+      "current_task": "Review-Agenda für IDEA-003 finalisieren",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Mindestens 35% Profit sichern"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 950,
+        "projectsCompleted": 2
       }
     },
     {
-      "id": "agent-002",
-      "name": "Backend Architect",
-      "role": "Backend",
-      "status": "active",
+      "id": "agent-nami",
+      "name": "Nami Build",
+      "agent_type": "Lead Builder",
+      "role": "Produkt & Auslieferung",
+      "status": "BUILDING",
+      "activity": "Implementiert IDEA-002 für produktive Nutzung",
+      "instance": "Matrix.Build.Cell-Beta",
+      "focus_keys": ["Delivery", "Qualität", "Automation"],
+      "current_task": "API-Schicht für Abrechnung deployen",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Nur freigegebene Ideen bauen"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 820,
+        "projectsCompleted": 1
       }
     },
     {
-      "id": "agent-003",
-      "name": "AI Engineer",
-      "role": "AI/ML",
-      "status": "idle",
+      "id": "agent-atlas",
+      "name": "Atlas Treasury",
+      "agent_type": "Finance Steward",
+      "role": "Finanzen & Risikosteuerung",
+      "status": "ACTIVE",
+      "activity": "Steuert Treasury und Burn-Rate für Expansion",
+      "instance": "Holistic.Finance.Stack",
+      "focus_keys": ["Treasury", "Profit", "Runway"],
+      "current_task": "Rebalancing nach Zahlung des Erstkunden",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Liquidität > 45 Tage sicherstellen"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 1040,
+        "projectsCompleted": 3
       }
     },
     {
-      "id": "agent-004",
-      "name": "DevOps Automator",
-      "role": "DevOps",
-      "status": "active",
+      "id": "agent-circe",
+      "name": "Circe Ops",
+      "agent_type": "Operations Orchestrator",
+      "role": "Ops & QA",
+      "status": "REVIEW",
+      "activity": "Bereitet Abnahme-Review mit dem Kunden vor",
+      "instance": "Holistic.Ops.Hub",
+      "focus_keys": ["QA", "Review", "Customer Support"],
+      "current_task": "Abnahmelog für IDEA-001 aktualisieren",
       "equityShare": 0.25,
-      "current_task": null,
+      "autonomy": "VOLL",
+      "guardrails": {"finance": "Keine Demos – nur produktive Übergaben"},
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 1050,
+        "projectsCompleted": 2
       }
     }
   ],
-  "treasury": {
-    "balance": 8140.0,
-    "metrics": {
-      "burnRate": 5.0,
-      "runwayHours": 1628.0,
-      "profitMargin": -100.0
-    }
+  "projects": {
+    "active": [
+      {
+        "id": "IDEA-002",
+        "name": "Build: Automatisierte Abrechnungsschicht",
+        "stage": "active",
+        "value": 2200,
+        "impactScore": 82,
+        "roi": 185,
+        "customer": "Founding Customer (You)",
+        "team": ["agent-nami", "agent-atlas"]
+      }
+    ],
+    "pipeline": [
+      {
+        "id": "IDEA-003",
+        "name": "Review: Founder Insights Dashboard",
+        "stage": "pipeline",
+        "value": 1500,
+        "impactScore": 88,
+        "roi": 160,
+        "customer": "Founding Customer (You)",
+        "team": ["agent-helio", "agent-circe"]
+      }
+    ],
+    "completed": [
+      {
+        "id": "IDEA-001",
+        "name": "Go-Live: Onboarding Automation",
+        "stage": "completed",
+        "value": 1800,
+        "impactScore": 92,
+        "roi": 140,
+        "customer": "Founding Customer (You)",
+        "team": ["agent-nami", "agent-circe"]
+      }
+    ]
   },
-  "activeProjects": [
-    {
-      "id": "proj-001",
-      "name": "Dashboard Redesign",
-      "stage": "active",
-      "value": 3000,
-      "impactScore": 85,
-      "team": [
-        "agent-001"
-      ]
-    },
-    {
-      "id": "proj-003",
-      "name": "CI/CD Pipeline",
-      "stage": "active",
-      "value": 2700,
-      "impactScore": 78,
-      "team": [
-        "agent-004"
-      ]
-    }
-  ]
+  "organizationalDesign": {
+    "coreModel": "Holistische Matrix mit autonomen Pods und Finanz-Governance",
+    "structures": [
+      {"name": "Holistic Growth Pod", "focus": "Direkter Kundenkontakt & Upsell"},
+      {"name": "Matrix Build Cell", "focus": "Feature-Umsetzung mit Review-Schleifen"},
+      {"name": "Finance Guard Squad", "focus": "Profitsteuerung & Treasury"}
+    ],
+    "governance": "Autonome Agenten entscheiden innerhalb Profit-Grenzen, tägliche Review mit dem Kunden.",
+    "scalingNorthStar": "3 neue zahlende Kunden pro Quartal durch ausgelieferte Ideen."
+  }
 }

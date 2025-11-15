@@ -1,0 +1,52 @@
+{
+  "customer": {
+    "id": "cust-001",
+    "name": "Founding Customer (You)",
+    "relationship": "Direkte Partnerschaft",
+    "negotiationWindow": "Offener Pitch-Slot 09:00-11:00 CET",
+    "nextReview": "Heute 18:00 CET",
+    "status": "ACTIVE"
+  },
+  "dealTerms": {
+    "tokenRate": 450,
+    "paymentCadence": "Per accepted build",
+    "acceptanceRule": "Nur vollständig ausgelieferte Ideen werden bezahlt."
+  },
+  "currencyReserve": {
+    "availableTokens": 3200,
+    "lockedForIdeas": 1450,
+    "circulation": 870
+  },
+  "ideaPipeline": [
+    {
+      "id": "IDEA-002",
+      "title": "Automatisierte Abrechnungsschicht",
+      "status": "BUILDING",
+      "roi": 185,
+      "tokenBudget": 950,
+      "owner": "agent-nami",
+      "leadAgent": "Nami Build",
+      "customerValue": "Reduziert manuelle Rechnungszeit und ermöglicht skalierbare Abwicklung."
+    },
+    {
+      "id": "IDEA-003",
+      "title": "Founder Insights Dashboard",
+      "status": "REVIEW",
+      "roi": 160,
+      "tokenBudget": 500,
+      "owner": "agent-helio",
+      "leadAgent": "Helios Growth",
+      "customerValue": "Bereitet Entscheidungsgrundlagen für nächste Investitionsrunde vor."
+    },
+    {
+      "id": "IDEA-001",
+      "title": "Onboarding Automation Live",
+      "status": "ACCEPTED",
+      "roi": 140,
+      "tokenBudget": 0,
+      "owner": "agent-circe",
+      "leadAgent": "Circe Ops",
+      "customerValue": "Lieferte 60% Zeitersparnis und läuft produktiv."
+    }
+  ]
+}

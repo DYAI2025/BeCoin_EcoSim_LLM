@@ -1,46 +1,38 @@
 {
   "active": [
     {
-      "id": "proj-001",
-      "name": "Dashboard Redesign",
+      "id": "IDEA-002",
+      "name": "Build: Automatisierte Abrechnungsschicht",
       "stage": "active",
-      "value": 3000,
-      "impactScore": 85,
-      "team": [
-        "agent-001"
-      ]
-    },
-    {
-      "id": "proj-003",
-      "name": "CI/CD Pipeline",
-      "stage": "active",
-      "value": 2700,
-      "impactScore": 78,
-      "team": [
-        "agent-004"
-      ]
+      "value": 2200,
+      "impactScore": 82,
+      "roi": 185,
+      "customer": "Founding Customer (You)",
+      "team": ["agent-nami", "agent-atlas"]
     }
   ],
   "pipeline": [
     {
-      "id": "proj-004",
-      "name": "LLM Integration",
+      "id": "IDEA-003",
+      "name": "Review: Founder Insights Dashboard",
       "stage": "pipeline",
-      "value": 4000,
-      "impactScore": 95,
-      "team": []
+      "value": 1500,
+      "impactScore": 88,
+      "roi": 160,
+      "customer": "Founding Customer (You)",
+      "team": ["agent-helio", "agent-circe"]
     }
   ],
   "completed": [
     {
-      "id": "proj-002",
-      "name": "API Integration",
+      "id": "IDEA-001",
+      "name": "Go-Live: Onboarding Automation",
       "stage": "completed",
-      "value": 2500,
+      "value": 1800,
       "impactScore": 92,
-      "team": [
-        "agent-002"
-      ]
+      "roi": 140,
+      "customer": "Founding Customer (You)",
+      "team": ["agent-nami", "agent-circe"]
     }
   ]
 }
