@@ -67,6 +67,122 @@
             font-weight: bold;
         }
 
+        /* Customer Exchange */
+        #customer-exchange {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 20px 0 20px;
+        }
+
+        .exchange-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .exchange-header h2 {
+            font-size: 18px;
+            color: #00ff88;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        .customer-badge {
+            background: #0f3460;
+            border: 3px solid #00ff88;
+            padding: 10px 15px;
+            font-size: 10px;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0 #000;
+        }
+
+        .exchange-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .exchange-card {
+            background: #16213e;
+            border: 4px solid #0f3460;
+            box-shadow: 5px 5px 0 #000;
+            padding: 20px;
+            min-height: 180px;
+        }
+
+        .exchange-card h3 {
+            font-size: 14px;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .exchange-stat {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .exchange-stat-label {
+            color: #888;
+        }
+
+        .exchange-stat-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .idea-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .idea-item {
+            background: #0f3460;
+            border-left: 4px solid #00ff88;
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        .idea-item .idea-title {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+
+        .idea-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: #888;
+            font-size: 10px;
+        }
+
+        .idea-status {
+            padding: 3px 6px;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0 #000;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .idea-status.BUILDING {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .idea-status.REVIEW {
+            background: #ffaa00;
+            color: #000;
+        }
+
+        .idea-status.ACCEPTED {
+            background: #00b2ff;
+            color: #000;
+        }
+
         /* Office Layout */
         .office {
             display: grid;
@@ -129,6 +245,60 @@
         .agent-role {
             font-size: 10px;
             color: #888;
+        }
+
+        .agent-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 10px 0 0 0;
+        }
+
+        .meta-block {
+            background: #0f3460;
+            padding: 8px;
+            border: 2px solid #000;
+            font-size: 10px;
+        }
+
+        .meta-label {
+            color: #888;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .agent-tags {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .agent-tag {
+            background: #00ff88;
+            color: #000;
+            border: 2px solid #000;
+            padding: 4px 6px;
+            font-size: 9px;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .agent-tag.muted {
+            background: #444;
+            color: #ccc;
+        }
+
+        .agent-guardrail {
+            margin-top: 8px;
+            font-size: 10px;
+            color: #ffaa00;
         }
 
         .status-indicator {
@@ -476,6 +646,58 @@
                 opacity: 1;
             }
         }
+
+        /* Organization Section */
+        #organization-section {
+            max-width: 1400px;
+            margin: 20px auto 0 auto;
+            padding: 0 20px;
+        }
+
+        #organization-section h2 {
+            font-size: 18px;
+            color: #00ff88;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+
+        .organization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+        }
+
+        .organization-card {
+            background: #16213e;
+            border: 4px solid #0f3460;
+            box-shadow: 5px 5px 0 #000;
+            padding: 18px;
+            min-height: 160px;
+        }
+
+        .org-title {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .org-body {
+            font-size: 11px;
+            color: #00ff88;
+            line-height: 1.4;
+        }
+
+        .org-pill {
+            display: inline-block;
+            background: #0f3460;
+            border: 2px solid #00ff88;
+            padding: 4px 6px;
+            font-size: 9px;
+            text-transform: uppercase;
+            margin: 3px;
+        }
     </style>
 </head>
 <body>
@@ -495,11 +717,11 @@
                 <div class="stat-value" id="revenue">-</div>
             </div>
             <div class="stat">
-                <div class="stat-label">PROJECTS</div>
-                <div class="stat-value" id="projects">-</div>
+                <div class="stat-label">CUSTOMER</div>
+                <div class="stat-value" id="customer">-</div>
             </div>
             <div class="stat">
-                <div class="stat-label">TEAM</div>
+                <div class="stat-label">AGENTS</div>
                 <div class="stat-value" id="team">-</div>
             </div>
         </div>
@@ -510,9 +732,61 @@
         </div>
     </div>
 
+    <section id="customer-exchange" class="pixel-text">
+        <div class="exchange-header">
+            <h2>🤝 CUSTOMER EXCHANGE</h2>
+            <div class="customer-badge" id="customer-badge">Waiting for data…</div>
+        </div>
+        <div class="exchange-grid">
+            <div class="exchange-card" id="customer-card">
+                <h3>Founding Customer</h3>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Relationship</span>
+                    <span class="exchange-stat-value" id="customer-relationship">-</span>
+                </div>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Negotiation</span>
+                    <span class="exchange-stat-value" id="customer-negotiation">-</span>
+                </div>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Next Review</span>
+                    <span class="exchange-stat-value" id="customer-next-review">-</span>
+                </div>
+            </div>
+            <div class="exchange-card" id="currency-card">
+                <h3>Token Treasury</h3>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Available</span>
+                    <span class="exchange-stat-value" id="currency-available">-</span>
+                </div>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Locked</span>
+                    <span class="exchange-stat-value" id="currency-locked">-</span>
+                </div>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Circulating</span>
+                    <span class="exchange-stat-value" id="currency-circulation">-</span>
+                </div>
+                <div class="exchange-stat">
+                    <span class="exchange-stat-label">Token Rate</span>
+                    <span class="exchange-stat-value" id="currency-rate">-</span>
+                </div>
+            </div>
+            <div class="exchange-card" id="ideas-card">
+                <h3>Accepted Ideas</h3>
+                <div class="idea-list" id="idea-list"></div>
+            </div>
+        </div>
+    </section>
+
     <div class="office" id="office">
         <div class="loading pixel-text">LOADING OFFICE</div>
     </div>
+
+    <section id="organization-section" class="pixel-text" style="display: none;">
+        <h2>🏗 ORGANISATIONSDESIGN</h2>
+        <div class="organization-grid" id="organization-grid"></div>
+    </section>
 
     <!-- CEO Discovery Section -->
     <section id="ceo-discovery-section" class="pixel-text">
@@ -584,32 +858,42 @@
         const API_BASE = './becoin-economy/';
 
         const AGENT_AVATARS = {
-            'AGENT-001': '💼', // CEO-Sales
-            'AGENT-002': '⚙️', // CTO-Engineer
-            'AGENT-003': '🎨', // CDO-Design
-        };
-
-        const AGENT_NAMES = {
-            'AGENT-001': 'CEO-Sales',
-            'AGENT-002': 'CTO-Engineer',
-            'AGENT-003': 'CDO-Design',
+            'agent-helio': '💼',
+            'agent-nami': '🛠️',
+            'agent-atlas': '💰',
+            'agent-circe': '⚡'
         };
 
         async function loadData() {
             try {
-                // NEW: Load orchestrator status for REAL agent data
-                const [treasury, roster, projects, ledger, orchestrator] = await Promise.all([
+                const [
+                    treasury,
+                    roster,
+                    projects,
+                    ledger,
+                    orchestrator,
+                    customerMarket
+                ] = await Promise.all([
                     fetch(API_BASE + 'treasury.json').then(r => r.json()),
                     fetch(API_BASE + 'agent-roster.json').then(r => r.json()),
                     fetch(API_BASE + 'projects.json').then(r => r.json()),
                     fetch(API_BASE + 'impact-ledger.json').then(r => r.json()),
-                    fetch(API_BASE + 'orchestrator-status.json').then(r => r.json()).catch(() => null)
+                    fetch(API_BASE + 'orchestrator-status.json').then(r => r.json()).catch(() => null),
+                    fetch(API_BASE + 'customer-market.json').then(r => r.json())
                 ]);
 
-                updateHeader(treasury, projects, roster, orchestrator);
-                renderOffice(roster, projects, orchestrator);
-                renderProjects(projects);
-                renderConsole(treasury, orchestrator);
+                const normalizedProjects = orchestrator?.projects ?? projects;
+                const aggregatedAgents = orchestrator?.agents ?? [
+                    ...(roster.founders || []),
+                    ...(roster.employees || [])
+                ];
+
+                updateHeader(treasury, normalizedProjects, aggregatedAgents, customerMarket);
+                renderCustomerExchange(customerMarket, ledger, aggregatedAgents);
+                renderOffice(aggregatedAgents, normalizedProjects);
+                renderProjects(normalizedProjects);
+                renderOrganization(orchestrator);
+                renderConsole(treasury);
             } catch (error) {
                 document.getElementById('office').innerHTML = `
                     <div class="loading pixel-text" style="color: #ff0055;">
@@ -622,25 +906,22 @@
             }
         }
 
-        function updateHeader(treasury, projects, roster, orchestrator) {
-            // Use orchestrator data if available (REAL), otherwise fallback
-            const balance = orchestrator?.treasury?.balance ?? treasury.balance;
-            const burnRate = orchestrator?.treasury?.metrics?.burnRate ?? treasury.metrics.burnRate;
+        function updateHeader(treasury, projects, agents, customerMarket) {
+            const balance = treasury.balance ?? 0;
+            const burnRate = treasury.metrics?.burnRate ?? 0;
+            const revenue = treasury.metrics?.totalRevenue ?? 0;
 
             document.getElementById('treasury').textContent =
-                balance.toLocaleString() + ' Bc';
+                `${balance.toLocaleString()} Bc`;
             document.getElementById('burnrate').textContent =
-                burnRate + ' Bc/h';
+                `${burnRate.toLocaleString(undefined, { maximumFractionDigits: 1 })} Bc/h`;
             document.getElementById('revenue').textContent =
-                treasury.metrics.totalRevenue.toLocaleString() + ' Bc';
-            document.getElementById('projects').textContent =
-                (orchestrator?.projects?.active ?? projects.active.length) + '/' +
-                (orchestrator?.projects?.completed ?? projects.completed.length);
-            document.getElementById('team').textContent =
-                (orchestrator?.agents?.length ?? (roster.founders.length + roster.employees.length));
+                `${revenue.toLocaleString()} Bc`;
+            document.getElementById('customer').textContent =
+                customerMarket?.customer?.name ?? 'YOU';
+            document.getElementById('team').textContent = agents.length;
 
-            // Health bar
-            const healthPercent = (treasury.balance / treasury.startCapital) * 100;
+            const healthPercent = Math.max(0, Math.min(100, (balance / treasury.startCapital) * 100));
             const healthBar = document.getElementById('healthBar');
             const healthText = document.getElementById('healthText');
 
@@ -656,29 +937,92 @@
             }
         }
 
-        function renderOffice(roster, projects, orchestrator) {
+        function renderCustomerExchange(market, ledger, agents = []) {
+            const badge = document.getElementById('customer-badge');
+            if (!market) {
+                badge.textContent = 'Awaiting customer data';
+                return;
+            }
+
+            badge.textContent = `SOLE CLIENT • ${market.customer?.name ?? 'YOU'}`;
+            document.getElementById('customer-relationship').textContent = market.customer?.relationship ?? '-';
+            document.getElementById('customer-negotiation').textContent = market.customer?.negotiationWindow ?? '-';
+            document.getElementById('customer-next-review').textContent = market.customer?.nextReview ?? '-';
+
+            const reserve = market.currencyReserve ?? {};
+            document.getElementById('currency-available').textContent = `${(reserve.availableTokens ?? 0).toLocaleString()} Bc`;
+            document.getElementById('currency-locked').textContent = `${(reserve.lockedForIdeas ?? 0).toLocaleString()} Bc`;
+            document.getElementById('currency-circulation').textContent = `${(reserve.circulation ?? 0).toLocaleString()} Bc`;
+            document.getElementById('currency-rate').textContent = `${market.dealTerms?.tokenRate ?? 0} Bc / acceptance`;
+
+            const agentLookup = Object.fromEntries(agents.map(agent => [agent.id, agent.name]));
+            const ideaList = document.getElementById('idea-list');
+            ideaList.innerHTML = '';
+
+            (market.ideaPipeline || []).forEach(idea => {
+                const item = document.createElement('div');
+                item.className = 'idea-item';
+                const ownerName = idea.leadAgent ?? agentLookup[idea.owner] ?? 'Team';
+                const roiText = idea.roi != null ? `ROI ${idea.roi}%` : '';
+                const budgetText = idea.tokenBudget != null ? `Budget ${idea.tokenBudget} Bc` : '';
+                const statusClass = idea.status ? idea.status.toUpperCase() : 'PENDING';
+
+                item.innerHTML = `
+                    <div class="idea-title">${idea.title}</div>
+                    <div class="idea-meta">
+                        <span class="idea-status ${statusClass}">${statusClass}</span>
+                        ${roiText ? `<span>${roiText}</span>` : ''}
+                        ${budgetText ? `<span>${budgetText}</span>` : ''}
+                        <span>Lead: ${ownerName}</span>
+                    </div>
+                    <div style="color:#ccc;font-size:9px;margin-top:6px;">${idea.customerValue}</div>
+                `;
+                ideaList.appendChild(item);
+            });
+
+            if (!market.ideaPipeline?.length) {
+                ideaList.innerHTML = '<div style="color: #666; font-size: 10px;">Noch keine Ideen akzeptiert.</div>';
+            }
+
+            const policyText = market.dealTerms?.acceptanceRule;
+            const policyNode = document.getElementById('idea-policy');
+            if (policyNode) {
+                policyNode.remove();
+            }
+            if (policyText) {
+                const policy = document.createElement('div');
+                policy.id = 'idea-policy';
+                policy.style = 'font-size:9px;color:#ffaa00;margin-top:12px;line-height:1.4;';
+                policy.textContent = `Policy: ${policyText}`;
+                document.getElementById('ideas-card').appendChild(policy);
+            }
+
+            const impactNode = document.getElementById('idea-impact-score');
+            if (impactNode) {
+                impactNode.remove();
+            }
+            if (ledger?.totalImpactScore != null) {
+                const impact = document.createElement('div');
+                impact.id = 'idea-impact-score';
+                impact.style = 'font-size:9px;color:#00ff88;margin-top:6px;';
+                impact.textContent = `Impact Score: ${ledger.totalImpactScore}`;
+                document.getElementById('ideas-card').appendChild(impact);
+            }
+        }
+
+        function renderOffice(agents, projects) {
             const office = document.getElementById('office');
             office.innerHTML = '';
 
-            // Use orchestrator agents if available (REAL), otherwise roster
-            const agents = orchestrator?.agents ?? roster.founders;
+            if (!agents.length) {
+                office.innerHTML = '<div class="loading pixel-text" style="color:#ffaa00;">Keine Agenten aktiv.</div>';
+                return;
+            }
 
-            // Render agents
+            const activeProjects = projects?.active ?? [];
+
             agents.forEach(agent => {
-                const activeProject = projects.active.find(p =>
-                    p.team && p.team.includes(agent.id)
-                );
-
-                const card = createAgentCard(agent, activeProject);
-                office.appendChild(card);
-            });
-
-            // Render employees
-            roster.employees.forEach(agent => {
-                const activeProject = projects.active.find(p =>
-                    p.team && p.team.includes(agent.id)
-                );
-
+                const activeProject = activeProjects.find(p => p.team && p.team.includes(agent.id));
                 const card = createAgentCard(agent, activeProject);
                 office.appendChild(card);
             });
@@ -686,19 +1030,24 @@
 
         function createAgentCard(agent, activeProject) {
             const card = document.createElement('div');
+            const normalizedStatus = (agent.status || '').toString().toUpperCase();
+            const isActive = ['ACTIVE', 'BUILDING', 'NEGOTIATING', 'REVIEW'].includes(normalizedStatus) || !!activeProject;
+            const currentTask = agent.current_task || activeProject?.name;
+            const activityText = agent.activity || (currentTask ? `🔨 Build: ${currentTask}` : '💤 Wartet auf bestätigte Idee');
+            const guardrailText = agent.guardrails?.finance || agent.guardrail || 'Profit sichern & Burn decken';
+            const instanceText = agent.instance || 'Noch nicht zugewiesen';
+            const autonomyText = agent.autonomy || 'VOLL';
+            const keys = agent.focus_keys || agent.focusKeys || [];
+            const earned = Number(agent.performance?.becoinEarned ?? agent.metrics?.becoins_earned ?? 0);
+            const delivered = agent.performance?.projectsCompleted ?? agent.metrics?.projects_completed ?? 0;
+            const equity = agent.equityShare != null ? `${Math.round(agent.equityShare * 100)}%` : 'N/A';
 
-            // Check orchestrator status for REAL activity
-            const isActive = agent.status === 'ACTIVE' || activeProject;
-            const currentTask = agent.current_task || (activeProject ? activeProject.name : null);
+            const tagsHtml = keys.length
+                ? keys.map(k => `<span class="agent-tag">${k}</span>`).join('')
+                : '<span class="agent-tag muted">Wartet auf Fokus</span>';
 
             card.className = 'agent-card ' + (isActive ? 'working' : 'idle');
-
             const statusClass = isActive ? 'active' : 'idle';
-            const activityText = currentTask ? '🔨 Working on: ' + currentTask :
-                                agent.status === 'IDLE' ? '💤 Waiting' :
-                                activeProject
-                ? `🔨 Working on: ${activeProject.name}`
-                : '💤 Waiting for work...';
 
             card.innerHTML = `
                 <div class="status-indicator ${statusClass}"></div>
@@ -706,28 +1055,40 @@
                     <div class="agent-avatar">${AGENT_AVATARS[agent.id] || '👤'}</div>
                     <div class="agent-info">
                         <h3 class="pixel-text">${agent.name}</h3>
-                        <div class="agent-role">${agent.role}</div>
+                        <div class="agent-role">Agent: ${agent.agent_type || agent.role || 'Autonom'}</div>
                     </div>
                 </div>
-                <div class="agent-activity ${activeProject ? '' : 'idle'}">
+                <div class="agent-activity ${isActive ? '' : 'idle'}">
                     ${activityText}
                 </div>
+                <div class="agent-meta">
+                    <div class="meta-block">
+                        <span class="meta-label">Instanz</span>
+                        <span class="meta-value">${instanceText}</span>
+                    </div>
+                    <div class="meta-block">
+                        <span class="meta-label">Autonomie</span>
+                        <span class="meta-value">${autonomyText}</span>
+                    </div>
+                </div>
+                <div class="agent-guardrail">Guardrail: ${guardrailText}</div>
+                <div class="agent-tags">${tagsHtml}</div>
                 <div class="agent-stats">
                     <div class="agent-stat">
-                        <div class="agent-stat-label">EQUITY</div>
-                        <div class="agent-stat-value">${agent.equityShare ? (agent.equityShare * 100).toFixed(0) + '%' : 'N/A'}</div>
+                        <div class="agent-stat-label">Equity</div>
+                        <div class="agent-stat-value">${equity}</div>
                     </div>
                     <div class="agent-stat">
-                        <div class="agent-stat-label">EARNED</div>
-                        <div class="agent-stat-value">${agent.performance?.becoinEarned || agent.metrics?.becoins_earned || 0} Bc</div>
+                        <div class="agent-stat-label">Earned</div>
+                        <div class="agent-stat-value">${earned.toLocaleString()} Bc</div>
                     </div>
                     <div class="agent-stat">
-                        <div class="agent-stat-label">PROJECTS</div>
-                        <div class="agent-stat-value">${agent.performance?.projectsCompleted || agent.metrics?.projects_completed || 0}</div>
+                        <div class="agent-stat-label">Delivered</div>
+                        <div class="agent-stat-value">${delivered}</div>
                     </div>
                     <div class="agent-stat">
-                        <div class="agent-stat-label">STATUS</div>
-                        <div class="agent-stat-value">${agent.status || 'IDLE'}</div>
+                        <div class="agent-stat-label">Status</div>
+                        <div class="agent-stat-value">${normalizedStatus || 'IDLE'}</div>
                     </div>
                 </div>
             `;
@@ -740,19 +1101,23 @@
 
             const board = document.createElement('div');
             board.className = 'projects-board';
+            const active = projects.active || [];
+            const pipeline = projects.pipeline || [];
+            const completed = projects.completed || [];
+
             board.innerHTML = `
-                <div class="board-title pixel-text">📊 PROJECT BOARD</div>
+                <div class="board-title pixel-text">📦 DELIVERY BOARD – FOUNDING CUSTOMER</div>
                 <div class="project-lanes">
                     <div class="project-lane">
-                        <div class="lane-title pixel-text">🔄 ACTIVE (${projects.active.length})</div>
+                        <div class="lane-title pixel-text">🔄 ACTIVE (${active.length})</div>
                         <div id="active-lane"></div>
                     </div>
                     <div class="project-lane">
-                        <div class="lane-title pixel-text">⏳ PIPELINE (${projects.pipeline.length})</div>
+                        <div class="lane-title pixel-text">⏳ PIPELINE (${pipeline.length})</div>
                         <div id="pipeline-lane"></div>
                     </div>
                     <div class="project-lane">
-                        <div class="lane-title pixel-text">✅ COMPLETED (${projects.completed.length})</div>
+                        <div class="lane-title pixel-text">✅ COMPLETED (${completed.length})</div>
                         <div id="completed-lane"></div>
                     </div>
                 </div>
@@ -760,31 +1125,30 @@
 
             office.appendChild(board);
 
-            // Populate lanes
             const activeLane = document.getElementById('active-lane');
             const pipelineLane = document.getElementById('pipeline-lane');
             const completedLane = document.getElementById('completed-lane');
 
-            projects.active.forEach(p => {
+            active.forEach(p => {
                 activeLane.innerHTML += createProjectCard(p, 'active');
             });
 
-            projects.pipeline.forEach(p => {
+            pipeline.forEach(p => {
                 pipelineLane.innerHTML += createProjectCard(p, 'pipeline');
             });
 
-            projects.completed.slice(-5).forEach(p => {
+            completed.slice(-5).forEach(p => {
                 completedLane.innerHTML += createProjectCard(p, 'completed');
             });
 
-            if (projects.active.length === 0) {
-                activeLane.innerHTML = '<div style="color: #666; font-size: 10px;">No active projects</div>';
+            if (active.length === 0) {
+                activeLane.innerHTML = '<div style="color: #666; font-size: 10px;">Keine aktiven Builds</div>';
             }
-            if (projects.pipeline.length === 0) {
-                pipelineLane.innerHTML = '<div style="color: #666; font-size: 10px;">Pipeline empty</div>';
+            if (pipeline.length === 0) {
+                pipelineLane.innerHTML = '<div style="color: #666; font-size: 10px;">Pipeline leer</div>';
             }
-            if (projects.completed.length === 0) {
-                completedLane.innerHTML = '<div style="color: #666; font-size: 10px;">No completed projects</div>';
+            if (completed.length === 0) {
+                completedLane.innerHTML = '<div style="color: #666; font-size: 10px;">Noch nichts ausgeliefert</div>';
             }
         }
 
@@ -793,13 +1157,71 @@
                 ? `<div style="color: ${project.impactScore > 70 ? '#00ff88' : '#ffaa00'}">Impact: ${project.impactScore}/100</div>`
                 : '';
 
+            const roi = project.roi != null ? `<div style="color:#00b2ff;font-size:10px;">ROI ${project.roi}%</div>` : '';
+            const customer = project.customer ? `<div style="color:#888;font-size:10px;">${project.customer}</div>` : '';
+
             return `
                 <div class="project-card ${type}">
                     <div class="project-name">${project.name || project.id}</div>
                     <div class="project-value">💰 ${project.value || 0} Becoins</div>
                     ${impactBadge}
+                    ${roi}
+                    ${customer}
                 </div>
             `;
+        }
+
+        function renderOrganization(orchestrator) {
+            const section = document.getElementById('organization-section');
+            if (!orchestrator?.organizationalDesign) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            const grid = document.getElementById('organization-grid');
+            grid.innerHTML = '';
+            const design = orchestrator.organizationalDesign;
+
+            grid.innerHTML += `
+                <div class="organization-card">
+                    <div class="org-title">Operating Model</div>
+                    <div class="org-body">${design.coreModel}</div>
+                </div>
+            `;
+
+            if (design.structures?.length) {
+                const structures = design.structures.map(s => `
+                    <div style="margin-bottom:6px;">
+                        <span class="org-pill">${s.name}</span>
+                        <span style="color:#ccc;font-size:10px;">${s.focus}</span>
+                    </div>
+                `).join('');
+                grid.innerHTML += `
+                    <div class="organization-card">
+                        <div class="org-title">Struktur-Knoten</div>
+                        <div class="org-body">${structures}</div>
+                    </div>
+                `;
+            }
+
+            if (design.governance) {
+                grid.innerHTML += `
+                    <div class="organization-card">
+                        <div class="org-title">Governance</div>
+                        <div class="org-body">${design.governance}</div>
+                    </div>
+                `;
+            }
+
+            if (design.scalingNorthStar) {
+                grid.innerHTML += `
+                    <div class="organization-card">
+                        <div class="org-title">Scaling Focus</div>
+                        <div class="org-body">${design.scalingNorthStar}</div>
+                    </div>
+                `;
+            }
         }
 
         function renderConsole(treasury) {
@@ -808,7 +1230,8 @@
             console.className = 'console';
             console.innerHTML = '<div style="color: #00ff88; margin-bottom: 10px;">📟 RECENT TRANSACTIONS</div>';
 
-            const recentTxs = treasury.transactions.slice(-5).reverse();
+            const transactions = treasury.transactions || [];
+            const recentTxs = transactions.slice(-5).reverse();
             recentTxs.forEach(tx => {
                 const typeColor = tx.type.includes('REVENUE') ? '#00ff88' :
                                  tx.type.includes('COST') ? '#ff0055' : '#ffaa00';

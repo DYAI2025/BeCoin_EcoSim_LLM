@@ -1,4 +1,19 @@
 {
-  "records": [],
-  "totalImpactScore": 0
+  "records": [
+    {
+      "ideaId": "IDEA-001",
+      "timestamp": "2025-01-12T07:25:00Z",
+      "impactScore": 92,
+      "becoinReturn": 1800,
+      "notes": "Onboarding-Automation spart dem Erstkunden 60% Zeit und läuft produktiv."
+    },
+    {
+      "ideaId": "IDEA-002",
+      "timestamp": "2025-01-12T08:45:00Z",
+      "impactScore": 82,
+      "becoinReturn": 0,
+      "notes": "Build in Arbeit – Tokens gesperrt, Abnahme durch Kunden geplant."
+    }
+  ],
+  "totalImpactScore": 174
 }

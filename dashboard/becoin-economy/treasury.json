@@ -1,40 +1,61 @@
 {
-  "balance": 8140.0,
-  "startCapital": 10000,
+  "balance": 5120.0,
+  "startCapital": 6000.0,
   "metrics": {
-    "burnRate": 5.0,
-    "runwayHours": 1628.0,
-    "profitMargin": -100.0
+    "burnRate": 98.0,
+    "runwayHours": 52.2,
+    "profitMargin": 34.0,
+    "totalRevenue": 1800.0
   },
   "transactions": [
     {
-      "timestamp": "2025-11-07T11:42:11Z",
-      "type": "OPERATIONS_COST",
-      "amount": -120.0,
-      "description": "Operational runway burn for 1h",
+      "timestamp": "2025-01-12T07:30:00Z",
+      "type": "CUSTOMER_PAYMENT",
+      "amount": 1800.0,
+      "description": "Erstkunde akzeptiert IDEA-001 und zahlt in Becoins",
       "metadata": {
-        "hours": 1,
-        "burnRate": 120.0
+        "ideaId": "IDEA-001",
+        "review": "Accepted"
       }
     },
     {
-      "timestamp": "2025-11-07T11:42:16Z",
-      "type": "OPERATIONS_COST",
-      "amount": -120.0,
-      "description": "Operational runway burn for 1h",
+      "timestamp": "2025-01-12T08:05:00Z",
+      "type": "BUILD_ALLOCATION",
+      "amount": -950.0,
+      "description": "Tokens für IDEA-002 Build gesperrt",
       "metadata": {
-        "hours": 1,
-        "burnRate": 120.0
+        "ideaId": "IDEA-002",
+        "owner": "agent-nami"
       }
     },
     {
-      "timestamp": "2025-11-07T11:42:21Z",
+      "timestamp": "2025-01-12T09:00:00Z",
       "type": "OPERATIONS_COST",
-      "amount": -120.0,
-      "description": "Operational runway burn for 1h",
+      "amount": -98.0,
+      "description": "Tagesburn für Infrastruktur und Modelle",
       "metadata": {
         "hours": 1,
-        "burnRate": 120.0
+        "burnRate": 98.0
+      }
+    },
+    {
+      "timestamp": "2025-01-12T09:30:00Z",
+      "type": "TREASURY_REALLOCATION",
+      "amount": -632.0,
+      "description": "Profit in Reserves und Expansionstopf verteilt",
+      "metadata": {
+        "reserve": 0.35,
+        "expansion": 0.25
+      }
+    },
+    {
+      "timestamp": "2025-01-12T10:15:00Z",
+      "type": "SCALING_FUND",
+      "amount": -1000.0,
+      "description": "Seed für Akquise des zweiten Kunden zurückgelegt",
+      "metadata": {
+        "target": "Customer Expansion",
+        "owner": "agent-helio"
       }
     }
   ]
