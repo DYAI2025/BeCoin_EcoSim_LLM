@@ -4,6 +4,7 @@ Test suite for FastAPI server base functionality.
 This test ensures the server starts correctly and provides
 a health check endpoint for monitoring.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,6 +13,7 @@ def test_server_imports():
     """Test that server module can be imported."""
     try:
         from dashboard.server import app
+
         assert app is not None
     except ImportError:
         pytest.fail("Failed to import server module")
@@ -41,8 +43,8 @@ def test_cors_enabled():
         "/api/status",
         headers={
             "Origin": "http://localhost:3000",
-            "Access-Control-Request-Method": "GET"
-        }
+            "Access-Control-Request-Method": "GET",
+        },
     )
 
     assert response.status_code == 200

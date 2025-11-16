@@ -1,26 +1,5 @@
 {
-  "active": [
-    {
-      "id": "proj-001",
-      "name": "Dashboard Redesign",
-      "stage": "active",
-      "value": 3000,
-      "impactScore": 85,
-      "team": [
-        "agent-001"
-      ]
-    },
-    {
-      "id": "proj-003",
-      "name": "CI/CD Pipeline",
-      "stage": "active",
-      "value": 2700,
-      "impactScore": 78,
-      "team": [
-        "agent-004"
-      ]
-    }
-  ],
+  "active": [],
   "pipeline": [
     {
       "id": "proj-004",
@@ -33,6 +12,16 @@
   ],
   "completed": [
     {
+      "id": "proj-001",
+      "name": "Dashboard Redesign",
+      "stage": "completed",
+      "value": 3000,
+      "impactScore": 85,
+      "team": [
+        "agent-001"
+      ]
+    },
+    {
       "id": "proj-002",
       "name": "API Integration",
       "stage": "completed",
@@ -40,6 +29,16 @@
       "impactScore": 92,
       "team": [
         "agent-002"
+      ]
+    },
+    {
+      "id": "proj-003",
+      "name": "CI/CD Pipeline",
+      "stage": "completed",
+      "value": 2700,
+      "impactScore": 78,
+      "team": [
+        "agent-004"
       ]
     }
   ]

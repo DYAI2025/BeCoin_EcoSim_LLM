@@ -4,6 +4,7 @@ Test suite for CEO Discovery Data Bridge.
 This test ensures the data bridge correctly reads and formats
 CEO Discovery session data for API consumption.
 """
+
 import pytest
 import json
 import tempfile
@@ -20,7 +21,7 @@ def temp_discovery_dir():
 
         with open(sample_path) as f:
             data = json.load(f)
-        with open(dest_path, 'w') as f:
+        with open(dest_path, "w") as f:
             json.dump(data, f)
 
         yield tmpdir
@@ -30,6 +31,7 @@ def test_data_bridge_imports():
     """Test that data bridge module can be imported"""
     try:
         from dashboard.ceo_data_bridge import CEODataBridge
+
         assert CEODataBridge is not None
     except ImportError:
         pytest.fail("Failed to import CEODataBridge")
@@ -112,7 +114,7 @@ def test_invalid_json():
 
         # Create invalid JSON file
         invalid_path = Path(tmpdir) / "discovery-9999999999.json"
-        with open(invalid_path, 'w') as f:
+        with open(invalid_path, "w") as f:
             f.write("{ invalid json }")
 
         bridge = CEODataBridge(discovery_sessions_path=tmpdir)

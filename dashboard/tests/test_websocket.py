@@ -4,6 +4,7 @@ Test suite for WebSocket Manager.
 This test ensures WebSocket connections work correctly for
 real-time CEO Discovery updates.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,6 +13,7 @@ def test_websocket_manager_imports():
     """Test that WebSocketManager can be imported"""
     try:
         from dashboard.websocket_manager import WebSocketManager
+
         assert WebSocketManager is not None
     except ImportError:
         pytest.fail("Failed to import WebSocketManager")
@@ -23,7 +25,7 @@ def test_websocket_manager_initialization():
 
     manager = WebSocketManager()
     assert manager is not None
-    assert hasattr(manager, 'active_connections')
+    assert hasattr(manager, "active_connections")
     assert len(manager.active_connections) == 0
 
 
@@ -93,11 +95,7 @@ async def test_websocket_broadcast_new_proposal():
     mock_ws.send_json = AsyncMock()
     manager.active_connections.append(mock_ws)
 
-    proposal = {
-        "id": "proposal-001",
-        "title": "Test Proposal",
-        "roi": 4.2
-    }
+    proposal = {"id": "proposal-001", "title": "Test Proposal", "roi": 4.2}
 
     await manager.broadcast_new_proposal(proposal)
 

@@ -1,16 +1,16 @@
 {
-  "lastUpdate": "2025-11-07T11:42:21Z",
+  "lastUpdate": "2025-11-08T03:21:30Z",
   "agents": [
     {
       "id": "agent-001",
       "name": "Frontend Developer",
       "role": "Frontend",
-      "status": "active",
+      "status": "IDLE",
       "equityShare": 0.25,
       "current_task": null,
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 300.0,
+        "projectsCompleted": 1
       }
     },
     {
@@ -41,43 +41,22 @@
       "id": "agent-004",
       "name": "DevOps Automator",
       "role": "DevOps",
-      "status": "active",
+      "status": "IDLE",
       "equityShare": 0.25,
       "current_task": null,
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 270.0,
+        "projectsCompleted": 1
       }
     }
   ],
   "treasury": {
-    "balance": 8140.0,
+    "balance": 0.0,
     "metrics": {
-      "burnRate": 5.0,
-      "runwayHours": 1628.0,
-      "profitMargin": -100.0
+      "burnRate": 197.22,
+      "runwayHours": 0.0,
+      "profitMargin": -149.12
     }
   },
-  "activeProjects": [
-    {
-      "id": "proj-001",
-      "name": "Dashboard Redesign",
-      "stage": "active",
-      "value": 3000,
-      "impactScore": 85,
-      "team": [
-        "agent-001"
-      ]
-    },
-    {
-      "id": "proj-003",
-      "name": "CI/CD Pipeline",
-      "stage": "active",
-      "value": 2700,
-      "impactScore": 78,
-      "team": [
-        "agent-004"
-      ]
-    }
-  ]
+  "activeProjects": []
 }

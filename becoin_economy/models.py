@@ -1,4 +1,5 @@
 """Core domain models for the Becoin economy simulation."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -19,7 +20,9 @@ class Transaction:
 
     def to_dict(self) -> Dict[str, object]:
         return {
-            "timestamp": self.timestamp.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "timestamp": self.timestamp.replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "type": self.type,
             "amount": round(self.amount, 2),
             "description": self.description,
@@ -35,11 +38,13 @@ class Treasury:
     balance: float
     burn_window_hours: int = 72
     transactions: List[Transaction] = field(default_factory=list)
-    metrics: Dict[str, float] = field(default_factory=lambda: {
-        "burnRate": 0.0,
-        "runwayHours": float("inf"),
-        "profitMargin": 0.0,
-    })
+    metrics: Dict[str, float] = field(
+        default_factory=lambda: {
+            "burnRate": 0.0,
+            "runwayHours": float("inf"),
+            "profitMargin": 0.0,
+        }
+    )
     _total_revenue: float = 0.0
     _total_cost: float = 0.0
 
@@ -55,7 +60,9 @@ class Treasury:
         self._update_metrics()
 
     def _update_metrics(self) -> None:
-        window_start = datetime.now(timezone.utc) - timedelta(hours=self.burn_window_hours)
+        window_start = datetime.now(timezone.utc) - timedelta(
+            hours=self.burn_window_hours
+        )
         recent_costs = [
             -tx.amount
             for tx in self.transactions
@@ -70,7 +77,9 @@ class Treasury:
             self.metrics["runwayHours"] = float("inf")
 
         if self._total_revenue > 0:
-            profit_margin = (self._total_revenue - self._total_cost) / self._total_revenue * 100
+            profit_margin = (
+                (self._total_revenue - self._total_cost) / self._total_revenue * 100
+            )
             self.metrics["profitMargin"] = round(profit_margin, 2)
         else:
             self.metrics["profitMargin"] = -100.0 if self._total_cost else 0.0
@@ -87,10 +96,12 @@ class Agent:
     equity_share: float
     is_founder: bool = True
     current_task: Optional[str] = None
-    performance: Dict[str, float] = field(default_factory=lambda: {
-        "becoin_earned": 0.0,
-        "projects_completed": 0,
-    })
+    performance: Dict[str, float] = field(
+        default_factory=lambda: {
+            "becoin_earned": 0.0,
+            "projects_completed": 0,
+        }
+    )
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -148,7 +159,9 @@ class ImpactRecord:
             "impactScore": self.impact_score,
             "roi": round(self.roi, 2),
             "notes": self.notes,
-            "timestamp": self.timestamp.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "timestamp": self.timestamp.replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z"),
         }
 
 
@@ -163,12 +176,20 @@ class EconomySnapshot:
     generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def to_dashboard_payload(self) -> Dict[str, object]:
-        founders = [agent.to_dict() for agent in self.agents.values() if agent.is_founder]
-        employees = [agent.to_dict() for agent in self.agents.values() if not agent.is_founder]
+        founders = [
+            agent.to_dict() for agent in self.agents.values() if agent.is_founder
+        ]
+        employees = [
+            agent.to_dict() for agent in self.agents.values() if not agent.is_founder
+        ]
 
         active = [p.to_dict() for p in self.projects.values() if p.stage == "active"]
-        pipeline = [p.to_dict() for p in self.projects.values() if p.stage == "pipeline"]
-        completed = [p.to_dict() for p in self.projects.values() if p.stage == "completed"]
+        pipeline = [
+            p.to_dict() for p in self.projects.values() if p.stage == "pipeline"
+        ]
+        completed = [
+            p.to_dict() for p in self.projects.values() if p.stage == "completed"
+        ]
 
         runway = self.treasury.metrics["runwayHours"]
         runway_serializable = None if isinf(runway) else round(runway, 2)
@@ -181,7 +202,12 @@ class EconomySnapshot:
                 "runwayHours": runway_serializable,
                 "profitMargin": self.treasury.metrics["profitMargin"],
             },
-            "transactions": [tx.to_dict() for tx in sorted(self.treasury.transactions, key=lambda tx: tx.timestamp)],
+            "transactions": [
+                tx.to_dict()
+                for tx in sorted(
+                    self.treasury.transactions, key=lambda tx: tx.timestamp
+                )
+            ],
         }
 
         return {
@@ -197,10 +223,14 @@ class EconomySnapshot:
             },
             "impact_ledger": {
                 "records": [record.to_dict() for record in self.impact_records],
-                "totalImpactScore": sum(record.impact_score for record in self.impact_records),
+                "totalImpactScore": sum(
+                    record.impact_score for record in self.impact_records
+                ),
             },
             "orchestrator_status": {
-                "lastUpdate": self.generated_at.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                "lastUpdate": self.generated_at.replace(microsecond=0)
+                .isoformat()
+                .replace("+00:00", "Z"),
                 "agents": founders + employees,
                 "treasury": {
                     "balance": treasury_dict["balance"],

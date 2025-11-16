@@ -1,14 +1,14 @@
 {
-  "balance": 8140.0,
+  "balance": 0.0,
   "startCapital": 10000,
   "metrics": {
-    "burnRate": 5.0,
-    "runwayHours": 1628.0,
-    "profitMargin": -100.0
+    "burnRate": 197.22,
+    "runwayHours": 0.0,
+    "profitMargin": -149.12
   },
   "transactions": [
     {
-      "timestamp": "2025-11-07T11:42:11Z",
+      "timestamp": "2025-11-07T22:39:08Z",
       "type": "OPERATIONS_COST",
       "amount": -120.0,
       "description": "Operational runway burn for 1h",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "timestamp": "2025-11-07T11:42:16Z",
+      "timestamp": "2025-11-07T22:39:13Z",
       "type": "OPERATIONS_COST",
       "amount": -120.0,
       "description": "Operational runway burn for 1h",
@@ -28,13 +28,1091 @@
       }
     },
     {
-      "timestamp": "2025-11-07T11:42:21Z",
+      "timestamp": "2025-11-07T22:39:18Z",
       "type": "OPERATIONS_COST",
       "amount": -120.0,
       "description": "Operational runway burn for 1h",
       "metadata": {
         "hours": 1,
         "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:48Z",
+      "type": "PROJECT_REVENUE",
+      "amount": 3000,
+      "description": "Revenue from Dashboard Redesign",
+      "metadata": {
+        "project_id": "proj-001"
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:53Z",
+      "type": "PROJECT_REVENUE",
+      "amount": 2700,
+      "description": "Revenue from CI/CD Pipeline",
+      "metadata": {
+        "project_id": "proj-003"
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:39:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:40:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:41:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:42:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:43:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:44:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -120.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 120.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -121.67,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 121.67
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -123.36,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 123.36
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -125.07,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 125.07
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -126.81,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 126.81
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -128.57,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 128.57
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -130.35,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 130.35
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -132.16,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 132.16
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -134.0,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 134.0
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -135.86,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 135.86
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:45:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -137.75,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 137.75
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -139.66,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 139.66
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -141.6,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 141.6
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -143.57,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 143.57
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -145.56,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 145.56
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -147.58,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 147.58
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -149.63,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 149.63
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -151.71,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 151.71
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -153.82,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 153.82
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -155.95,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 155.95
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -158.12,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 158.12
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -160.32,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 160.32
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:46:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -162.54,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 162.54
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -164.8,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 164.8
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -167.09,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 167.09
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:13Z",
+      "type": "OPERATIONS_COST",
+      "amount": -169.41,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 169.41
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:18Z",
+      "type": "OPERATIONS_COST",
+      "amount": -171.76,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 171.76
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:23Z",
+      "type": "OPERATIONS_COST",
+      "amount": -174.15,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 174.15
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:28Z",
+      "type": "OPERATIONS_COST",
+      "amount": -176.57,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 176.57
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:33Z",
+      "type": "OPERATIONS_COST",
+      "amount": -179.02,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 179.02
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:38Z",
+      "type": "OPERATIONS_COST",
+      "amount": -181.51,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 181.51
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:43Z",
+      "type": "OPERATIONS_COST",
+      "amount": -184.03,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 184.03
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:48Z",
+      "type": "OPERATIONS_COST",
+      "amount": -186.58,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 186.58
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:53Z",
+      "type": "OPERATIONS_COST",
+      "amount": -189.17,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 189.17
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:47:58Z",
+      "type": "OPERATIONS_COST",
+      "amount": -191.8,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 191.8
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:48:03Z",
+      "type": "OPERATIONS_COST",
+      "amount": -194.47,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 194.47
+      }
+    },
+    {
+      "timestamp": "2025-11-07T22:48:08Z",
+      "type": "OPERATIONS_COST",
+      "amount": -3.98,
+      "description": "Operational runway burn for 1h",
+      "metadata": {
+        "hours": 1,
+        "burnRate": 197.17
       }
     }
   ]

@@ -18,7 +18,7 @@ import json
 import subprocess
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional
 from dataclasses import dataclass, field
 import argparse
 from datetime import datetime
@@ -27,12 +27,13 @@ from datetime import datetime
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from autonomous_agents.personalities import load_personalities
+from autonomous_agents.personalities import load_personalities  # noqa: E402
 
 
 @dataclass
 class Task:
     """Represents a single task from an implementation plan."""
+
     number: int
     title: str
     description: str
@@ -46,6 +47,7 @@ class Task:
 @dataclass
 class ExecutionResult:
     """Result of executing a task."""
+
     success: bool
     output: str
     files_modified: List[str]
@@ -67,7 +69,7 @@ class OllamaClient:
     def _load_config(self) -> dict:
         """Load model configuration."""
         if self.config_path.exists():
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path, "r") as f:
                 return json.load(f)
         return {}
 
@@ -89,13 +91,18 @@ class OllamaClient:
 
         # Call Ollama API via curl
         cmd = [
-            'curl', '-s', f'{self.endpoint}/api/generate',
-            '-d', json.dumps({
-                'model': self.model,
-                'prompt': full_prompt,
-                'stream': False,
-                'options': self.options
-            })
+            "curl",
+            "-s",
+            f"{self.endpoint}/api/generate",
+            "-d",
+            json.dumps(
+                {
+                    "model": self.model,
+                    "prompt": full_prompt,
+                    "stream": False,
+                    "options": self.options,
+                }
+            ),
         ]
 
         try:
@@ -104,7 +111,7 @@ class OllamaClient:
                 raise RuntimeError(f"Ollama API call failed: {result.stderr}")
 
             response = json.loads(result.stdout)
-            return response.get('response', '')
+            return response.get("response", "")
 
         except subprocess.TimeoutExpired:
             raise RuntimeError("LLM generation timed out after 120 seconds")
@@ -130,15 +137,15 @@ class PlanParser:
         Returns:
             List of Task objects
         """
-        with open(self.plan_path, 'r') as f:
+        with open(self.plan_path, "r") as f:
             content = f.read()
 
         tasks = []
         current_task = None
 
         # Split into sections by task headers (## Task N:)
-        task_pattern = r'^## Task (\d+): (.+)$'
-        lines = content.split('\n')
+        task_pattern = r"^## Task (\d+): (.+)$"
+        lines = content.split("\n")
 
         i = 0
         while i < len(lines):
@@ -154,29 +161,25 @@ class PlanParser:
                 # Start new task
                 task_num = int(match.group(1))
                 task_title = match.group(2).strip()
-                current_task = Task(
-                    number=task_num,
-                    title=task_title,
-                    description=""
-                )
+                current_task = Task(number=task_num, title=task_title, description="")
 
             elif current_task:
                 # Accumulate task content
-                if line.startswith('```'):
+                if line.startswith("```"):
                     # Extract code snippet
                     code_lines = []
                     i += 1
-                    while i < len(lines) and not lines[i].startswith('```'):
+                    while i < len(lines) and not lines[i].startswith("```"):
                         code_lines.append(lines[i])
                         i += 1
-                    current_task.code_snippets.append('\n'.join(code_lines))
-                elif line.strip().startswith('**File:**'):
+                    current_task.code_snippets.append("\n".join(code_lines))
+                elif line.strip().startswith("**File:**"):
                     # Extract file path
-                    file_path = line.split('**File:**')[1].strip().strip('`')
+                    file_path = line.split("**File:**")[1].strip().strip("`")
                     current_task.files_to_modify.append(file_path)
                 else:
                     # Add to description
-                    current_task.description += line + '\n'
+                    current_task.description += line + "\n"
 
             i += 1
 
@@ -219,8 +222,8 @@ class Orchestrator:
         log_entry = f"[{timestamp}] [{level}] {message}"
         print(log_entry)
 
-        with open(self.log_file, 'a') as f:
-            f.write(log_entry + '\n')
+        with open(self.log_file, "a") as f:
+            f.write(log_entry + "\n")
 
     def load_plan(self):
         """Load and parse the implementation plan."""
@@ -252,9 +255,9 @@ class Orchestrator:
         Returns:
             ExecutionResult with execution details
         """
-        self.log(f"\n{'='*60}")
+        self.log(f"\n{'=' * 60}")
         self.log(f"🚀 Executing Task {task.number}: {task.title}")
-        self.log(f"{'='*60}")
+        self.log(f"{'=' * 60}")
 
         task.status = "in_progress"
 
@@ -262,7 +265,9 @@ class Orchestrator:
             # Get agent personality
             personality = None
             if task.agent_personality:
-                personality = self.personality_loader.get_personality(task.agent_personality)
+                personality = self.personality_loader.get_personality(
+                    task.agent_personality
+                )
 
             # Build the prompt
             prompt = self._build_task_prompt(task)
@@ -279,7 +284,7 @@ class Orchestrator:
                     success=True,
                     output="Dry run - no execution",
                     files_modified=[],
-                    tests_passed=False
+                    tests_passed=False,
                 )
 
             # Generate code/solution using LLM
@@ -293,7 +298,7 @@ class Orchestrator:
 
             # Run tests if this is a testing task
             tests_passed = False
-            if 'test' in task.title.lower():
+            if "test" in task.title.lower():
                 tests_passed = self._run_tests()
 
             task.status = "completed"
@@ -305,7 +310,7 @@ class Orchestrator:
                 success=True,
                 output=response,
                 files_modified=files_modified,
-                tests_passed=tests_passed
+                tests_passed=tests_passed,
             )
 
         except Exception as e:
@@ -318,7 +323,7 @@ class Orchestrator:
                 output="",
                 files_modified=[],
                 tests_passed=False,
-                error_message=str(e)
+                error_message=str(e),
             )
 
     def _build_task_prompt(self, task: Task) -> str:
@@ -384,7 +389,7 @@ Now execute this task.
         modified_files = []
 
         # Extract file blocks using pattern: **File: path** followed by code block
-        file_pattern = r'\*\*File:\s*([^\*]+)\*\*\s*```(?:\w+)?\n(.*?)```'
+        file_pattern = r"\*\*File:\s*([^\*]+)\*\*\s*```(?:\w+)?\n(.*?)```"
         matches = re.findall(file_pattern, response, re.DOTALL)
 
         for file_path, code in matches:
@@ -400,7 +405,7 @@ Now execute this task.
                 full_path.parent.mkdir(parents=True, exist_ok=True)
 
                 # Write file
-                with open(full_path, 'w') as f:
+                with open(full_path, "w") as f:
                     f.write(code)
 
                 modified_files.append(file_path)
@@ -421,10 +426,7 @@ Now execute this task.
         try:
             # Try to run pytest
             result = subprocess.run(
-                ['pytest', '-v'],
-                capture_output=True,
-                text=True,
-                timeout=60
+                ["pytest", "-v"], capture_output=True, text=True, timeout=60
             )
 
             if result.returncode == 0:
@@ -444,9 +446,9 @@ Now execute this task.
 
     def execute_all(self):
         """Execute all tasks in sequence."""
-        self.log("\n" + "="*60)
+        self.log("\n" + "=" * 60)
         self.log("🎬 Starting Autonomous Execution")
-        self.log("="*60 + "\n")
+        self.log("=" * 60 + "\n")
 
         start_time = datetime.now()
 
@@ -464,6 +466,7 @@ Now execute this task.
             if i < len(self.tasks) - 1:
                 self.log("\n⏸️  Pausing 2 seconds before next task...")
                 import time
+
                 time.sleep(2)
 
         end_time = datetime.now()
@@ -474,9 +477,9 @@ Now execute this task.
 
     def print_summary(self, duration: float):
         """Print execution summary."""
-        self.log("\n" + "="*60)
+        self.log("\n" + "=" * 60)
         self.log("📊 Execution Summary")
-        self.log("="*60)
+        self.log("=" * 60)
 
         completed = sum(1 for t in self.tasks if t.status == "completed")
         failed = sum(1 for t in self.tasks if t.status == "failed")
@@ -499,18 +502,15 @@ def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
         description="Autonomous Agent Orchestrator",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument(
-        'plan',
-        help='Path to implementation plan (markdown file)'
-    )
+    parser.add_argument("plan", help="Path to implementation plan (markdown file)")
 
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Show what would be executed without actually running'
+        "--dry-run",
+        action="store_true",
+        help="Show what would be executed without actually running",
     )
 
     args = parser.parse_args()
@@ -527,6 +527,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Fatal error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

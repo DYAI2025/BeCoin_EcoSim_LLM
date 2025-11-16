@@ -33,7 +33,10 @@ def test_payload_files_match_dashboard_expectations(sample_economy):
     assert any(project["stage"] == "completed" for project in projects["completed"])
 
     orchestrator = payload["orchestrator-status.json"]
-    assert orchestrator["treasury"]["metrics"]["burnRate"] == treasury["metrics"]["burnRate"]
+    assert (
+        orchestrator["treasury"]["metrics"]["burnRate"]
+        == treasury["metrics"]["burnRate"]
+    )
     assert orchestrator["agents"]
 
 

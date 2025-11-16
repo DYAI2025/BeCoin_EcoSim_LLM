@@ -1,10 +1,18 @@
 """Simulation engine for the Becoin economy."""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Dict, Iterable, List, Optional
 
-from becoin_economy.models import Agent, EconomySnapshot, ImpactRecord, Project, Transaction, Treasury
+from becoin_economy.models import (
+    Agent,
+    EconomySnapshot,
+    ImpactRecord,
+    Project,
+    Transaction,
+    Treasury,
+)
 
 
 class EconomyError(Exception):
@@ -36,7 +44,9 @@ class BecoinEconomy:
     ) -> None:
         self.treasury = treasury
         self.agents: Dict[str, Agent] = {agent.id: agent for agent in agents}
-        self.projects: Dict[str, Project] = {project.id: project for project in projects}
+        self.projects: Dict[str, Project] = {
+            project.id: project for project in projects
+        }
         self.impact_records: List[ImpactRecord] = list(impact_records or [])
         self.baseline_hourly_burn = baseline_hourly_burn
 
@@ -89,8 +99,12 @@ class BecoinEconomy:
                 continue
             agent.status = "IDLE"
             agent.current_task = None
-            agent.performance["projects_completed"] = agent.performance.get("projects_completed", 0) + 1
-            agent.performance["becoin_earned"] = agent.performance.get("becoin_earned", 0) + per_agent_bonus
+            agent.performance["projects_completed"] = (
+                agent.performance.get("projects_completed", 0) + 1
+            )
+            agent.performance["becoin_earned"] = (
+                agent.performance.get("becoin_earned", 0) + per_agent_bonus
+            )
 
         roi = project.value / project.cost if project.cost else 0
         self.impact_records.append(
@@ -117,13 +131,17 @@ class BecoinEconomy:
             metadata={"agent_id": agent_id},
         )
 
-        agent.performance["becoin_earned"] = agent.performance.get("becoin_earned", 0) + amount
+        agent.performance["becoin_earned"] = (
+            agent.performance.get("becoin_earned", 0) + amount
+        )
 
     def advance_time(self, hours: int) -> None:
         if hours <= 0:
             raise ValueError("hours must be positive")
 
-        effective_burn_rate = max(self.treasury.metrics.get("burnRate", 0.0), self.baseline_hourly_burn)
+        effective_burn_rate = max(
+            self.treasury.metrics.get("burnRate", 0.0), self.baseline_hourly_burn
+        )
         spend = min(effective_burn_rate * hours, self.treasury.balance)
 
         if spend == 0:
@@ -153,13 +171,21 @@ class BecoinEconomy:
         except KeyError as exc:
             raise UnknownProjectError(project_id) from exc
 
-    def _spend(self, amount: float, tx_type: str, description: str, metadata: Optional[Dict[str, object]] = None) -> None:
+    def _spend(
+        self,
+        amount: float,
+        tx_type: str,
+        description: str,
+        metadata: Optional[Dict[str, object]] = None,
+    ) -> None:
         if amount <= 0:
             raise ValueError("amount must be positive")
 
         signed_amount = -abs(amount)
         if self.treasury.balance + signed_amount < 0:
-            raise InsufficientFundsError(f"Treasury balance would drop below zero (attempted spend: {amount})")
+            raise InsufficientFundsError(
+                f"Treasury balance would drop below zero (attempted spend: {amount})"
+            )
 
         transaction = Transaction(
             timestamp=datetime.now(timezone.utc),
@@ -170,7 +196,13 @@ class BecoinEconomy:
         )
         self.treasury.apply_transaction(transaction)
 
-    def _earn(self, amount: float, tx_type: str, description: str, metadata: Optional[Dict[str, object]] = None) -> None:
+    def _earn(
+        self,
+        amount: float,
+        tx_type: str,
+        description: str,
+        metadata: Optional[Dict[str, object]] = None,
+    ) -> None:
         if amount <= 0:
             raise ValueError("amount must be positive")
 

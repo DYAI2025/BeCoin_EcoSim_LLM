@@ -4,12 +4,12 @@
       "id": "agent-001",
       "name": "Frontend Developer",
       "role": "Frontend",
-      "status": "active",
+      "status": "IDLE",
       "equityShare": 0.25,
       "current_task": null,
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 300.0,
+        "projectsCompleted": 1
       }
     },
     {
@@ -40,12 +40,12 @@
       "id": "agent-004",
       "name": "DevOps Automator",
       "role": "DevOps",
-      "status": "active",
+      "status": "IDLE",
       "equityShare": 0.25,
       "current_task": null,
       "performance": {
-        "becoinEarned": 0.0,
-        "projectsCompleted": 0
+        "becoinEarned": 270.0,
+        "projectsCompleted": 1
       }
     }
   ],

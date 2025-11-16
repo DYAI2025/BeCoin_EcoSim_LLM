@@ -1,0 +1,7 @@
+[tool.black]
+line-length = 88
+target-version = ['py312']
+include = '\\.(py|pyi)$'
+exclude = '''
+/(\.git|\.hg|\.mypy_cache|\.ruff_cache|\.tox|\.venv|venv|build|dist|_build|buck-out|site-packages)/
+'''

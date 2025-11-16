@@ -1,5 +1,4 @@
 """Stress tests for the Becoin economy logic to expose weaknesses."""
-from datetime import timedelta
 
 import pytest
 
@@ -16,11 +15,15 @@ def test_randomized_simulation_does_not_break_invariants(sample_economy, seeded_
         op = rng.choice(operations)
 
         if op == "start":
-            pipeline_projects = [p for p in economy.projects.values() if p.stage == "pipeline"]
+            pipeline_projects = [
+                p for p in economy.projects.values() if p.stage == "pipeline"
+            ]
             if pipeline_projects:
                 economy.start_project(rng.choice(pipeline_projects).id)
         elif op == "complete":
-            active_projects = [p for p in economy.projects.values() if p.stage == "active"]
+            active_projects = [
+                p for p in economy.projects.values() if p.stage == "active"
+            ]
             if active_projects:
                 economy.complete_project(rng.choice(active_projects).id)
         elif op == "pay":
