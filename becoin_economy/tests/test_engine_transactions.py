@@ -1,5 +1,4 @@
 """Unit tests for the Becoin economy engine covering core workflows."""
-from datetime import timedelta
 
 import pytest
 
@@ -14,7 +13,10 @@ def test_start_project_moves_pipeline_to_active(sample_economy):
 
     assert economy.projects["PRJ-ALPHA"].stage == "active"
     assert economy.projects["PRJ-ALPHA"].started_at is not None
-    assert economy.treasury.balance == starting_balance - economy.projects["PRJ-ALPHA"].cost
+    assert (
+        economy.treasury.balance
+        == starting_balance - economy.projects["PRJ-ALPHA"].cost
+    )
     assert any(tx.type == "PROJECT_COST" for tx in economy.treasury.transactions)
 
 
@@ -48,14 +50,19 @@ def test_pay_agent_updates_treasury_and_agent(sample_economy):
     assert economy.treasury.balance == starting_balance - 250
     agent = economy.agents["AGENT-101"]
     assert agent.performance["becoin_earned"] >= 250
-    assert any(tx.type == "PAYROLL" and tx.metadata["agent_id"] == "AGENT-101" for tx in economy.treasury.transactions)
+    assert any(
+        tx.type == "PAYROLL" and tx.metadata["agent_id"] == "AGENT-101"
+        for tx in economy.treasury.transactions
+    )
 
 
 def test_prevents_overspending(sample_economy):
     economy = sample_economy
 
     with pytest.raises(InsufficientFundsError):
-        economy.pay_agent("AGENT-101", amount=economy.treasury.balance + 1, reason="Overdraft attempt")
+        economy.pay_agent(
+            "AGENT-101", amount=economy.treasury.balance + 1, reason="Overdraft attempt"
+        )
 
 
 def test_snapshot_has_expected_structure(sample_economy):
@@ -68,11 +75,17 @@ def test_snapshot_has_expected_structure(sample_economy):
     payload = snapshot.to_dashboard_payload()
 
     assert set(payload.keys()) == {
-        "treasury", "agent_roster", "projects", "impact_ledger", "orchestrator_status"
+        "treasury",
+        "agent_roster",
+        "projects",
+        "impact_ledger",
+        "orchestrator_status",
     }
 
     treasury = payload["treasury"]
-    assert {"balance", "startCapital", "metrics", "transactions"}.issubset(treasury.keys())
+    assert {"balance", "startCapital", "metrics", "transactions"}.issubset(
+        treasury.keys()
+    )
     assert treasury["metrics"]["burnRate"] >= 0
 
     roster = payload["agent_roster"]

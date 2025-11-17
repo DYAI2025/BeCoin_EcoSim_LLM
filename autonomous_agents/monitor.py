@@ -19,6 +19,7 @@ import argparse
 @dataclass
 class LogEntry:
     """Represents a single log entry."""
+
     timestamp: datetime
     level: str
     message: str
@@ -27,6 +28,7 @@ class LogEntry:
 @dataclass
 class TaskStatus:
     """Represents the status of a task."""
+
     number: int
     title: str
     status: str  # pending, in_progress, completed, failed
@@ -67,7 +69,7 @@ class LogMonitor:
         log_files = sorted(
             self.logs_dir.glob("execution_*.log"),
             key=lambda p: p.stat().st_mtime,
-            reverse=True
+            reverse=True,
         )
 
         return log_files[0] if log_files else None
@@ -75,7 +77,7 @@ class LogMonitor:
     def _parse_log_line(self, line: str) -> Optional[LogEntry]:
         """Parse a single log line."""
         # Format: [YYYY-MM-DD HH:MM:SS] [LEVEL] Message
-        pattern = r'\[([^\]]+)\] \[([^\]]+)\] (.+)'
+        pattern = r"\[([^\]]+)\] \[([^\]]+)\] (.+)"
         match = re.match(pattern, line)
 
         if match:
@@ -94,7 +96,7 @@ class LogMonitor:
     def _extract_task_info(self, message: str) -> Optional[tuple]:
         """Extract task number and title from message."""
         # Pattern: 🚀 Executing Task N: Title
-        pattern = r'🚀 Executing Task (\d+): (.+)'
+        pattern = r"🚀 Executing Task (\d+): (.+)"
         match = re.match(pattern, message)
 
         if match:
@@ -115,16 +117,18 @@ class LogMonitor:
                 existing.status = "in_progress"
                 existing.start_time = entry.timestamp
             else:
-                self.tasks.append(TaskStatus(
-                    number=task_num,
-                    title=task_title,
-                    status="in_progress",
-                    start_time=entry.timestamp
-                ))
+                self.tasks.append(
+                    TaskStatus(
+                        number=task_num,
+                        title=task_title,
+                        status="in_progress",
+                        start_time=entry.timestamp,
+                    )
+                )
 
         # Check for task completion
         if "completed successfully" in entry.message.lower():
-            match = re.search(r'Task (\d+)', entry.message)
+            match = re.search(r"Task (\d+)", entry.message)
             if match:
                 task_num = int(match.group(1))
                 task = next((t for t in self.tasks if t.number == task_num), None)
@@ -134,7 +138,7 @@ class LogMonitor:
 
         # Check for task failure
         if "failed" in entry.message.lower() and entry.level == "ERROR":
-            match = re.search(r'Task (\d+)', entry.message)
+            match = re.search(r"Task (\d+)", entry.message)
             if match:
                 task_num = int(match.group(1))
                 task = next((t for t in self.tasks if t.number == task_num), None)
@@ -146,7 +150,7 @@ class LogMonitor:
         """Read new lines from the log file since last read."""
         entries = []
 
-        with open(self.log_file, 'r') as f:
+        with open(self.log_file, "r") as f:
             f.seek(self.current_position)
             new_lines = f.readlines()
             self.current_position = f.tell()
@@ -163,7 +167,7 @@ class LogMonitor:
         """Display current status of all tasks."""
         # Clear screen (optional)
         if self.follow:
-            os.system('clear' if os.name != 'nt' else 'cls')
+            os.system("clear" if os.name != "nt" else "cls")
 
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         print("🤖 Autonomous Agent Monitor")
@@ -208,7 +212,9 @@ class LogMonitor:
         total = len(self.tasks)
 
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"Summary: {completed}/{total} completed, {failed} failed, {in_progress} in progress")
+        print(
+            f"Summary: {completed}/{total} completed, {failed} failed, {in_progress} in progress"
+        )
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
     def monitor(self):
@@ -238,18 +244,18 @@ def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
         description="Monitor autonomous agent execution",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     parser.add_argument(
-        '-f', '--follow',
-        action='store_true',
-        help='Follow log file in real-time (like tail -f)'
+        "-f",
+        "--follow",
+        action="store_true",
+        help="Follow log file in real-time (like tail -f)",
     )
 
     parser.add_argument(
-        '--log-file',
-        help='Path to specific log file (default: latest)'
+        "--log-file", help="Path to specific log file (default: latest)"
     )
 
     args = parser.parse_args()
@@ -266,6 +272,7 @@ def main():
     except Exception as e:
         print(f"❌ Fatal error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

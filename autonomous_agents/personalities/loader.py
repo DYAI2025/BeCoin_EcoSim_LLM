@@ -4,8 +4,8 @@ Agency_of_Agents personality loader for autonomous agents.
 Loads agent personalities from the Agency_of_Agents repository and makes them
 available to the orchestrator for task-specific agent creation.
 """
+
 import os
-import re
 import json
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -15,6 +15,7 @@ from dataclasses import dataclass
 @dataclass
 class AgentPersonality:
     """Represents a specialized agent personality from Agency_of_Agents."""
+
     name: str
     description: str
     color: str
@@ -30,7 +31,7 @@ class AgentPersonality:
             "color": self.color,
             "category": self.category,
             "file_path": self.file_path,
-            "full_prompt": self.full_prompt
+            "full_prompt": self.full_prompt,
         }
 
 
@@ -76,32 +77,34 @@ class PersonalityLoader:
         body = content
 
         # Check for YAML frontmatter (--- at start and end)
-        if content.startswith('---\n'):
-            parts = content.split('---\n', 2)
+        if content.startswith("---\n"):
+            parts = content.split("---\n", 2)
             if len(parts) >= 3:
                 # Parse frontmatter
                 frontmatter_text = parts[1]
                 body = parts[2]
 
-                for line in frontmatter_text.strip().split('\n'):
-                    if ':' in line:
-                        key, value = line.split(':', 1)
+                for line in frontmatter_text.strip().split("\n"):
+                    if ":" in line:
+                        key, value = line.split(":", 1)
                         frontmatter[key.strip()] = value.strip()
 
         return frontmatter, body
 
-    def _load_personality(self, file_path: Path, category: str) -> Optional[AgentPersonality]:
+    def _load_personality(
+        self, file_path: Path, category: str
+    ) -> Optional[AgentPersonality]:
         """Load a single personality from a markdown file."""
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             frontmatter, body = self._parse_frontmatter(content)
 
             # Extract metadata
-            name = frontmatter.get('name', file_path.stem)
-            description = frontmatter.get('description', '')
-            color = frontmatter.get('color', 'blue')
+            name = frontmatter.get("name", file_path.stem)
+            description = frontmatter.get("description", "")
+            color = frontmatter.get("color", "blue")
 
             # Create personality object
             personality = AgentPersonality(
@@ -110,7 +113,7 @@ class PersonalityLoader:
                 color=color,
                 category=category,
                 file_path=str(file_path),
-                full_prompt=body.strip()
+                full_prompt=body.strip(),
             )
 
             return personality
@@ -122,9 +125,15 @@ class PersonalityLoader:
     def _load_all_personalities(self):
         """Load all personalities from the Agency directory."""
         categories = [
-            'engineering', 'design', 'marketing', 'product',
-            'project-management', 'support', 'testing', 'specialized',
-            'spatial-computing'
+            "engineering",
+            "design",
+            "marketing",
+            "product",
+            "project-management",
+            "support",
+            "testing",
+            "specialized",
+            "spatial-computing",
         ]
 
         for category in categories:
@@ -133,7 +142,7 @@ class PersonalityLoader:
                 continue
 
             # Load all markdown files in the category
-            for md_file in category_path.glob('*.md'):
+            for md_file in category_path.glob("*.md"):
                 personality = self._load_personality(md_file, category)
                 if personality:
                     self.personalities[personality.name] = personality
@@ -144,7 +153,9 @@ class PersonalityLoader:
         """Get a specific personality by name."""
         return self.personalities.get(name)
 
-    def list_personalities(self, category: Optional[str] = None) -> List[AgentPersonality]:
+    def list_personalities(
+        self, category: Optional[str] = None
+    ) -> List[AgentPersonality]:
         """
         List all available personalities.
 
@@ -172,8 +183,10 @@ class PersonalityLoader:
         matches = []
 
         for personality in self.personalities.values():
-            if (query in personality.name.lower() or
-                query in personality.description.lower()):
+            if (
+                query in personality.name.lower()
+                or query in personality.description.lower()
+            ):
                 matches.append(personality)
 
         return matches
@@ -195,19 +208,19 @@ class PersonalityLoader:
 
         # Define keyword mappings
         keyword_mappings = {
-            'frontend': 'engineering-frontend-developer',
-            'backend': 'engineering-backend-architect',
-            'mobile': 'engineering-mobile-app-builder',
-            'ai': 'engineering-ai-engineer',
-            'devops': 'engineering-devops-automator',
-            'prototype': 'engineering-rapid-prototyper',
-            'ui': 'design-ui-designer',
-            'ux': 'design-ux-researcher',
-            'brand': 'design-brand-guardian',
-            'marketing': 'marketing-growth-hacker',
-            'content': 'marketing-content-creator',
-            'test': 'testing-test-automation-engineer',
-            'qa': 'testing-qa-analyst',
+            "frontend": "engineering-frontend-developer",
+            "backend": "engineering-backend-architect",
+            "mobile": "engineering-mobile-app-builder",
+            "ai": "engineering-ai-engineer",
+            "devops": "engineering-devops-automator",
+            "prototype": "engineering-rapid-prototyper",
+            "ui": "design-ui-designer",
+            "ux": "design-ux-researcher",
+            "brand": "design-brand-guardian",
+            "marketing": "marketing-growth-hacker",
+            "content": "marketing-content-creator",
+            "test": "testing-test-automation-engineer",
+            "qa": "testing-qa-analyst",
         }
 
         # Check for keyword matches
@@ -218,7 +231,7 @@ class PersonalityLoader:
                     return personality
 
         # If no match, return a general-purpose agent
-        return self.get_personality('engineering-senior-developer')
+        return self.get_personality("engineering-senior-developer")
 
     def save_cache(self, cache_path: str):
         """Save loaded personalities to cache file."""
@@ -227,7 +240,7 @@ class PersonalityLoader:
             for name, personality in self.personalities.items()
         }
 
-        with open(cache_path, 'w', encoding='utf-8') as f:
+        with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(cache_data, f, indent=2)
 
     def get_categories(self) -> List[str]:
@@ -256,16 +269,16 @@ if __name__ == "__main__":
     try:
         loader = load_personalities()
 
-        print(f"\n📊 Statistics:")
+        print("\n📊 Statistics:")
         print(f"  Total personalities: {len(loader.personalities)}")
         print(f"  Categories: {', '.join(loader.get_categories())}")
 
-        print(f"\n🔍 Sample personalities:")
+        print("\n🔍 Sample personalities:")
         for i, personality in enumerate(list(loader.personalities.values())[:5]):
-            print(f"  {i+1}. {personality.name} ({personality.category})")
+            print(f"  {i + 1}. {personality.name} ({personality.category})")
             print(f"     {personality.description[:80]}...")
 
-        print(f"\n🎯 Testing best match:")
+        print("\n🎯 Testing best match:")
         test_tasks = [
             "Build a React component for the dashboard",
             "Deploy the application to AWS",
@@ -289,4 +302,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()

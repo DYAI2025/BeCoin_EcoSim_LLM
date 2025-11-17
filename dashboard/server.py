@@ -4,7 +4,16 @@ CEO Discovery Dashboard - FastAPI Server
 This server provides REST and WebSocket APIs for the CEO Discovery Dashboard.
 It integrates with the Becoin Economy system and supports autonomous agent operations.
 """
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, Depends, HTTPException, status
+
+from fastapi import (
+    FastAPI,
+    Query,
+    WebSocket,
+    WebSocketDisconnect,
+    Depends,
+    HTTPException,
+    status,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse
@@ -34,7 +43,9 @@ AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "")
 AUTH_ENABLED = bool(AUTH_USERNAME and AUTH_PASSWORD)
 
 if not AUTH_ENABLED:
-    logger.warning("⚠️  Authentication is DISABLED. Set AUTH_USERNAME and AUTH_PASSWORD environment variables to enable security.")
+    logger.warning(
+        "⚠️  Authentication is DISABLED. Set AUTH_USERNAME and AUTH_PASSWORD environment variables to enable security."
+    )
 else:
     logger.info("✓ Authentication is ENABLED")
 
@@ -50,12 +61,10 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) ->
 
     # Use constant-time comparison to prevent timing attacks
     username_correct = secrets.compare_digest(
-        credentials.username.encode("utf8"),
-        AUTH_USERNAME.encode("utf8")
+        credentials.username.encode("utf8"), AUTH_USERNAME.encode("utf8")
     )
     password_correct = secrets.compare_digest(
-        credentials.password.encode("utf8"),
-        AUTH_PASSWORD.encode("utf8")
+        credentials.password.encode("utf8"), AUTH_PASSWORD.encode("utf8")
     )
 
     if not (username_correct and password_correct):
@@ -72,7 +81,7 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) ->
 app = FastAPI(
     title="CEO Discovery Dashboard",
     description="Real-time monitoring and control for autonomous AI agent firm",
-    version=__version__
+    version=__version__,
 )
 
 # Initialize data bridge and WebSocket manager
@@ -108,7 +117,7 @@ async def root():
             "message": "CEO Discovery Dashboard API",
             "version": __version__,
             "service": "ceo-discovery-dashboard",
-            "status": "operational"
+            "status": "operational",
         }
 
 
@@ -118,11 +127,12 @@ async def health_check():
     return {
         "status": "operational",
         "service": "ceo-discovery-dashboard",
-        "version": __version__
+        "version": __version__,
     }
 
 
 # CEO Discovery Endpoints
+
 
 @app.get("/api/ceo/status")
 async def get_ceo_status(username: str = Depends(verify_credentials)):
@@ -134,7 +144,7 @@ async def get_ceo_status(username: str = Depends(verify_credentials)):
 async def get_proposals(
     min_roi: float = Query(0.0, description="Minimum ROI threshold"),
     limit: int = Query(10, description="Maximum number of proposals"),
-    username: str = Depends(verify_credentials)
+    username: str = Depends(verify_credentials),
 ):
     """Get CEO Discovery proposals with optional filtering."""
     return ceo_bridge.get_proposals(min_roi=min_roi, limit=limit)
@@ -142,8 +152,11 @@ async def get_proposals(
 
 @app.get("/api/ceo/patterns")
 async def get_patterns(
-    type: Optional[str] = Query(None, description="Filter by pattern type (repetitive, error, bottleneck, workflow)"),
-    username: str = Depends(verify_credentials)
+    type: Optional[str] = Query(
+        None,
+        description="Filter by pattern type (repetitive, error, bottleneck, workflow)",
+    ),
+    username: str = Depends(verify_credentials),
 ):
     """Get identified patterns, optionally filtered by type."""
     return ceo_bridge.get_patterns(pattern_type=type)
@@ -158,13 +171,14 @@ async def get_pain_points(username: str = Depends(verify_credentials)):
 @app.get("/api/ceo/history")
 async def get_history(
     limit: int = Query(10, description="Maximum number of sessions to return"),
-    username: str = Depends(verify_credentials)
+    username: str = Depends(verify_credentials),
 ):
     """Get historical discovery sessions."""
     return ceo_bridge.get_history(limit=limit)
 
 
 # WebSocket Endpoint
+
 
 @app.websocket("/ws/ceo")
 async def websocket_endpoint(websocket: WebSocket):
@@ -187,11 +201,9 @@ async def websocket_endpoint(websocket: WebSocket):
             logger.info(f"Received WebSocket message: {data}")
 
             # Echo back for debugging (can be removed in production)
-            await websocket.send_json({
-                "type": "echo",
-                "message": "Message received",
-                "original": data
-            })
+            await websocket.send_json(
+                {"type": "echo", "message": "Message received", "original": data}
+            )
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
         logger.info("WebSocket client disconnected normally")
@@ -202,4 +214,5 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=3000)

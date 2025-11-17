@@ -5,11 +5,10 @@ Reads and formats CEO Discovery session data for API consumption.
 This module bridges between the file-based discovery session storage
 and the FastAPI endpoints that serve the dashboard.
 """
+
 import json
-import os
 from pathlib import Path
 from typing import List, Dict, Optional
-from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +17,9 @@ logger = logging.getLogger(__name__)
 class CEODataBridge:
     """Reads and formats CEO Discovery session data for API consumption"""
 
-    def __init__(self, discovery_sessions_path: str = "../.claude-flow/discovery-sessions"):
+    def __init__(
+        self, discovery_sessions_path: str = "../.claude-flow/discovery-sessions"
+    ):
         """
         Initialize the data bridge.
 
@@ -124,7 +125,7 @@ class CEODataBridge:
             session_files = sorted(
                 self.sessions_path.glob("discovery-*.json"),
                 key=lambda f: f.stat().st_mtime,
-                reverse=True
+                reverse=True,
             )
 
             sessions = []
@@ -139,7 +140,7 @@ class CEODataBridge:
                         "start_time": data.get("start_time"),
                         "status": data.get("status"),
                         "pattern_count": len(data.get("patterns", [])),
-                        "proposal_count": len(data.get("proposals", []))
+                        "proposal_count": len(data.get("proposals", [])),
                     }
                     sessions.append(summary)
 
@@ -166,5 +167,5 @@ class CEODataBridge:
             "status": "idle",
             "patterns": [],
             "pain_points": [],
-            "proposals": []
+            "proposals": [],
         }
