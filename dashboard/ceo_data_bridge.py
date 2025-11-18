@@ -10,7 +10,7 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,9 @@ class CEODataBridge:
     """Reads and formats CEO Discovery session data for API consumption"""
 
     def __init__(
-        self, discovery_sessions_path: str = "../.claude-flow/discovery-sessions"
+        self,
+        discovery_sessions_path: str = "../.claude-flow/discovery-sessions",
+        cache_ttl: int = 30,
     ):
         """
         Initialize the data bridge.
@@ -28,8 +30,9 @@ class CEODataBridge:
             discovery_sessions_path: Path to directory containing discovery session JSON files
         """
         self.sessions_path = Path(discovery_sessions_path)
-        self._cache: Dict[str, Dict] = {}
-        self._cache_ttl = 30  # seconds
+        self._cache: Dict[str, object] = {}
+        self._cache_signature: Optional[Tuple[float, float]] = None
+        self._cache_ttl = cache_ttl  # seconds
 
     def _get_cached_value(self, key: str):
         """Return cached value if within TTL."""
@@ -74,11 +77,18 @@ class CEODataBridge:
                 return session
 
             latest_file = max(session_files, key=lambda f: f.stat().st_mtime)
+            latest_mtime = latest_file.stat().st_mtime
+
+            cached = self._use_cache(latest_mtime)
+            if cached is not None:
+                return cached
 
             with open(latest_file) as f:
                 data = json.load(f)
 
-            self._set_cached_value("current_session", data)
+            self._cache = data
+            self._cache_signature = (latest_mtime, time.time())
+
             return data
 
         except (FileNotFoundError, json.JSONDecodeError) as e:
@@ -206,3 +216,18 @@ class CEODataBridge:
             "pain_points": [],
             "proposals": [],
         }
+
+    def _use_cache(self, latest_mtime: float) -> Optional[Dict]:
+        """Return cached session data if still valid for the given file mtime."""
+
+        if not self._cache or not self._cache_signature:
+            return None
+
+        cached_mtime, cached_at = self._cache_signature
+        if cached_mtime != latest_mtime:
+            return None
+
+        if time.time() - cached_at > self._cache_ttl:
+            return None
+
+        return self._cache

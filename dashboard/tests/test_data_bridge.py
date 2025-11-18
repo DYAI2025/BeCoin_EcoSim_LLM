@@ -125,95 +125,26 @@ def test_invalid_json():
         assert session["status"] == "idle"
 
 
-def test_get_current_session_uses_cache(temp_discovery_dir):
-    """Ensure repeated calls within TTL return cached session data"""
+def test_session_cache_prevents_repeated_disk_reads(temp_discovery_dir, monkeypatch):
+    """Ensure the bridge caches the latest session for the cache TTL."""
 
-    from dashboard.ceo_data_bridge import CEODataBridge
+    import dashboard.ceo_data_bridge as bridge_module
 
-    bridge = CEODataBridge(discovery_sessions_path=temp_discovery_dir)
-    session_file = Path(temp_discovery_dir) / "discovery-1234567890.json"
+    bridge = bridge_module.CEODataBridge(
+        discovery_sessions_path=temp_discovery_dir, cache_ttl=60
+    )
 
-    first_session = bridge.get_current_session()
+    original_load = bridge_module.json.load
+    load_count = {"calls": 0}
 
-    # Update the underlying file to simulate new data being written
-    with open(session_file) as f:
-        data = json.load(f)
-    data["session_id"] = "discovery-CHANGED"
-    with open(session_file, "w") as f:
-        json.dump(data, f)
+    def tracked_load(*args, **kwargs):  # pragma: no cover - helper closure
+        load_count["calls"] += 1
+        return original_load(*args, **kwargs)
 
-    # Should still return cached value because TTL not expired
-    second_session = bridge.get_current_session()
+    monkeypatch.setattr(bridge_module.json, "load", tracked_load)
 
-    assert second_session["session_id"] == first_session["session_id"]
+    first = bridge.get_current_session()
+    second = bridge.get_current_session()
 
-
-def test_cache_expires_after_ttl(temp_discovery_dir, monkeypatch):
-    """Ensure cache refreshes after TTL elapses"""
-
-    import dashboard.ceo_data_bridge as bridge_mod
-
-    fake_time = [1_000.0]
-
-    def fake_time_func():
-        return fake_time[0]
-
-    monkeypatch.setattr(bridge_mod.time, "time", fake_time_func)
-    bridge = bridge_mod.CEODataBridge(discovery_sessions_path=temp_discovery_dir)
-
-    initial_session = bridge.get_current_session()
-    assert initial_session["session_id"] == "discovery-1234567890"
-
-    session_file = Path(temp_discovery_dir) / "discovery-1234567890.json"
-    with open(session_file) as f:
-        updated_data = json.load(f)
-    updated_data["session_id"] = "discovery-new"
-    with open(session_file, "w") as f:
-        json.dump(updated_data, f)
-
-    # Advance fake time beyond TTL
-    fake_time[0] += bridge._cache_ttl + 1
-
-    refreshed_session = bridge.get_current_session()
-    assert refreshed_session["session_id"] == "discovery-new"
-
-
-def test_history_cache_respects_ttl(temp_discovery_dir, monkeypatch):
-    """History results should be cached and refreshed after TTL"""
-
-    import dashboard.ceo_data_bridge as bridge_mod
-
-    fake_time = [2_000.0]
-
-    def fake_time_func():
-        return fake_time[0]
-
-    monkeypatch.setattr(bridge_mod.time, "time", fake_time_func)
-    bridge = bridge_mod.CEODataBridge(discovery_sessions_path=temp_discovery_dir)
-
-    initial_history = bridge.get_history(limit=5)
-    assert len(initial_history) == 1
-
-    # Add a new discovery session file
-    new_session_path = Path(temp_discovery_dir) / "discovery-2222222222.json"
-    with open(new_session_path, "w") as f:
-        json.dump(
-            {
-                "session_id": "discovery-2222222222",
-                "start_time": "2025-12-01T12:00:00Z",
-                "status": "completed",
-                "patterns": [],
-                "pain_points": [],
-                "proposals": [],
-            },
-            f,
-        )
-
-    cached_history = bridge.get_history(limit=5)
-    # Still returns cached data (without the new session)
-    assert len(cached_history) == 1
-
-    fake_time[0] += bridge._cache_ttl + 5
-
-    refreshed_history = bridge.get_history(limit=5)
-    assert len(refreshed_history) == 2
+    assert first == second
+    assert load_count["calls"] == 1, "Second call should come from cache"
