@@ -52,13 +52,23 @@ def test_cors_enabled():
 
 
 def test_root_endpoint():
-    """Test root endpoint provides service info."""
-    from dashboard.server import app
+    """Test root endpoint provides service info or HTML dashboard."""
+    from dashboard.server import app, DASHBOARD_DIR
 
     client = TestClient(app)
     response = client.get("/")
 
     assert response.status_code == 200
-    data = response.json()
-    assert "message" in data
-    assert "version" in data
+
+    # Check if office-ui.html exists
+    html_file = DASHBOARD_DIR / "office-ui.html"
+
+    if html_file.exists():
+        # Should return HTML when file exists
+        assert response.headers["content-type"].startswith("text/html")
+        assert b"<!DOCTYPE html>" in response.content or b"<html" in response.content
+    else:
+        # Should return JSON when file doesn't exist
+        data = response.json()
+        assert "message" in data
+        assert "version" in data
