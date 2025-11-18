@@ -20,7 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Optional
+from typing import List, Optional
 import logging
 import os
 import secrets
@@ -104,10 +104,40 @@ ceo_bridge = CEODataBridge()
 ws_manager = WebSocketManager()
 
 # Configure CORS
+DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://becoin-ecosim-llm.fly.dev",
+    "https://becoin-ecosystem.fly.dev",
+]
+
+
+def _load_allowed_origins(env_value: Optional[str]) -> List[str]:
+    """Return the CORS allowlist based on the provided environment value."""
+
+    if env_value:
+        origins = [origin.strip() for origin in env_value.split(",") if origin.strip()]
+        if origins:
+            return origins
+    return DEFAULT_ALLOWED_ORIGINS
+
+
+ENV_ALLOWED_ORIGINS = os.getenv("DASHBOARD_ALLOW_ORIGINS")
+ALLOWED_ORIGINS = _load_allowed_origins(ENV_ALLOWED_ORIGINS)
+ALLOW_ALL_ORIGINS = "*" in ALLOWED_ORIGINS
+
+# When allow_origins includes "*", FastAPI requires allow_credentials=False to avoid
+# sending cookies/tokens to arbitrary origins. Otherwise credentials are permitted.
+if ALLOW_ALL_ORIGINS:
+    ALLOWED_ORIGINS = ["*"]
+    ALLOW_CREDENTIALS = False
+else:
+    ALLOW_CREDENTIALS = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
