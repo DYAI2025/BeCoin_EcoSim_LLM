@@ -44,6 +44,22 @@ def test_websocket_connection():
         assert "timestamp" in data
 
 
+def test_websocket_streams_session_updates():
+    """WebSocket should push the latest CEO session snapshot on connect."""
+
+    from dashboard.server import app
+
+    client = TestClient(app)
+
+    with client.websocket_connect("/ws/ceo") as websocket:
+        websocket.receive_json()  # Connection established message
+        session_update = websocket.receive_json()
+
+        assert session_update["type"] == "session_update"
+        assert "session" in session_update
+        assert "timestamp" in session_update
+
+
 def test_websocket_multiple_connections():
     """Test multiple WebSocket connections"""
     from dashboard.server import app
