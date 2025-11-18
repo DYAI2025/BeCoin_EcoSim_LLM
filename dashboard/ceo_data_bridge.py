@@ -7,9 +7,10 @@ and the FastAPI endpoints that serve the dashboard.
 """
 
 import json
-from pathlib import Path
-from typing import List, Dict, Optional
 import logging
+import time
+from pathlib import Path
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +28,26 @@ class CEODataBridge:
             discovery_sessions_path: Path to directory containing discovery session JSON files
         """
         self.sessions_path = Path(discovery_sessions_path)
-        self._cache = {}
+        self._cache: Dict[str, Dict] = {}
         self._cache_ttl = 30  # seconds
+
+    def _get_cached_value(self, key: str):
+        """Return cached value if within TTL."""
+
+        entry = self._cache.get(key)
+        if not entry:
+            return None
+
+        if time.time() - entry["timestamp"] > self._cache_ttl:
+            self._cache.pop(key, None)
+            return None
+
+        return entry["data"]
+
+    def _set_cached_value(self, key: str, value):
+        """Store value in cache with current timestamp."""
+
+        self._cache[key] = {"timestamp": time.time(), "data": value}
 
     def get_current_session(self) -> Dict:
         """
@@ -37,25 +56,36 @@ class CEODataBridge:
         Returns:
             Dict containing session data or empty session if none found
         """
+        cached = self._get_cached_value("current_session")
+        if cached is not None:
+            return cached
+
         try:
             if not self.sessions_path.exists():
-                return self._empty_session()
+                session = self._empty_session()
+                self._set_cached_value("current_session", session)
+                return session
 
             # Find most recent session file
             session_files = list(self.sessions_path.glob("discovery-*.json"))
             if not session_files:
-                return self._empty_session()
+                session = self._empty_session()
+                self._set_cached_value("current_session", session)
+                return session
 
             latest_file = max(session_files, key=lambda f: f.stat().st_mtime)
 
             with open(latest_file) as f:
                 data = json.load(f)
 
+            self._set_cached_value("current_session", data)
             return data
 
         except (FileNotFoundError, json.JSONDecodeError) as e:
             logger.error(f"Error reading discovery session: {e}")
-            return self._empty_session()
+            session = self._empty_session()
+            self._set_cached_value("current_session", session)
+            return session
 
     def get_proposals(self, min_roi: float = 0.0, limit: int = 10) -> List[Dict]:
         """
@@ -118,8 +148,13 @@ class CEODataBridge:
         Returns:
             List of session summaries sorted by date descending
         """
+        cached_history = self._get_cached_value("history")
+        if cached_history is not None:
+            return cached_history[:limit]
+
         try:
             if not self.sessions_path.exists():
+                self._set_cached_value("history", [])
                 return []
 
             session_files = sorted(
@@ -129,7 +164,7 @@ class CEODataBridge:
             )
 
             sessions = []
-            for session_file in session_files[:limit]:
+            for session_file in session_files:
                 try:
                     with open(session_file) as f:
                         data = json.load(f)
@@ -148,10 +183,12 @@ class CEODataBridge:
                     logger.warning(f"Skipping invalid session file {session_file}: {e}")
                     continue
 
-            return sessions
+            self._set_cached_value("history", sessions)
+            return sessions[:limit]
 
         except Exception as e:
             logger.error(f"Error reading session history: {e}")
+            self._set_cached_value("history", [])
             return []
 
     def _empty_session(self) -> Dict:
