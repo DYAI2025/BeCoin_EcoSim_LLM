@@ -25,7 +25,7 @@ import secrets
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)  # Don't auto-raise 401 if no credentials
 
 try:
     from dashboard import __version__
@@ -50,14 +50,25 @@ else:
     logger.info("✓ Authentication is ENABLED")
 
 
-def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) -> str:
+def verify_credentials(
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+) -> str:
     """
     Verify HTTP Basic Auth credentials.
 
     Returns the username if valid, raises HTTPException if invalid.
+    If AUTH is disabled, returns 'anonymous' without requiring credentials.
     """
     if not AUTH_ENABLED:
         return "anonymous"
+
+    # If auth is enabled but no credentials provided
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Basic"},
+        )
 
     # Use constant-time comparison to prevent timing attacks
     username_correct = secrets.compare_digest(
