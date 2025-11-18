@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f dashboard/requirements.txt ]; then
+            pip install -r dashboard/requirements.txt
+          fi
+          # Install linting tools (flake8 and black are already in requirements.txt)
+          pip install flake8 black
+
+      - name: Run Black format check
+        run: |
+          black --check .
+
+      - name: Run flake8 linting
+        run: |
+          flake8 .
+
+      - name: Run pytest
+        run: |
+          pytest -q becoin_economy
