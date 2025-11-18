@@ -1,5 +1,7 @@
 # 🪙 BeCoin EcoSim
 
+[![CI](https://github.com/DYAI2025/lazy-bird-agent-becoin-10/actions/workflows/ci.yml/badge.svg)](https://github.com/DYAI2025/lazy-bird-agent-becoin-10/actions/workflows/ci.yml)
+
 BeCoin EcoSim is a self-contained simulation of an autonomous startup economy. It
 models treasury health, agent productivity, project pipelines, and the CEO discovery
 workflow that surfaces proposals and operational patterns. A FastAPI dashboard exposes
