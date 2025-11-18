@@ -2,12 +2,14 @@
   "active": [],
   "pipeline": [
     {
-      "id": "proj-004",
-      "name": "LLM Integration",
+      "id": "IDEA-003",
+      "name": "Review: Founder Insights Dashboard",
       "stage": "pipeline",
-      "value": 4000,
-      "impactScore": 95,
-      "team": []
+      "value": 1500,
+      "impactScore": 88,
+      "roi": 160,
+      "customer": "Founding Customer (You)",
+      "team": ["agent-helio", "agent-circe"]
     }
   ],
   "completed": [
@@ -25,7 +27,7 @@
       "id": "proj-002",
       "name": "API Integration",
       "stage": "completed",
-      "value": 2500,
+      "value": 1800,
       "impactScore": 92,
       "team": [
         "agent-002"
