@@ -51,6 +51,23 @@ def test_cors_enabled():
     assert "access-control-allow-origin" in response.headers
 
 
+def test_cors_rejects_unknown_origin():
+    """Ensure preflight requests from disallowed origins are rejected."""
+    from dashboard.server import app
+
+    client = TestClient(app)
+    response = client.options(
+        "/api/status",
+        headers={
+            "Origin": "https://malicious.example",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+
+    assert response.status_code in {400, 403}
+    assert "access-control-allow-origin" not in response.headers
+
+
 def test_root_endpoint():
     """Test root endpoint provides service info or HTML dashboard."""
     from dashboard.server import app, DASHBOARD_DIR
