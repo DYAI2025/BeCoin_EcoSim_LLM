@@ -5,10 +5,11 @@ This test ensures the data bridge correctly reads and formats
 CEO Discovery session data for API consumption.
 """
 
-import pytest
 import json
 import tempfile
 from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture
