@@ -207,6 +207,15 @@ class Orchestrator:
         self.personality_loader = load_personalities()
         self.tasks: List[Task] = []
         self.current_task_index = 0
+        self.activation_context = {
+            "prototype_focus": "",
+            "relationship_goals": "",
+            "data_permissions": {
+                "local_files": False,
+                "google_drive": False,
+                "email": False,
+            },
+        }
 
         # Create logs directory
         self.logs_dir = Path("autonomous_agents/logs")
@@ -244,6 +253,73 @@ class Orchestrator:
             if personality:
                 task.agent_personality = personality.name
                 self.log(f"  Task {task.number}: {personality.name}")
+
+    def run_activation_briefing(self):
+        """Establish first-contact rituals before autonomous execution."""
+        self.log("\n🤝 Activation briefing started")
+        self.log(
+            "✨ Agents will reach out for a rapid prototype interview to keep the user "
+            "energized about the idea."
+        )
+        self.log(
+            "🔐 We also need explicit permission before touching local files, Google "
+            "Drive artifacts, or email threads."
+        )
+
+        if sys.stdin.isatty():
+            try:
+                focus = input(
+                    "Describe the first prototype vision or interview focus you want the "
+                    "agents to pitch: "
+                ).strip()
+                relationship = input(
+                    "How should the agents excite the user about next steps? "
+                ).strip()
+
+                def ask_permission(label: str) -> bool:
+                    answer = input(
+                        f"May the agents review {label}? (yes/no): "
+                    ).strip().lower()
+                    return answer in {"y", "yes"}
+
+                self.activation_context["prototype_focus"] = focus
+                self.activation_context["relationship_goals"] = relationship
+                self.activation_context["data_permissions"]["local_files"] = ask_permission(
+                    "local project files"
+                )
+                self.activation_context["data_permissions"]["google_drive"] = ask_permission(
+                    "Google Drive"
+                )
+                self.activation_context["data_permissions"]["email"] = ask_permission(
+                    "email threads"
+                )
+            except EOFError:
+                self.log(
+                    "⚠️ Interactive input not available; assuming permissions are pending.",
+                    "WARNING",
+                )
+        else:
+            self.log(
+                "📝 Non-interactive session detected. Document prototype focus and "
+                "permissions manually before continuing.",
+            )
+
+        self.log(
+            "💡 Prototype focus: "
+            f"{self.activation_context['prototype_focus'] or 'not captured'}"
+        )
+        self.log(
+            "🎯 Enthusiasm plan: "
+            f"{self.activation_context['relationship_goals'] or 'share a compelling teaser'}"
+        )
+        permissions = self.activation_context["data_permissions"]
+        self.log(
+            "🔎 Data permissions → local files: {local}, Google Drive: {drive}, email: {email}".format(
+                local="granted" if permissions["local_files"] else "pending",
+                drive="granted" if permissions["google_drive"] else "pending",
+                email="granted" if permissions["email"] else "pending",
+            )
+        )
 
     def execute_task(self, task: Task) -> ExecutionResult:
         """
@@ -449,6 +525,31 @@ Now execute this task.
         self.log("\n" + "=" * 60)
         self.log("🎬 Starting Autonomous Execution")
         self.log("=" * 60 + "\n")
+        if self.activation_context["prototype_focus"]:
+            self.log(
+                "📣 Anchoring work around the user's prototype vision: "
+                f"{self.activation_context['prototype_focus']}"
+            )
+        if self.activation_context["relationship_goals"]:
+            self.log(
+                "💬 Agents will emphasize: "
+                f"{self.activation_context['relationship_goals']}"
+            )
+        permissions = self.activation_context["data_permissions"]
+        granted_sources = [
+            name
+            for name, allowed in permissions.items()
+            if allowed
+        ]
+        if granted_sources:
+            self.log(
+                "📁 Approved research surfaces: " + ", ".join(granted_sources)
+            )
+        else:
+            self.log(
+                "📁 No research repositories approved yet; agents will rely on public "
+                "context until permission arrives."
+            )
 
         start_time = datetime.now()
 
@@ -519,6 +620,7 @@ def main():
         orchestrator = Orchestrator(args.plan, dry_run=args.dry_run)
         orchestrator.load_plan()
         orchestrator.assign_personalities()
+        orchestrator.run_activation_briefing()
         orchestrator.execute_all()
 
     except KeyboardInterrupt:
