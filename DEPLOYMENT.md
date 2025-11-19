@@ -278,18 +278,17 @@ After making code changes:
 
 ### CORS
 
-Current configuration allows all origins (`allow_origins=["*"]`). For production:
+- ✅ By default the dashboard server now whitelists the local dev URLs and Fly.io domains:
+  `http://localhost:3000`, `http://127.0.0.1:3000`, `https://becoin-ecosim-llm.fly.dev`, `https://becoin-ecosystem.fly.dev`.
+- 🔒 Cookies/credentials are only sent when the origin is explicitly whitelisted.
 
-1. Edit `dashboard/server.py`
-2. Replace `allow_origins=["*"]` with specific domains:
-   ```python
-   allow_origins=[
-       "https://your-frontend.com",
-       "https://dashboard.your-company.com"
-   ]
-   ```
+Override the list via the `DASHBOARD_ALLOW_ORIGINS` environment variable (comma-separated list):
 
-3. Redeploy: `fly deploy`
+```bash
+export DASHBOARD_ALLOW_ORIGINS="https://my-dashboard.company,https://app.fly.dev"
+```
+
+Redeploy after adjusting the env var: `fly deploy`
 
 ### Recommendations
 
