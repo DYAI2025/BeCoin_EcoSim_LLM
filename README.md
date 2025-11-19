@@ -1,5 +1,7 @@
 # 🪙 BeCoin EcoSim
 
+![CI](https://github.com/DYAI2025/lazy-bird-agent-becoin-10/workflows/CI/badge.svg)
+
 BeCoin EcoSim is a self-contained simulation of an autonomous startup economy. It
 models treasury health, agent productivity, project pipelines, and the CEO discovery
 workflow that surfaces proposals and operational patterns. A FastAPI dashboard exposes
@@ -81,13 +83,15 @@ pytest
 
 ### Continuous Integration
 
-The project uses GitHub Actions to automatically run code quality checks on pull requests and pushes to `main`:
+The project uses GitHub Actions for automated quality checks on every pull request and
+push to the main branch. The CI workflow (`.github/workflows/ci.yml`) runs:
 
-- **Black** – code formatting verification (`black --check .`)
-- **flake8** – linting with project-specific configuration from `.flake8`
-- **pytest** – automated test suite for the economy engine
+1. **Black format check** – Ensures code formatting adheres to Black standards
+2. **Flake8 linting** – Validates code quality and catches common issues
+3. **Pytest** – Runs the full test suite to verify economy invariants and API contracts
 
-The CI workflow is defined in `.github/workflows/ci.yml` and runs on Python 3.12 with pip caching for faster builds.
+All checks must pass before merging. The CI badge at the top of this README shows the
+current build status.
 
 ## 🚀 Running the Dashboard
 
