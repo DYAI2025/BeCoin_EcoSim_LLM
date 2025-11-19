@@ -38,7 +38,7 @@ code generation starts:
 2. **Permission requests** – If the session is interactive, the CLI explicitly asks
    whether agents may review local files, Google Drive assets, and email threads,
    storing each answer in the activation context. Non-interactive sessions get a
-   reminder to capture those approvals manually. 【F:autonomous_agents/orchestrator.py†L269-L321】
+   reminder to capture those approvals manually. 【F:autonomous_agents/orchestrator.py†L257-L322】
 3. **Enthusiasm and research cues** – The activation context records the prototype
    focus plus the tone that should excite the user, then the execution loop reiterates
    those cues and lists which data surfaces were approved so every task stays aligned
