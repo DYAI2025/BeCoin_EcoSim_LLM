@@ -79,6 +79,16 @@ Run the full suite from the repository root:
 pytest
 ```
 
+### Continuous Integration
+
+The project uses GitHub Actions to automatically run code quality checks on pull requests and pushes to `main`:
+
+- **Black** – code formatting verification (`black --check .`)
+- **flake8** – linting with project-specific configuration from `.flake8`
+- **pytest** – automated test suite for the economy engine
+
+The CI workflow is defined in `.github/workflows/ci.yml` and runs on Python 3.12 with pip caching for faster builds.
+
 ## 🚀 Running the Dashboard
 
 1. Install dashboard dependencies:
