@@ -1716,7 +1716,11 @@
 
         // Connect to chat WebSocket
         function connectChatWebSocket() {
-            const chatWsUrl = 'ws://localhost:3000/ws/chat';
+            // Dynamically construct WebSocket URL based on current location
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsHost = window.location.hostname;
+            const wsPort = window.location.port ? `:${window.location.port}` : '';
+            const chatWsUrl = `${wsProtocol}//${wsHost}${wsPort}/ws/chat`;
             chatWs = new WebSocket(chatWsUrl);
 
             chatWs.onopen = () => {
