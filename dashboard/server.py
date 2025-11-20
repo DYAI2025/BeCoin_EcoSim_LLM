@@ -117,6 +117,7 @@ ws_manager = WebSocketManager()
 # Chat storage (in-memory for now, can be moved to database later)
 chat_messages: List[Dict] = []
 chat_connections: List[WebSocket] = []
+chat_lock = asyncio.Lock()
 
 # Configure CORS
 DEFAULT_ALLOWED_ORIGINS = [
