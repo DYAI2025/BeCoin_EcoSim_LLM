@@ -1,0 +1,38 @@
+name: CI - Lint and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f dashboard/requirements.txt ]; then
+          pip install -r dashboard/requirements.txt
+        fi
+        pip install black flake8
+
+    - name: Run Black (check formatting)
+      run: black --check .
+
+    - name: Run flake8 (linting)
+      run: flake8 .
+
+    - name: Run pytest (tests)
+      run: pytest -q becoin_economy
