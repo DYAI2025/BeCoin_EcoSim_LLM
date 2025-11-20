@@ -7,6 +7,7 @@ without authentication requirements.
 
 import os
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -33,6 +34,16 @@ def disable_auth():
         os.environ["AUTH_USERNAME"] = original_username
     if original_password is not None:
         os.environ["AUTH_PASSWORD"] = original_password
+
+
+@pytest.fixture
+def client():
+    """
+    Provide a TestClient instance for testing the FastAPI application.
+    """
+    from dashboard.server import app
+
+    return TestClient(app)
 
 
 # This runs at module import time, before the server module is imported

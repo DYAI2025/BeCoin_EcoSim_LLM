@@ -20,12 +20,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from typing import List, Optional
+from typing import List, Optional, Dict
+from pydantic import BaseModel
 import logging
 import os
 import secrets
 from pathlib import Path
 import contextlib
+import json
 
 logger = logging.getLogger(__name__)
 security = HTTPBasic(auto_error=False)  # Don't auto-raise 401 if no credentials
@@ -92,6 +94,15 @@ def verify_credentials(
     return credentials.username
 
 
+# Pydantic models for chat
+class ChatMessage(BaseModel):
+    type: str
+    content: str
+    target_agent: str
+    timestamp: str
+    sender: str
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title="CEO Discovery Dashboard",
@@ -102,6 +113,11 @@ app = FastAPI(
 # Initialize data bridge and WebSocket manager
 ceo_bridge = CEODataBridge()
 ws_manager = WebSocketManager()
+
+# Chat storage (in-memory for now, can be moved to database later)
+chat_messages: List[Dict] = []
+chat_connections: List[WebSocket] = []
+chat_lock = asyncio.Lock()
 
 # Configure CORS
 DEFAULT_ALLOWED_ORIGINS = [
@@ -145,6 +161,9 @@ app.add_middleware(
 # Get the dashboard directory path
 DASHBOARD_DIR = Path(__file__).parent
 STATIC_DIR = DASHBOARD_DIR / "becoin-economy"
+
+# Chat history file path
+CHAT_HISTORY_FILE = DASHBOARD_DIR / "chat_history.json"
 
 # Mount static files directory if it exists
 if STATIC_DIR.exists():
@@ -305,6 +324,166 @@ async def _stream_ceo_session_updates(websocket: WebSocket) -> None:
             last_signature = signature
 
         await asyncio.sleep(max(0.1, WS_POLL_INTERVAL))
+
+
+# Chat Endpoints
+
+
+def load_chat_history() -> List[Dict]:
+    """Load chat history from file."""
+    global chat_messages
+    try:
+        if CHAT_HISTORY_FILE.exists():
+            with open(CHAT_HISTORY_FILE, "r", encoding="utf-8") as f:
+                chat_messages = json.load(f)
+                logger.info(f"Loaded {len(chat_messages)} chat messages from history")
+        else:
+            chat_messages = []
+    except Exception as e:
+        logger.error(f"Error loading chat history: {e}")
+        chat_messages = []
+    return chat_messages
+
+
+def save_chat_history():
+    """Save chat history to file."""
+    try:
+        with open(CHAT_HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(chat_messages, f, indent=2, ensure_ascii=False)
+        logger.info(f"Saved {len(chat_messages)} chat messages to history")
+    except Exception as e:
+        logger.error(f"Error saving chat history: {e}")
+
+
+@app.get("/api/chat/history")
+async def get_chat_history(
+    limit: int = Query(100, description="Maximum number of messages", ge=1, le=1000),
+    username: str = Depends(verify_credentials),
+):
+    """Get chat message history."""
+    load_chat_history()
+    return {"messages": chat_messages[-limit:] if chat_messages else []}
+
+
+@app.post("/api/chat/send")
+async def send_chat_message(
+    message: ChatMessage, username: str = Depends(verify_credentials)
+):
+    """Send a chat message (REST API fallback)."""
+    message_dict = message.model_dump()
+    chat_messages.append(message_dict)
+    save_chat_history()
+
+    # Broadcast to all connected chat WebSocket clients
+    await broadcast_to_chat_clients(message_dict)
+
+    # TODO: Send to agent for processing
+    # For now, we just echo back a simple response
+    if message.target_agent != "all":
+        agent_response = {
+            "type": "agent_message",
+            "content": f"Nachricht erhalten: '{message.content}'. Agent-Antworten werden bald implementiert!",
+            "target_agent": message.target_agent,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "sender": message.target_agent,
+        }
+        chat_messages.append(agent_response)
+        save_chat_history()
+        await broadcast_to_chat_clients(agent_response)
+
+    return {"status": "sent", "message": message_dict}
+
+
+async def broadcast_to_chat_clients(message: Dict):
+    """Broadcast message to all connected chat clients."""
+    disconnected = []
+    for connection in chat_connections:
+        try:
+            await connection.send_json(message)
+        except Exception as e:
+            logger.error(f"Error broadcasting to chat client: {e}")
+            disconnected.append(connection)
+
+    # Clean up disconnected clients
+    for connection in disconnected:
+        if connection in chat_connections:
+            chat_connections.remove(connection)
+
+
+@app.websocket("/ws/chat")
+async def chat_websocket(websocket: WebSocket):
+    """
+    WebSocket endpoint for bidirectional chat communication.
+
+    Clients connect to this endpoint to send and receive chat messages
+    in real-time with agents.
+    """
+    await websocket.accept()
+    chat_connections.append(websocket)
+    logger.info(f"Chat WebSocket connected. Total connections: {len(chat_connections)}")
+
+    # Send welcome message and chat history
+    await websocket.send_json(
+        {
+            "type": "connection_established",
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "message": "Chat verbunden - Sie können jetzt mit Agenten kommunizieren",
+        }
+    )
+
+    # Send recent chat history
+    load_chat_history()
+    if chat_messages:
+        await websocket.send_json(
+            {"type": "chat_history", "messages": chat_messages[-50:]}
+        )
+
+    try:
+        while True:
+            # Receive message from client
+            data = await websocket.receive_text()
+            message = json.loads(data)
+
+            # Store message
+            chat_messages.append(message)
+            save_chat_history()
+
+            # Broadcast to other clients
+            await broadcast_to_chat_clients(message)
+
+            # TODO: Send to agent for processing
+            # For now, echo back a simple response
+            if message.get("target_agent") and message.get("target_agent") != "all":
+                agent_response = {
+                    "type": "agent_message",
+                    "content": f"Nachricht erhalten: '{message.get('content')}'. Agent-Antworten werden bald implementiert!",
+                    "target_agent": message.get("target_agent"),
+                    "timestamp": datetime.now(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                    "sender": message.get("target_agent", "Agent"),
+                }
+                chat_messages.append(agent_response)
+                save_chat_history()
+                await broadcast_to_chat_clients(agent_response)
+
+    except WebSocketDisconnect:
+        chat_connections.remove(websocket)
+        logger.info(
+            f"Chat WebSocket disconnected. Total connections: {len(chat_connections)}"
+        )
+    except Exception as e:
+        logger.error(f"Chat WebSocket error: {e}")
+        if websocket in chat_connections:
+            chat_connections.remove(websocket)
+
+
+# Load chat history on startup
+@app.on_event("startup")
+async def startup_event():
+    """Load chat history on application startup."""
+    load_chat_history()
+    logger.info("Application started, chat history loaded")
 
 
 if __name__ == "__main__":
