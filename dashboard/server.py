@@ -111,7 +111,10 @@ app = FastAPI(
 )
 
 # Initialize data bridge and WebSocket manager
-ceo_bridge = CEODataBridge()
+DISCOVERY_SESSIONS_PATH = os.getenv(
+    "DISCOVERY_SESSIONS_PATH", "../.claude-flow/discovery-sessions"
+)
+ceo_bridge = CEODataBridge(discovery_sessions_path=DISCOVERY_SESSIONS_PATH)
 ws_manager = WebSocketManager()
 
 # Chat storage (in-memory for now, can be moved to database later)
@@ -355,6 +358,70 @@ def save_chat_history():
         logger.error(f"Error saving chat history: {e}")
 
 
+def _build_agent_response_content(user_message: str) -> str:
+    """Create a contextual agent reply using the latest discovery session data."""
+
+    session = ceo_bridge.get_current_session()
+
+    if session.get("status") == "idle":
+        return (
+            "Nachricht erhalten. Aktuell liegen keine Discovery-Daten vor; "
+            "ich gebe Bescheid, sobald neue Erkenntnisse verfügbar sind."
+        )
+
+    proposals = session.get("proposals", [])
+    patterns = session.get("patterns", [])
+    pain_points = session.get("pain_points", [])
+
+    parts = [f"Nachricht erhalten: '{user_message}'."]
+
+    if proposals:
+        top = max(proposals, key=lambda p: p.get("roi", 0))
+        parts.append(
+            "Top-Vorschlag: {title} (ROI {roi}x, Zeitplan {timeline}, Kosten {cost}).".format(
+                title=top.get("title", ""),
+                roi=top.get("roi", "?"),
+                timeline=top.get("timeline", "unbekannt"),
+                cost=top.get("cost_becoins", "unbekannt"),
+            )
+        )
+
+    if pain_points:
+        primary = pain_points[0]
+        parts.append(
+            "Wichtigster Pain Point: {title} (≈{time} Min/Woche, Schwere {severity}).".format(
+                title=primary.get("title", "Unbekannt"),
+                time=primary.get("time_cost_minutes", "?"),
+                severity=primary.get("severity", "?"),
+            )
+        )
+
+    if patterns:
+        pattern = patterns[0]
+        parts.append(
+            "Beobachtetes Muster: {description}".format(
+                description=pattern.get("description", ""),
+            )
+        )
+
+    parts.append("Ich setze die genannten Maßnahmen jetzt um und melde Fortschritt im Chat.")
+
+    return " ".join(parts)
+
+
+def _create_agent_message(target_agent: str, user_content: str) -> Dict:
+    """Build an agent response payload enriched with discovery insights."""
+
+    content = _build_agent_response_content(user_content)
+    return {
+        "type": "agent_message",
+        "content": content,
+        "target_agent": target_agent,
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "sender": target_agent,
+    }
+
+
 @app.get("/api/chat/history")
 async def get_chat_history(
     limit: int = Query(100, description="Maximum number of messages", ge=1, le=1000),
@@ -377,16 +444,10 @@ async def send_chat_message(
     # Broadcast to all connected chat WebSocket clients
     await broadcast_to_chat_clients(message_dict)
 
-    # TODO: Send to agent for processing
-    # For now, we just echo back a simple response
     if message.target_agent != "all":
-        agent_response = {
-            "type": "agent_message",
-            "content": f"Nachricht erhalten: '{message.content}'. Agent-Antworten werden bald implementiert!",
-            "target_agent": message.target_agent,
-            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            "sender": message.target_agent,
-        }
+        agent_response = _create_agent_message(
+            target_agent=message.target_agent, user_content=message.content
+        )
         chat_messages.append(agent_response)
         save_chat_history()
         await broadcast_to_chat_clients(agent_response)
@@ -451,18 +512,11 @@ async def chat_websocket(websocket: WebSocket):
             # Broadcast to other clients
             await broadcast_to_chat_clients(message)
 
-            # TODO: Send to agent for processing
-            # For now, echo back a simple response
             if message.get("target_agent") and message.get("target_agent") != "all":
-                agent_response = {
-                    "type": "agent_message",
-                    "content": f"Nachricht erhalten: '{message.get('content')}'. Agent-Antworten werden bald implementiert!",
-                    "target_agent": message.get("target_agent"),
-                    "timestamp": datetime.now(timezone.utc)
-                    .isoformat()
-                    .replace("+00:00", "Z"),
-                    "sender": message.get("target_agent", "Agent"),
-                }
+                agent_response = _create_agent_message(
+                    target_agent=message.get("target_agent", "Agent"),
+                    user_content=message.get("content", ""),
+                )
                 chat_messages.append(agent_response)
                 save_chat_history()
                 await broadcast_to_chat_clients(agent_response)
