@@ -79,6 +79,17 @@ Run the full suite from the repository root:
 pytest
 ```
 
+### Continuous Integration
+
+All pull requests and pushes to `main` automatically run:
+
+- **Black** – Code formatting checks (`black --check .`)
+- **flake8** – Linting with configured rules (`.flake8`)
+- **pytest** – Full test suite for `becoin_economy`
+
+The CI workflow is defined in `.github/workflows/ci.yml` and uses pip caching to
+speed up builds.
+
 ## 🚀 Running the Dashboard
 
 1. Install dashboard dependencies:
