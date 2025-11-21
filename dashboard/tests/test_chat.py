@@ -5,6 +5,7 @@ This module tests the bidirectional chat communication between users and agents.
 """
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 def test_get_chat_history_empty(client):
     """Test getting chat history when no messages exist."""
@@ -193,3 +194,38 @@ def test_broadcast_to_multiple_clients(client):
                 response1["type"] == "user_message"
                 or response2["type"] == "user_message"
             )
+
+
+def test_agent_response_includes_discovery_data(client, tmp_path):
+    """Agent replies should surface current discovery insights instead of placeholders."""
+
+    from dashboard import server
+
+    # Reset chat state so assertions are deterministic
+    server.chat_messages.clear()
+    server.save_chat_history()
+
+    sample = Path(__file__).parent / "fixtures" / "sample_discovery_session.json"
+    discovery_file = tmp_path / "discovery-abc.json"
+    discovery_file.write_text(sample.read_text())
+
+    # Point the bridge to the sample discovery data
+    server.ceo_bridge.sessions_path = tmp_path
+    server.ceo_bridge._cache.clear()
+    server.ceo_bridge._cache_signature = None
+
+    message = {
+        "type": "user_message",
+        "content": "Was ist der aktuelle Plan?",
+        "target_agent": "agent-helio",
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "sender": "User",
+    }
+
+    client.post("/api/chat/send", json=message)
+
+    history = client.get("/api/chat/history").json()["messages"]
+    agent_messages = [m for m in history if m.get("type") == "agent_message"]
+
+    assert agent_messages, "Agent response should be present"
+    assert any("Automated Database Backup System" in m["content"] for m in agent_messages)
