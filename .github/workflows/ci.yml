@@ -5,19 +5,25 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: Install dependencies
@@ -26,13 +32,17 @@ jobs:
           if [ -f dashboard/requirements.txt ]; then
             pip install -r dashboard/requirements.txt
           fi
-          pip install black flake8
+          # Install linting tools (flake8 and black are already in requirements.txt)
+          pip install flake8 black
 
-      - name: Check code formatting with Black
-        run: black --check .
+      - name: Run Black format check
+        run: |
+          black --check .
 
-      - name: Lint with flake8
-        run: flake8 .
+      - name: Run flake8 linting
+        run: |
+          flake8 .
 
-      - name: Run tests with pytest
-        run: pytest -q becoin_economy
+      - name: Run pytest
+        run: |
+          pytest -q becoin_economy
