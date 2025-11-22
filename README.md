@@ -1,5 +1,7 @@
 # 🪙 BeCoin EcoSim
 
+![CI Status](https://github.com/DYAI2025/becoin-ecosim-llm/actions/workflows/ci.yml/badge.svg)
+
 BeCoin EcoSim is a self-contained simulation of an autonomous startup economy. It
 models treasury health, agent productivity, project pipelines, and the CEO discovery
 workflow that surfaces proposals and operational patterns. A FastAPI dashboard exposes
@@ -78,6 +80,17 @@ Run the full suite from the repository root:
 ```bash
 pytest
 ```
+
+### Continuous Integration
+
+The project uses GitHub Actions to automatically run linting and tests on all pull
+requests and pushes to main. The CI workflow checks:
+
+- **Code formatting** with Black (`black --check .`)
+- **Code linting** with flake8 (`flake8 .`)
+- **Unit tests** with pytest (`pytest -q becoin_economy`)
+
+All checks must pass before merging. See `.github/workflows/ci.yml` for details.
 
 ## 🚀 Running the Dashboard
 
