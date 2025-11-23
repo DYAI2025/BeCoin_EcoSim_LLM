@@ -536,12 +536,9 @@ Now execute this task.
                 f"{self.activation_context['relationship_goals']}"
             )
         permissions = self.activation_context["data_permissions"]
-        granted_sources = [
-            name
-            for name, allowed in permissions.items()
-            if allowed
-        ]
-        if granted_sources:
+        if granted_sources := [
+            name for name, allowed in permissions.items() if allowed
+        ]:
             self.log(
                 "📁 Approved research surfaces: " + ", ".join(granted_sources)
             )
