@@ -213,7 +213,7 @@ class OllamaLLMBridge:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get(f"{self.base_url}/api/tags")
                 return response.status_code == 200
-        except:
+        except Exception:
             return False
 ```
 
