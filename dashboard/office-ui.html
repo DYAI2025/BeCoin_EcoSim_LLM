@@ -1771,8 +1771,15 @@
         function loadChatHistory(messages) {
             chatMessages = messages;
             const messagesContainer = document.getElementById('chat-messages');
-            // Clear existing messages except system message
-            messagesContainer.innerHTML = messagesContainer.children[0].outerHTML;
+            // Clear existing messages except system message (if it exists)
+            const firstChild = messagesContainer.firstElementChild;
+            if (firstChild) {
+                // Preserve the first child (system message) and clear the rest
+                messagesContainer.innerHTML = firstChild.outerHTML;
+            } else {
+                // No children present; just clear the container
+                messagesContainer.innerHTML = '';
+            }
 
             messages.forEach(msg => {
                 const type = msg.sender === 'User' ? 'user' : 'agent';
