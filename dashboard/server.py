@@ -120,6 +120,7 @@ ws_manager = WebSocketManager()
 # Chat storage (in-memory for now, can be moved to database later)
 chat_messages: List[Dict] = []
 chat_connections: List[WebSocket] = []
+# Use chat_lock to protect all accesses (reads/writes) to chat_messages for concurrency safety.
 chat_lock = asyncio.Lock()
 
 # Configure CORS
