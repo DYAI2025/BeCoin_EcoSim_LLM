@@ -29,11 +29,40 @@ pytest -v
 cd dashboard
 pip install -r requirements.txt
 
+# Ensure Ollama is running for LLM-powered chat
+curl http://localhost:11434/api/tags
+
 # Start FastAPI server (default port 3000)
 uvicorn server:app --reload --port 3000
 
 # Serve static dashboard (separate terminal)
 python3 -m http.server 8080
+```
+
+### Interactive Agent Chat
+```bash
+# The dashboard includes a fully interactive chat system with LLM-powered agents
+
+# Features:
+# - 800px × 900px chat window (resizable, fullscreen mode)
+# - Real-time agent responses via Ollama (qwen2.5-coder:7b)
+# - Action execution (start projects, check treasury, etc.)
+# - Treasury-safety guardrails (balance never <0)
+# - Smart agent routing based on intent detection
+# - Agent info panel showing status, earnings, projects
+
+# Example interactions:
+# - "Start API optimization project with 500 Bc budget" → Executes if treasury allows
+# - "Check our burn rate" → Returns treasury analysis
+# - "Deploy the new feature" → Routes to DevOps agent
+# - "Analyze our financial health" → Routes to Financial Analyst
+
+# Chat controls:
+# - Enter: Send message
+# - Shift+Enter: New line
+# - ⛶ Button: Fullscreen mode
+# - ℹ Button: Agent info panel
+# - ▼ Button: Minimize chat
 ```
 
 ### Autonomous Agents
