@@ -863,7 +863,6 @@ Top Action:      check_treasury (42%)
 - **Aktionen:** Anzahl ausgeführter Aktionen, Erfolgsrate
 - **Firmen-Impact:** Treasury-Änderungen durch Agent-Aktionen, ROI
 - **User-Satisfaction:** implizit (Anzahl Follow-up-Fragen)
-- **User-Satisfaction:** Implicit (Anzahl Follow-up-Fragen)
 
 ---
 
