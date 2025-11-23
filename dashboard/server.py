@@ -188,7 +188,7 @@ def load_or_create_economy():
                     agent = Agent(
                         id=agent_data.get("id", "unknown"),
                         name=agent_data.get("name", "Unknown"),
-                        agent_type=agent_data.get("agent_type", "autonomous"),
+                        role=agent_data.get("agent_type", "autonomous"),  # BeCoin uses 'role' not 'agent_type'
                         status=agent_data.get("status", "idle"),
                         equity_share=agent_data.get("equityShare", 0.0)
                     )
@@ -207,8 +207,11 @@ def load_or_create_economy():
                         project = Project(
                             id=proj_data.get("id", "unknown"),
                             name=proj_data.get("name", "Unknown Project"),
+                            stage=stage,  # BeCoin uses 'stage' not 'status'
+                            cost=proj_data.get("cost", 0),
                             value=proj_data.get("value", 0),
-                            status=stage
+                            impact_score=proj_data.get("impactScore", 0),
+                            team=proj_data.get("team", [])
                         )
                         projects.append(project)
 
@@ -235,28 +238,28 @@ def load_or_create_economy():
                 Agent(
                     id="agent-helio",
                     name="Helio",
-                    agent_type="Product Manager",
+                    role="Product Manager",
                     status="active",
                     equity_share=0.25
                 ),
                 Agent(
                     id="agent-nami",
                     name="Nami",
-                    agent_type="Backend Developer",
+                    role="Backend Developer",
                     status="active",
                     equity_share=0.25
                 ),
                 Agent(
                     id="agent-atlas",
                     name="Atlas",
-                    agent_type="Financial Analyst",
+                    role="Financial Analyst",
                     status="active",
                     equity_share=0.25
                 ),
                 Agent(
                     id="agent-circe",
                     name="Circe",
-                    agent_type="DevOps Engineer",
+                    role="DevOps Engineer",
                     status="active",
                     equity_share=0.25
                 )

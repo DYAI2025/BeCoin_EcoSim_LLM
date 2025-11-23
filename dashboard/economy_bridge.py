@@ -223,9 +223,11 @@ class EconomyBridge:
             project = Project(
                 id=project_id,
                 name=project_name,
-                value=budget,
-                team=[agent_id],
-                status="active"
+                stage="pipeline",  # BeCoin uses 'stage' (pipeline/active/completed)
+                cost=budget,
+                value=budget * 2,  # Simple ROI assumption: 2x return
+                impact_score=50,  # Default impact score
+                team=[agent_id]
             )
 
             self.economy.start_project(project)
