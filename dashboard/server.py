@@ -132,10 +132,165 @@ DISCOVERY_SESSIONS_PATH = os.getenv(
 ceo_bridge = CEODataBridge(discovery_sessions_path=DISCOVERY_SESSIONS_PATH)
 ws_manager = WebSocketManager()
 
+# Economy integration
+economy_lock = asyncio.Lock()  # For thread-safe economy operations
+
+
+def load_or_create_economy():
+    """
+    Load existing BecoinEconomy instance or create a new one.
+
+    Tries to:
+    1. Load from existing JSON files in dashboard/becoin-economy/
+    2. If not found, create a fresh economy with sensible defaults
+
+    Returns:
+        BecoinEconomy instance or None if unavailable
+    """
+    try:
+        # Try to import BeCoin Economy
+        import sys
+        becoin_path = Path(__file__).parent.parent / "becoin_economy"
+        if str(becoin_path) not in sys.path:
+            sys.path.insert(0, str(becoin_path))
+
+        from becoin_economy.engine import BecoinEconomy
+        from becoin_economy.models import Treasury, Agent, Project
+
+        # Check if we have existing economy data
+        treasury_file = STATIC_DIR / "treasury.json"
+
+        if treasury_file.exists():
+            # Load from existing files
+            logger.info("Loading existing economy from JSON files...")
+            import json
+
+            with open(treasury_file, 'r') as f:
+                treasury_data = json.load(f)
+
+            # Create treasury
+            treasury = Treasury(
+                balance=treasury_data.get("balance", 10000),
+                start_capital=treasury_data.get("start_capital", 10000)
+            )
+
+            # Load agents from agent-roster.json
+            agents = []
+            roster_file = STATIC_DIR / "agent-roster.json"
+            if roster_file.exists():
+                with open(roster_file, 'r') as f:
+                    roster_data = json.load(f)
+
+                # Get all agents (founders + employees)
+                all_agents = roster_data.get("founders", []) + roster_data.get("employees", [])
+
+                for agent_data in all_agents:
+                    agent = Agent(
+                        id=agent_data.get("id", "unknown"),
+                        name=agent_data.get("name", "Unknown"),
+                        agent_type=agent_data.get("agent_type", "autonomous"),
+                        status=agent_data.get("status", "idle"),
+                        equity_share=agent_data.get("equityShare", 0.0)
+                    )
+                    agents.append(agent)
+
+            # Load projects
+            projects = []
+            projects_file = STATIC_DIR / "projects.json"
+            if projects_file.exists():
+                with open(projects_file, 'r') as f:
+                    projects_data = json.load(f)
+
+                # Load active and pipeline projects
+                for stage in ["active", "pipeline"]:
+                    for proj_data in projects_data.get(stage, []):
+                        project = Project(
+                            id=proj_data.get("id", "unknown"),
+                            name=proj_data.get("name", "Unknown Project"),
+                            value=proj_data.get("value", 0),
+                            status=stage
+                        )
+                        projects.append(project)
+
+            economy = BecoinEconomy(
+                treasury=treasury,
+                agents=agents if agents else None,
+                projects=projects if projects else None
+            )
+
+            logger.info(f"✅ Loaded economy: {len(agents)} agents, {len(projects)} projects, {treasury.balance} Bc")
+            return economy
+
+        else:
+            # Create fresh economy with defaults
+            logger.info("Creating fresh economy with defaults...")
+
+            treasury = Treasury(
+                balance=10000,
+                start_capital=10000
+            )
+
+            # Create default agents matching dashboard
+            agents = [
+                Agent(
+                    id="agent-helio",
+                    name="Helio",
+                    agent_type="Product Manager",
+                    status="active",
+                    equity_share=0.25
+                ),
+                Agent(
+                    id="agent-nami",
+                    name="Nami",
+                    agent_type="Backend Developer",
+                    status="active",
+                    equity_share=0.25
+                ),
+                Agent(
+                    id="agent-atlas",
+                    name="Atlas",
+                    agent_type="Financial Analyst",
+                    status="active",
+                    equity_share=0.25
+                ),
+                Agent(
+                    id="agent-circe",
+                    name="Circe",
+                    agent_type="DevOps Engineer",
+                    status="active",
+                    equity_share=0.25
+                )
+            ]
+
+            economy = BecoinEconomy(
+                treasury=treasury,
+                agents=agents,
+                projects=[]
+            )
+
+            logger.info(f"✅ Created fresh economy: 4 agents, 0 projects, 10000 Bc")
+            return economy
+
+    except ImportError as e:
+        logger.error(f"❌ Could not import BeCoin Economy: {e}")
+        logger.warning("⚠️  Economy Bridge will run in MOCK mode")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Error loading/creating economy: {e}")
+        logger.warning("⚠️  Economy Bridge will run in MOCK mode")
+        return None
+
+
 # Chat storage (in-memory for now, can be moved to database later)
 chat_messages: List[Dict] = []
 chat_connections: List[WebSocket] = []
 chat_lock = asyncio.Lock()
+
+# Chat history limit (prevent memory leaks)
+MAX_CHAT_MESSAGES = 1000
+
+# Global economy instance
+economy_instance = None
 
 # Configure CORS
 DEFAULT_ALLOWED_ORIGINS = [
@@ -364,11 +519,18 @@ def load_chat_history() -> List[Dict]:
 
 
 def save_chat_history():
-    """Save chat history to file."""
+    """Save chat history to file with automatic trimming."""
+    global chat_messages
     try:
+        # Trim history if it exceeds MAX_CHAT_MESSAGES (prevent memory leaks)
+        if len(chat_messages) > MAX_CHAT_MESSAGES:
+            trimmed_count = len(chat_messages) - MAX_CHAT_MESSAGES
+            chat_messages = chat_messages[-MAX_CHAT_MESSAGES:]
+            logger.info(f"Trimmed {trimmed_count} old messages (limit: {MAX_CHAT_MESSAGES})")
+
         with open(CHAT_HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(chat_messages, f, indent=2, ensure_ascii=False)
-        logger.info(f"Saved {len(chat_messages)} chat messages to history")
+        logger.debug(f"Saved {len(chat_messages)} chat messages to history")
     except Exception as e:
         logger.error(f"Error saving chat history: {e}")
 
@@ -546,20 +708,22 @@ async def send_chat_message(
             target_agent=message.target_agent, user_content=message.content
         )
 
-        # Execute actions if any
+        # Execute actions if any (with economy lock for concurrency safety)
         actions = agent_response.get("actions", [])
         if actions:
             economy_bridge = get_economy_bridge()
             action_results = []
 
-            for action in actions:
-                result = economy_bridge.execute_agent_action(
-                    agent_id=message.target_agent,
-                    action=action
-                )
-                action_results.append(result)
+            # Use lock to prevent concurrent economy modifications
+            async with economy_lock:
+                for action in actions:
+                    result = economy_bridge.execute_agent_action(
+                        agent_id=message.target_agent,
+                        action=action
+                    )
+                    action_results.append(result)
 
-                logger.info(f"Action executed: {action['type']} -> {result['status']}")
+                    logger.info(f"Action executed: {action['type']} -> {result['status']}")
 
             # Append action results to agent response
             if action_results:
@@ -632,7 +796,7 @@ async def chat_websocket(websocket: WebSocket):
             await broadcast_to_chat_clients(message)
 
             if message.get("target_agent") and message.get("target_agent") != "all":
-                agent_response = _create_agent_message(
+                agent_response = await _create_agent_message(
                     target_agent=message.get("target_agent", "Agent"),
                     user_content=message.get("content", ""),
                 )
@@ -654,9 +818,43 @@ async def chat_websocket(websocket: WebSocket):
 # Load chat history on startup
 @app.on_event("startup")
 async def startup_event():
-    """Load chat history on application startup."""
+    """Initialize economy, check services, and load chat history on startup."""
+    global economy_instance
+
+    # 1. Load or create economy
+    logger.info("=" * 60)
+    logger.info("🚀 Starting Dashboard Server...")
+    logger.info("=" * 60)
+
+    economy_instance = load_or_create_economy()
+
+    if economy_instance:
+        # Set economy in economy_bridge
+        from dashboard.economy_bridge import set_economy_instance
+        set_economy_instance(economy_instance)
+        logger.info("✅ Economy Bridge connected to live economy")
+    else:
+        logger.warning("⚠️  Economy Bridge running in MOCK mode (no economy available)")
+
+    # 2. Check Ollama health
+    llm_bridge = get_llm_bridge()
+    is_ollama_healthy = await llm_bridge.check_ollama_health()
+
+    if is_ollama_healthy:
+        logger.info(f"✅ Ollama LLM available (model: {llm_bridge.model})")
+    else:
+        logger.warning("⚠️  Ollama LLM NOT available!")
+        logger.warning("   → Chat will use fallback responses (no AI generation)")
+        logger.warning("   → Start Ollama with: ollama serve")
+        logger.warning(f"   → Required model: {llm_bridge.model}")
+
+    # 3. Load chat history
     load_chat_history()
-    logger.info("Application started, chat history loaded")
+    logger.info(f"✅ Loaded {len(chat_messages)} chat messages from history")
+
+    logger.info("=" * 60)
+    logger.info("✅ Dashboard Server ready!")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":
