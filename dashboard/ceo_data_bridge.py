@@ -227,7 +227,4 @@ class CEODataBridge:
         if cached_mtime != latest_mtime:
             return None
 
-        if time.time() - cached_at > self._cache_ttl:
-            return None
-
-        return self._cache
+        return None if time.time() - cached_at > self._cache_ttl else self._cache
