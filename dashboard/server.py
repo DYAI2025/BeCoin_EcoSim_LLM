@@ -37,12 +37,14 @@ try:
     from dashboard.ceo_data_bridge import CEODataBridge
     from dashboard.websocket_manager import WebSocketManager
     from dashboard.llm_bridge import get_llm_bridge
+    from dashboard.economy_bridge import get_economy_bridge
 except ModuleNotFoundError:
     # When running directly, dashboard module not in path
     __version__ = "1.0.0"
     from ceo_data_bridge import CEODataBridge
     from websocket_manager import WebSocketManager
     from llm_bridge import get_llm_bridge
+    from economy_bridge import get_economy_bridge
 
 # Import personality loader
 import sys
@@ -426,25 +428,11 @@ def _get_economy_context() -> Dict:
     """
     Lädt aktuellen Economy-Context für LLM-Prompts.
 
-    TODO: Replace with real economy_bridge once implemented.
-
     Returns:
         Dict mit Treasury, Projekten, Metriken
     """
-    # Mock context for now (will be replaced with real data from economy_bridge)
-    return {
-        "treasury": {
-            "balance": 5000,
-            "burn_rate": 50.0,
-            "runway_hours": 100.0
-        },
-        "projects": {
-            "active": [],
-            "pipeline": [],
-            "completed": []
-        },
-        "agents": []
-    }
+    economy_bridge = get_economy_bridge()
+    return economy_bridge.get_context_for_chat()
 
 
 async def _create_agent_message(target_agent: str, user_content: str) -> Dict:
@@ -557,6 +545,28 @@ async def send_chat_message(
         agent_response = await _create_agent_message(
             target_agent=message.target_agent, user_content=message.content
         )
+
+        # Execute actions if any
+        actions = agent_response.get("actions", [])
+        if actions:
+            economy_bridge = get_economy_bridge()
+            action_results = []
+
+            for action in actions:
+                result = economy_bridge.execute_agent_action(
+                    agent_id=message.target_agent,
+                    action=action
+                )
+                action_results.append(result)
+
+                logger.info(f"Action executed: {action['type']} -> {result['status']}")
+
+            # Append action results to agent response
+            if action_results:
+                result_messages = "\n\n".join([r["message"] for r in action_results])
+                agent_response["content"] += f"\n\n**Aktionen ausgeführt:**\n{result_messages}"
+                agent_response["action_results"] = action_results
+
         chat_messages.append(agent_response)
         save_chat_history()
         await broadcast_to_chat_clients(agent_response)
