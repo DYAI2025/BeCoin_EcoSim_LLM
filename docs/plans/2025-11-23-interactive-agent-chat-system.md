@@ -1105,7 +1105,7 @@ Alle Agenten unterliegen strikten Guardrails:
 ## 🔮 Future Enhancements
 
 ### V2.0 Features
-- **Voice-Chat:** Spracheingabe/ausgabe für Agenten
+- **Voice-Chat:** Spracheingabe/Ausgabe für Agenten
 - **Agent-Avatare:** Generierte Avatare für jeden Agenten
 - **Multi-Language:** Deutsch, Englisch, weitere Sprachen
 - **Agent-Learning:** Agenten lernen aus vergangenen Interaktionen
