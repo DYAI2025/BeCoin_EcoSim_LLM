@@ -36,11 +36,24 @@ try:
     from dashboard import __version__
     from dashboard.ceo_data_bridge import CEODataBridge
     from dashboard.websocket_manager import WebSocketManager
+    from dashboard.llm_bridge import get_llm_bridge
 except ModuleNotFoundError:
     # When running directly, dashboard module not in path
     __version__ = "1.0.0"
     from ceo_data_bridge import CEODataBridge
     from websocket_manager import WebSocketManager
+    from llm_bridge import get_llm_bridge
+
+# Import personality loader
+import sys
+sys.path.append(str(Path(__file__).parent.parent / "autonomous_agents"))
+try:
+    from personalities.loader import load_personalities
+    personality_loader = load_personalities()
+    logger.info(f"✅ Loaded {len(personality_loader.personalities)} personalities")
+except Exception as e:
+    logger.warning(f"⚠️  Could not load personalities: {e}")
+    personality_loader = None
 
 # Load authentication credentials from environment
 AUTH_USERNAME = os.getenv("AUTH_USERNAME", "")
@@ -409,17 +422,113 @@ def _build_agent_response_content(user_message: str) -> str:
     return " ".join(parts)
 
 
-def _create_agent_message(target_agent: str, user_content: str) -> Dict:
-    """Build an agent response payload enriched with discovery insights."""
+def _get_economy_context() -> Dict:
+    """
+    Lädt aktuellen Economy-Context für LLM-Prompts.
 
-    content = _build_agent_response_content(user_content)
+    TODO: Replace with real economy_bridge once implemented.
+
+    Returns:
+        Dict mit Treasury, Projekten, Metriken
+    """
+    # Mock context for now (will be replaced with real data from economy_bridge)
     return {
-        "type": "agent_message",
-        "content": content,
-        "target_agent": target_agent,
-        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "sender": target_agent,
+        "treasury": {
+            "balance": 5000,
+            "burn_rate": 50.0,
+            "runway_hours": 100.0
+        },
+        "projects": {
+            "active": [],
+            "pipeline": [],
+            "completed": []
+        },
+        "agents": []
     }
+
+
+async def _create_agent_message(target_agent: str, user_content: str) -> Dict:
+    """
+    Erstellt Agent-Antwort via Ollama LLM.
+
+    Args:
+        target_agent: Agent-ID (z.B. "agent-helio")
+        user_content: User-Nachricht
+
+    Returns:
+        Agent-Nachricht als Dict
+    """
+    llm_bridge = get_llm_bridge()
+
+    # Check Ollama health
+    is_healthy = await llm_bridge.check_ollama_health()
+
+    if not is_healthy:
+        logger.warning("Ollama not available, using fallback response")
+        # Fallback to old behavior
+        content = _build_agent_response_content(user_content)
+        return {
+            "type": "agent_message",
+            "content": f"⚠️ LLM-Service offline. Fallback-Antwort: {content}",
+            "target_agent": target_agent,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "sender": target_agent,
+            "llm_enabled": False
+        }
+
+    # Load personality
+    personality = None
+    if personality_loader:
+        personality = personality_loader.get_personality_for_dashboard_agent(target_agent)
+
+    if not personality:
+        logger.warning(f"No personality found for {target_agent}, using default")
+        personality = {
+            "name": target_agent,
+            "role": "AI Agent",
+            "expertise": ["General"],
+            "communication_style": "Professionell"
+        }
+
+    # Load economy context
+    economy_context = _get_economy_context()
+
+    # Generate LLM response
+    try:
+        llm_response = await llm_bridge.generate_agent_response(
+            agent_id=target_agent,
+            agent_personality=personality,
+            user_message=user_content,
+            context=economy_context
+        )
+
+        # Parse actions from response
+        actions = llm_bridge.parse_agent_actions(llm_response)
+
+        return {
+            "type": "agent_message",
+            "content": llm_response,
+            "target_agent": target_agent,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "sender": target_agent,
+            "llm_enabled": True,
+            "personality": personality["name"],
+            "actions": actions if actions else []
+        }
+
+    except Exception as e:
+        logger.error(f"Error generating LLM response for {target_agent}: {e}")
+        # Fallback
+        content = _build_agent_response_content(user_content)
+        return {
+            "type": "agent_message",
+            "content": f"⚠️ Fehler bei LLM: {content}",
+            "target_agent": target_agent,
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "sender": target_agent,
+            "llm_enabled": False,
+            "error": str(e)
+        }
 
 
 @app.get("/api/chat/history")
@@ -445,7 +554,7 @@ async def send_chat_message(
     await broadcast_to_chat_clients(message_dict)
 
     if message.target_agent != "all":
-        agent_response = _create_agent_message(
+        agent_response = await _create_agent_message(
             target_agent=message.target_agent, user_content=message.content
         )
         chat_messages.append(agent_response)

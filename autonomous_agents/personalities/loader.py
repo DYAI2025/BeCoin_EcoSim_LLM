@@ -247,6 +247,112 @@ class PersonalityLoader:
         """Get all unique categories."""
         return sorted(set(p.category for p in self.personalities.values()))
 
+    def get_personality_for_dashboard_agent(self, agent_id: str) -> Optional[Dict]:
+        """
+        Gibt Personality-Definition für einen Dashboard-Agent zurück.
+
+        Dashboard-Agenten werden auf spezialisierte Personalities aus
+        Agency_of_Agents gemappt.
+
+        Args:
+            agent_id: Dashboard-Agent-ID (z.B. "agent-helio")
+
+        Returns:
+            Dict mit Personality-Daten oder None falls nicht gefunden
+        """
+        # Mapping: Dashboard-Agent-ID → Personality Name
+        personality_mapping = {
+            "agent-helio": "Product Manager",
+            "agent-nami": "Backend Developer",
+            "agent-atlas": "Financial Analyst",
+            "agent-circe": "DevOps Engineer"
+        }
+
+        # Fallback für unbekannte Agenten
+        personality_name = personality_mapping.get(agent_id)
+
+        if not personality_name:
+            # Try to find a general-purpose personality
+            personality = self.get_personality("Senior Developer")
+            if not personality:
+                # Last resort: any available personality
+                personalities_list = list(self.personalities.values())
+                personality = personalities_list[0] if personalities_list else None
+        else:
+            # Search for matching personality
+            personality = None
+            for p in self.personalities.values():
+                if personality_name.lower() in p.name.lower():
+                    personality = p
+                    break
+
+        if not personality:
+            return None
+
+        # Convert to dict with additional dashboard-specific fields
+        return {
+            "name": personality.name,
+            "role": personality.description or personality.name,
+            "expertise": self._extract_expertise(personality.full_prompt),
+            "communication_style": self._extract_communication_style(personality.full_prompt),
+            "category": personality.category,
+            "full_prompt": personality.full_prompt
+        }
+
+    def _extract_expertise(self, prompt: str) -> List[str]:
+        """
+        Extrahiert Expertise-Keywords aus Personality-Prompt.
+
+        Args:
+            prompt: Personality Prompt Text
+
+        Returns:
+            Liste von Expertise-Keywords
+        """
+        # Simple keyword extraction (kann mit NLP verbessert werden)
+        expertise_keywords = []
+
+        # Common tech keywords
+        tech_keywords = [
+            "Python", "JavaScript", "TypeScript", "React", "Node.js",
+            "FastAPI", "Django", "PostgreSQL", "Docker", "Kubernetes",
+            "AWS", "Azure", "GCP", "CI/CD", "DevOps",
+            "Machine Learning", "AI", "Data Science",
+            "UI/UX", "Design", "Product Management", "Finance"
+        ]
+
+        prompt_lower = prompt.lower()
+        for keyword in tech_keywords:
+            if keyword.lower() in prompt_lower:
+                expertise_keywords.append(keyword)
+
+        # Limit to top 5
+        return expertise_keywords[:5]
+
+    def _extract_communication_style(self, prompt: str) -> str:
+        """
+        Extrahiert Kommunikationsstil aus Personality-Prompt.
+
+        Args:
+            prompt: Personality Prompt Text
+
+        Returns:
+            Beschreibung des Kommunikationsstils
+        """
+        # Check for style indicators in prompt
+        prompt_lower = prompt.lower()
+
+        if "friendly" in prompt_lower or "warm" in prompt_lower:
+            return "Freundlich und hilfsbereit"
+        elif "technical" in prompt_lower or "precise" in prompt_lower:
+            return "Technisch und präzise"
+        elif "creative" in prompt_lower:
+            return "Kreativ und inspirierend"
+        elif "analytical" in prompt_lower:
+            return "Analytisch und datengetrieben"
+        else:
+            return "Professionell und fokussiert"
+
 
 # Convenience function for quick access
 def load_personalities(agency_path: Optional[str] = None) -> PersonalityLoader:
