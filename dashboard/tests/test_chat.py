@@ -1,3 +1,4 @@
+"""""""
 """
 Tests for chat functionality in the dashboard.
 
@@ -15,6 +16,7 @@ def test_get_chat_history_empty(client):
     assert "messages" in data
     assert isinstance(data["messages"], list)
 
+
 def test_send_chat_message(client):
     """Test sending a chat message via REST API."""
     message = {
@@ -31,6 +33,7 @@ def test_send_chat_message(client):
     assert data["status"] == "sent"
     assert "message" in data
 
+
 def test_send_chat_message_to_all_agents(client):
     """Test sending a broadcast message to all agents."""
     message = {
@@ -45,6 +48,7 @@ def test_send_chat_message_to_all_agents(client):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "sent"
+
 
 def test_get_chat_history_with_limit(client):
     """Test getting chat history with a limit."""
@@ -65,6 +69,7 @@ def test_get_chat_history_with_limit(client):
     data = response.json()
     assert len(data["messages"]) <= 3
 
+
 def test_chat_websocket_connection(client):
     """Test WebSocket connection for chat."""
     with client.websocket_connect("/ws/chat") as websocket:
@@ -72,6 +77,7 @@ def test_chat_websocket_connection(client):
         data = websocket.receive_json()
         assert data["type"] == "connection_established"
         assert "message" in data
+
 
 def test_chat_websocket_send_receive(client):
     """Test sending and receiving messages via WebSocket."""
@@ -104,6 +110,7 @@ def test_chat_websocket_send_receive(client):
         assert response["type"] == "agent_message"
         assert "content" in response
 
+
 def test_chat_message_persistence(client, tmp_path):
     """Test that chat messages are persisted to file."""
     # Send a message
@@ -125,6 +132,7 @@ def test_chat_message_persistence(client, tmp_path):
     found = any(msg["content"] == "Persistent message" for msg in messages)
     assert found, "Message should be persisted in history"
 
+
 def test_chat_message_validation(client):
     """Test that invalid messages are rejected."""
     # Missing required fields
@@ -137,6 +145,7 @@ def test_chat_message_validation(client):
     response = client.post("/api/chat/send", json=invalid_message)
     assert response.status_code == 422  # Validation error
 
+
 def test_multiple_websocket_connections(client):
     """Test multiple clients can connect simultaneously."""
     with client.websocket_connect("/ws/chat") as ws1:
@@ -148,12 +157,14 @@ def test_multiple_websocket_connections(client):
             assert data1["type"] == "connection_established"
             assert data2["type"] == "connection_established"
 
+
 def test_chat_history_loaded_on_startup(client):
     """Test that chat history is loaded when server starts."""
     # This is tested implicitly by other tests
     # Just verify the endpoint works
     response = client.get("/api/chat/history")
     assert response.status_code == 200
+
 
 def test_broadcast_to_multiple_clients(client):
     """Test that messages are broadcast to all connected clients."""
