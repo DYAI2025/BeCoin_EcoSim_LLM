@@ -71,9 +71,7 @@ class AgentChatSession:
     def _render_conversation(self) -> str:
         """Combine history into a single prompt for the LLM."""
 
-        transcript = []
-        for role, message in self.history:
-            transcript.append(f"{role.upper()}: {message}")
+        transcript = [f"{role.upper()}: {message}" for role, message in self.history]
         transcript.append("AGENT:")
         return "\n".join(transcript)
 
