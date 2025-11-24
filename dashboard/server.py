@@ -136,8 +136,9 @@ def _load_allowed_origins(env_value: Optional[str]) -> List[str]:
     """Return the CORS allowlist based on the provided environment value."""
 
     if env_value:
-        origins = [origin.strip() for origin in env_value.split(",") if origin.strip()]
-        if origins:
+        if origins := [
+            origin.strip() for origin in env_value.split(",") if origin.strip()
+        ]:
             return origins
     return DEFAULT_ALLOWED_ORIGINS
 
