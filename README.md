@@ -16,6 +16,8 @@ prevents catastrophic overspending.
   JSON payloads consumed by the pixel-art office UI.
 - **CEO discovery bridge** – the FastAPI server reads discovery sessions and streams
   WebSocket updates so leadership can monitor new proposals in real time.
+- **Two-way chat** – REST and WebSocket chat endpoints let users talk to agents and
+  receive answers grounded in the latest discovery session data.
 - **Stress-tested safety rails** – randomized burn/payroll scenarios ensure the
   treasury never silently drops below zero and that hand-offs between components are
   verified by unit tests.
@@ -65,15 +67,13 @@ prevents catastrophic overspending.
 
 ## 🧪 Testing & Quality Gates
 
-Every critical handover is covered by automated tests:
+The codebase ships with end-to-end coverage for the economy engine and dashboard:
 
-- `test_engine_transactions.py` validates project kick-off, completion, payroll, and
-  treasury reconciliation logic.
-- `test_exporter.py` confirms JSON payloads remain dashboard-compatible and free of
-  non-serializable data.
-- `test_stress_simulation.py` runs randomized start/complete/pay/advance cycles to
-  prove invariants (`balance >= 0`, chronological transactions, valid metrics).
-- Existing dashboard tests guarantee REST and WebSocket endpoints stay functional.
+- Engine tests validate project lifecycle, payroll, and treasury invariants.
+- Exporter tests keep dashboard payloads JSON-serializable.
+- Stress simulations ensure balances never go negative and transactions stay
+  chronological.
+- Dashboard tests cover REST APIs, WebSocket streaming, and chat persistence.
 
 Run the full suite from the repository root:
 
@@ -83,38 +83,39 @@ pytest
 
 ### Continuous Integration
 
-The project uses GitHub Actions to automatically run linting and tests on all pull
-requests and pushes to main. The CI workflow checks:
+GitHub Actions run formatting, linting, and a focused engine test suite on every
+push and pull request:
 
-- **Code formatting** with Black (`black --check .`)
-- **Code linting** with flake8 (`flake8 .`)
-- **Unit tests** with pytest (`pytest -q becoin_economy`)
+- **Formatting**: `black --check .`
+- **Linting**: `flake8 .`
+- **Unit tests**: `pytest -q becoin_economy`
 
-All checks must pass before merging. See `.github/workflows/ci.yml` for details.
+See `.github/workflows/ci.yml` for the full pipeline.
 
 ## 🚀 Running the Dashboard
 
 1. Install dashboard dependencies:
 
    ```bash
-   cd dashboard
-   pip install -r requirements.txt
+   pip install -r dashboard/requirements.txt
    ```
 
-2. Start the FastAPI server:
+2. Ensure data is available:
+
+   - CEO discovery sessions: place JSON files under `.claude-flow/discovery-sessions`
+     (or set `DISCOVERY_SESSIONS_PATH`).
+   - Economy snapshots: generate JSON under `dashboard/becoin-economy/` using
+     `build_dashboard_payload` or run `./autonomous_startup.sh` to produce demo data.
+
+3. Start the FastAPI server from the repo root:
 
    ```bash
-   uvicorn server:app --reload --port 3000
+   uvicorn dashboard.server:app --host 0.0.0.0 --port 3000 --reload
    ```
 
-3. Serve the static dashboard (separate terminal):
-
-   ```bash
-   python3 -m http.server 8080
-   ```
-
-4. Open `http://localhost:9001/dashboard/office-ui.html` and watch the BeCoin office
-   in action. The page polls the FastAPI endpoints and listens for WebSocket events.
+4. Open `http://localhost:3000/` to view the office UI. The page serves directly from
+   FastAPI, consumes the exported JSON files, and stays live via WebSocket updates and
+   the chat endpoints (`/api/chat/*` and `/ws/chat`).
 
 ## 🤖 Autonomous Agents
 
@@ -128,10 +129,10 @@ plans independently using local LLMs and specialized agent personalities.
 ./autonomous_agents/setup_autonomous_agents.sh
 
 # Execute a plan with dry-run (shows what would happen without executing)
-python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md --dry-run
+python3 autonomous_agents/orchestrator.py docs/plans/2025-11-05-ceo-dashboard-integration.md --dry-run
 
 # Execute a plan autonomously
-python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md
+python3 autonomous_agents/orchestrator.py docs/plans/2025-11-05-ceo-dashboard-integration.md
 
 # Monitor progress in real-time (separate terminal)
 python3 autonomous_agents/monitor.py -f

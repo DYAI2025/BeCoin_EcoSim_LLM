@@ -56,13 +56,20 @@ fly secrets set AUTH_PASSWORD="your_secure_password_here"
 
 ### 4. Create a Persistent Volume (Optional)
 
-If you want to persist discovery session data across deployments:
+If you want to persist discovery session data across deployments, create a volume and
+add a mount to `fly.toml`:
 
 ```bash
-fly volumes create becoin_data --size 1 --region iad
+fly volumes create becoin_data --size 1 --region fra
 ```
 
-**Note**: The region (`iad` = US East) should match `primary_region` in `fly.toml`.
+Then add:
+
+```toml
+[mounts]
+  source = "becoin_data"
+  destination = "/app/.claude-flow"
+```
 
 ### 5. Deploy Your Application
 
@@ -141,10 +148,10 @@ fly scale vm shared-cpu-2x
 ### Resource Configuration
 
 Current defaults (in `fly.toml`):
-- **VM Size**: `shared-cpu-1x`
-- **Memory**: 256MB
-- **Region**: `iad` (US East - Virginia)
-- **Min Machines**: 1
+- **CPU**: shared with 4 vCPUs
+- **Memory**: 2048MB
+- **Region**: `fra`
+- **Min Machines**: 0 (auto start/stop enabled)
 
 Adjust these in `fly.toml` before deployment or via CLI:
 
@@ -166,7 +173,10 @@ Once deployed, your dashboard exposes:
 - `GET /api/ceo/patterns?type=<type>` - Operational patterns
 - `GET /api/ceo/pain-points` - Identified issues
 - `GET /api/ceo/history?limit=10` - Historical sessions
-- `WS /ws/ceo` - WebSocket for real-time updates
+- `GET /api/chat/history` - Persisted chat transcript
+- `POST /api/chat/send` - Send a chat message to agents
+- `WS /ws/ceo` - WebSocket for discovery updates
+- `WS /ws/chat` - Bidirectional agent chat
 
 ## Monitoring
 
