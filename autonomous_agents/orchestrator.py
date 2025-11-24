@@ -27,6 +27,10 @@ from datetime import datetime
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+from autonomous_agents.economy_context import (  # noqa: E402
+    build_default_economy,
+    summarize_economy,
+)
 from autonomous_agents.personalities import load_personalities  # noqa: E402
 
 
@@ -207,6 +211,8 @@ class Orchestrator:
         self.personality_loader = load_personalities()
         self.tasks: List[Task] = []
         self.current_task_index = 0
+        self.economy = build_default_economy()
+        self.economy_context = summarize_economy(self.economy)
         self.activation_context = {
             "prototype_focus": "",
             "relationship_goals": "",
@@ -413,6 +419,8 @@ class Orchestrator:
 - Project: BeCoin Economic Simulation
 - Working Directory: {os.getcwd()}
 - Previous Tasks: {task.number - 1} completed
+- Economy Snapshot:
+{self.economy_context.describe()}
 
 ## Your Task
 {task.description}
