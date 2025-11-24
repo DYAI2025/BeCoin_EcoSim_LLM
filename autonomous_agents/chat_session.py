@@ -37,7 +37,7 @@ class AgentChatSession:
         )
 
         self.history: List[Tuple[str, str]] = []
-        self.plan_context = Path(plan_path) if plan_path else None
+        self.plan_context = plan_path
         self.economy = build_default_economy()
         self.economy_context = summarize_economy(self.economy)
 
