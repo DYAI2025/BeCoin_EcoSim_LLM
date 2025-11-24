@@ -111,7 +111,7 @@ def build_default_economy() -> BecoinEconomy:
         Project(
             id="PRJ-BETA",
             name="Automation Toolkit",
-            stage="active",
+            stage="pipeline",
             cost=2200,
             value=6200,
             impact_score=88,
