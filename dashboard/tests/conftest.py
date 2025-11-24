@@ -45,8 +45,3 @@ def client():
 
     return TestClient(app)
 
-
-# This runs at module import time, before the server module is imported
-# Clear auth variables immediately
-os.environ.pop("AUTH_USERNAME", None)
-os.environ.pop("AUTH_PASSWORD", None)
