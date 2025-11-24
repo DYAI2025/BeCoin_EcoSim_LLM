@@ -1,8 +1,7 @@
-"""""""
-"""
-Tests for chat functionality in the dashboard.
+"""Tests for chat functionality in the dashboard.
 
-This module tests the bidirectional chat communication between users and agents.
+This module exercises the bidirectional chat communication between users and
+agents, covering REST and WebSocket interactions plus persistence behavior.
 """
 
 from datetime import datetime, timezone
