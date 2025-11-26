@@ -73,10 +73,35 @@ Every critical handover is covered by automated tests:
   prove invariants (`balance >= 0`, chronological transactions, valid metrics).
 - Existing dashboard tests guarantee REST and WebSocket endpoints stay functional.
 
+### Continuous Integration
+
+The project uses GitHub Actions to run automated checks on all pull requests and pushes to `main`:
+
+- **Black** – Code formatting check (`black --check .`)
+- **flake8** – Linting for code quality
+- **pytest** – Automated test suite (`becoin_economy` tests)
+
+The workflow is defined in `.github/workflows/ci.yml` and runs on Python 3.12 with pip caching for faster builds.
+
+### Running Tests Locally
+
 Run the full suite from the repository root:
 
 ```bash
 pytest
+```
+
+To run the same checks as CI:
+
+```bash
+# Check formatting
+black --check .
+
+# Run linting
+flake8 .
+
+# Run tests
+pytest -q becoin_economy
 ```
 
 ## 🚀 Running the Dashboard
