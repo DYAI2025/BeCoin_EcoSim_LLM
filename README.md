@@ -75,6 +75,18 @@ The codebase ships with end-to-end coverage for the economy engine and dashboard
   chronological.
 - Dashboard tests cover REST APIs, WebSocket streaming, and chat persistence.
 
+### Continuous Integration
+
+The project uses GitHub Actions to run automated checks on all pull requests and pushes to `main`:
+
+- **Black** – Code formatting check (`black --check .`)
+- **flake8** – Linting for code quality
+- **pytest** – Automated test suite (`becoin_economy` tests)
+
+The workflow is defined in `.github/workflows/ci.yml` and runs on Python 3.12 with pip caching for faster builds.
+
+### Running Tests Locally
+
 Run the full suite from the repository root:
 
 ```bash
