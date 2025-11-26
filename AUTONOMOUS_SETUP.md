@@ -17,7 +17,7 @@ Das BeCoin System kann in 3 Modi betrieben werden:
 ./autonomous_agents/setup_autonomous_agents.sh
 
 # 2. Plan ausführen
-python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md
+python3 autonomous_agents/orchestrator.py docs/plans/2025-11-05-ceo-dashboard-integration.md
 ```
 
 ### Option 2: Kontinuierliche Simulation
@@ -33,7 +33,9 @@ python3 autonomous_agents/orchestrator.py docs/plans/example-plan.md
 - ✅ Wirtschaftsdaten werden generiert
 - ✅ Simulation läuft in 5-Sekunden-Zyklen (1 simulierte Stunde pro Zyklus)
 - ✅ Dashboard-Daten werden alle 5 Sekunden aktualisiert
-- ✅ Live-Updates auf https://becoin-ecosim-llm.fly.dev/
+- ℹ️  Die JSON-Dateien unter `dashboard/becoin-economy/` werden fortlaufend
+  überschrieben; starte `uvicorn dashboard.server:app --host 0.0.0.0 --port 3000`,
+  um die generierten Daten im UI zu sehen.
 
 **Beenden:** `Ctrl+C`
 
@@ -181,7 +183,7 @@ if ollama list | grep -q "llama3.1:8b"; then
 
 ### Live Dashboard
 
-https://becoin-ecosim-llm.fly.dev/
+Standard: `http://localhost:3000/` (nach Start von `uvicorn dashboard.server:app`).
 
 ### Logs Anzeigen
 

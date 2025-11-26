@@ -5,27 +5,32 @@ This server provides REST and WebSocket APIs for the CEO Discovery Dashboard.
 It integrates with the Becoin Economy system and supports autonomous agent operations.
 """
 
+import asyncio
+from datetime import datetime, timezone
 from fastapi import (
+    Depends,
     FastAPI,
+    HTTPException,
     Query,
     WebSocket,
     WebSocketDisconnect,
-    Depends,
-    HTTPException,
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Optional
+from typing import List, Optional, Dict
+from pydantic import BaseModel
 import logging
 import os
 import secrets
 from pathlib import Path
+import contextlib
+import json
 
 logger = logging.getLogger(__name__)
-security = HTTPBasic()
+security = HTTPBasic(auto_error=False)  # Don't auto-raise 401 if no credentials
 
 try:
     from dashboard import __version__
@@ -41,6 +46,7 @@ except ModuleNotFoundError:
 AUTH_USERNAME = os.getenv("AUTH_USERNAME", "")
 AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "")
 AUTH_ENABLED = bool(AUTH_USERNAME and AUTH_PASSWORD)
+WS_POLL_INTERVAL = float(os.getenv("CEO_DASHBOARD_WS_POLL_INTERVAL", "5"))
 
 if not AUTH_ENABLED:
     logger.warning(
@@ -50,14 +56,25 @@ else:
     logger.info("✓ Authentication is ENABLED")
 
 
-def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) -> str:
+def verify_credentials(
+    credentials: Optional[HTTPBasicCredentials] = Depends(security),
+) -> str:
     """
     Verify HTTP Basic Auth credentials.
 
     Returns the username if valid, raises HTTPException if invalid.
+    If AUTH is disabled, returns 'anonymous' without requiring credentials.
     """
     if not AUTH_ENABLED:
         return "anonymous"
+
+    # If auth is enabled but no credentials provided
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Basic"},
+        )
 
     # Use constant-time comparison to prevent timing attacks
     username_correct = secrets.compare_digest(
@@ -77,6 +94,15 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)) ->
     return credentials.username
 
 
+# Pydantic models for chat
+class ChatMessage(BaseModel):
+    type: str
+    content: str
+    target_agent: str
+    timestamp: str
+    sender: str
+
+
 # Initialize FastAPI app
 app = FastAPI(
     title="CEO Discovery Dashboard",
@@ -85,14 +111,54 @@ app = FastAPI(
 )
 
 # Initialize data bridge and WebSocket manager
-ceo_bridge = CEODataBridge()
+DISCOVERY_SESSIONS_PATH = os.getenv(
+    "DISCOVERY_SESSIONS_PATH", "../.claude-flow/discovery-sessions"
+)
+ceo_bridge = CEODataBridge(discovery_sessions_path=DISCOVERY_SESSIONS_PATH)
 ws_manager = WebSocketManager()
 
+# Chat storage (in-memory for now, can be moved to database later)
+chat_messages: List[Dict] = []
+chat_connections: List[WebSocket] = []
+# Use chat_lock to protect all accesses (reads/writes) to chat_messages for concurrency safety.
+chat_lock = asyncio.Lock()
+
 # Configure CORS
+DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://becoin-ecosim-llm.fly.dev",
+    "https://becoin-ecosystem.fly.dev",
+]
+
+
+def _load_allowed_origins(env_value: Optional[str]) -> List[str]:
+    """Return the CORS allowlist based on the provided environment value."""
+
+    if env_value:
+        if origins := [
+            origin.strip() for origin in env_value.split(",") if origin.strip()
+        ]:
+            return origins
+    return DEFAULT_ALLOWED_ORIGINS
+
+
+ENV_ALLOWED_ORIGINS = os.getenv("DASHBOARD_ALLOW_ORIGINS")
+ALLOWED_ORIGINS = _load_allowed_origins(ENV_ALLOWED_ORIGINS)
+ALLOW_ALL_ORIGINS = "*" in ALLOWED_ORIGINS
+
+# When allow_origins includes "*", FastAPI requires allow_credentials=False to avoid
+# sending cookies/tokens to arbitrary origins. Otherwise credentials are permitted.
+if ALLOW_ALL_ORIGINS:
+    ALLOWED_ORIGINS = ["*"]
+    ALLOW_CREDENTIALS = False
+else:
+    ALLOW_CREDENTIALS = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -100,6 +166,9 @@ app.add_middleware(
 # Get the dashboard directory path
 DASHBOARD_DIR = Path(__file__).parent
 STATIC_DIR = DASHBOARD_DIR / "becoin-economy"
+
+# Chat history file path
+CHAT_HISTORY_FILE = DASHBOARD_DIR / "chat_history.json"
 
 # Mount static files directory if it exists
 if STATIC_DIR.exists():
@@ -142,8 +211,18 @@ async def get_ceo_status(username: str = Depends(verify_credentials)):
 
 @app.get("/api/ceo/proposals")
 async def get_proposals(
-    min_roi: float = Query(0.0, description="Minimum ROI threshold"),
-    limit: int = Query(10, description="Maximum number of proposals"),
+    min_roi: float = Query(
+        0.0,
+        description="Minimum ROI threshold",
+        ge=0.0,
+        le=1000.0,
+    ),
+    limit: int = Query(
+        10,
+        description="Maximum number of proposals",
+        ge=1,
+        le=100,
+    ),
     username: str = Depends(verify_credentials),
 ):
     """Get CEO Discovery proposals with optional filtering."""
@@ -170,7 +249,12 @@ async def get_pain_points(username: str = Depends(verify_credentials)):
 
 @app.get("/api/ceo/history")
 async def get_history(
-    limit: int = Query(10, description="Maximum number of sessions to return"),
+    limit: int = Query(
+        10,
+        description="Maximum number of sessions to return",
+        ge=1,
+        le=100,
+    ),
     username: str = Depends(verify_credentials),
 ):
     """Get historical discovery sessions."""
@@ -193,23 +277,269 @@ async def websocket_endpoint(websocket: WebSocket):
     """
     await ws_manager.connect(websocket)
 
+    stream_task = asyncio.create_task(_stream_ceo_session_updates(websocket))
+
     try:
         while True:
-            # Keep connection alive and listen for any client messages
-            # (currently we only broadcast server->client, but this allows bidirectional)
-            data = await websocket.receive_text()
-            logger.info(f"Received WebSocket message: {data}")
-
-            # Echo back for debugging (can be removed in production)
-            await websocket.send_json(
-                {"type": "echo", "message": "Message received", "original": data}
-            )
+            # Keep connection alive and listen for optional client messages
+            await websocket.receive_text()
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
         logger.info("WebSocket client disconnected normally")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - safety net
         logger.error(f"WebSocket error: {e}")
         ws_manager.disconnect(websocket)
+    finally:
+        stream_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await stream_task
+
+
+async def _stream_ceo_session_updates(websocket: WebSocket) -> None:
+    """Continuously push CEO session snapshots to clients."""
+
+    last_signature = None
+
+    while True:
+        try:
+            session = ceo_bridge.get_current_session()
+        except Exception as exc:  # pragma: no cover - defensive logging
+            logger.error(f"Failed to read CEO session for WebSocket: {exc}")
+            await asyncio.sleep(WS_POLL_INTERVAL)
+            continue
+
+        signature = (
+            session.get("session_id"),
+            session.get("status"),
+            len(session.get("proposals", [])),
+            len(session.get("patterns", [])),
+            len(session.get("pain_points", [])),
+        )
+
+        if signature != last_signature:
+            await websocket.send_json(
+                {
+                    "type": "session_update",
+                    "timestamp": datetime.now(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                    "session": session,
+                }
+            )
+            last_signature = signature
+
+        await asyncio.sleep(max(0.1, WS_POLL_INTERVAL))
+
+
+# Chat Endpoints
+
+
+def load_chat_history() -> List[Dict]:
+    """Load chat history from file."""
+    global chat_messages
+    try:
+        if CHAT_HISTORY_FILE.exists():
+            with open(CHAT_HISTORY_FILE, "r", encoding="utf-8") as f:
+                chat_messages = json.load(f)
+                logger.info(f"Loaded {len(chat_messages)} chat messages from history")
+        else:
+            chat_messages = []
+    except Exception as e:
+        logger.error(f"Error loading chat history: {e}")
+        chat_messages = []
+    return chat_messages
+
+
+def save_chat_history():
+    """Save chat history to file."""
+    try:
+        with open(CHAT_HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(chat_messages, f, indent=2, ensure_ascii=False)
+        logger.info(f"Saved {len(chat_messages)} chat messages to history")
+    except Exception as e:
+        logger.error(f"Error saving chat history: {e}")
+
+
+def _build_agent_response_content(user_message: str) -> str:
+    """Create a contextual agent reply using the latest discovery session data."""
+
+    session = ceo_bridge.get_current_session()
+
+    if session.get("status") == "idle":
+        return (
+            "Nachricht erhalten. Aktuell liegen keine Discovery-Daten vor; "
+            "ich gebe Bescheid, sobald neue Erkenntnisse verfügbar sind."
+        )
+
+    proposals = session.get("proposals", [])
+    patterns = session.get("patterns", [])
+    pain_points = session.get("pain_points", [])
+
+    parts = [f"Nachricht erhalten: '{user_message}'."]
+
+    if proposals:
+        top = max(proposals, key=lambda p: p.get("roi", 0))
+        parts.append(
+            "Top-Vorschlag: {title} (ROI {roi}x, Zeitplan {timeline}, Kosten {cost}).".format(
+                title=top.get("title", ""),
+                roi=top.get("roi", "?"),
+                timeline=top.get("timeline", "unbekannt"),
+                cost=top.get("cost_becoins", "unbekannt"),
+            )
+        )
+
+    if pain_points:
+        primary = pain_points[0]
+        parts.append(
+            "Wichtigster Pain Point: {title} (≈{time} Min/Woche, Schwere {severity}).".format(
+                title=primary.get("title", "Unbekannt"),
+                time=primary.get("time_cost_minutes", "?"),
+                severity=primary.get("severity", "?"),
+            )
+        )
+
+    if patterns:
+        pattern = patterns[0]
+        parts.append(
+            "Beobachtetes Muster: {description}".format(
+                description=pattern.get("description", ""),
+            )
+        )
+
+    parts.append("Ich setze die genannten Maßnahmen jetzt um und melde Fortschritt im Chat.")
+
+    return " ".join(parts)
+
+
+def _create_agent_message(target_agent: str, user_content: str) -> Dict:
+    """Build an agent response payload enriched with discovery insights."""
+
+    content = _build_agent_response_content(user_content)
+    return {
+        "type": "agent_message",
+        "content": content,
+        "target_agent": target_agent,
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "sender": target_agent,
+    }
+
+
+@app.get("/api/chat/history")
+async def get_chat_history(
+    limit: int = Query(100, description="Maximum number of messages", ge=1, le=1000),
+    username: str = Depends(verify_credentials),
+):
+    """Get chat message history."""
+    load_chat_history()
+    return {"messages": chat_messages[-limit:] if chat_messages else []}
+
+
+@app.post("/api/chat/send")
+async def send_chat_message(
+    message: ChatMessage, username: str = Depends(verify_credentials)
+):
+    """Send a chat message (REST API fallback)."""
+    message_dict = message.model_dump()
+    chat_messages.append(message_dict)
+    save_chat_history()
+
+    # Broadcast to all connected chat WebSocket clients
+    await broadcast_to_chat_clients(message_dict)
+
+    if message.target_agent != "all":
+        agent_response = _create_agent_message(
+            target_agent=message.target_agent, user_content=message.content
+        )
+        chat_messages.append(agent_response)
+        save_chat_history()
+        await broadcast_to_chat_clients(agent_response)
+
+    return {"status": "sent", "message": message_dict}
+
+
+async def broadcast_to_chat_clients(message: Dict):
+    """Broadcast message to all connected chat clients."""
+    disconnected = []
+    for connection in chat_connections:
+        try:
+            await connection.send_json(message)
+        except Exception as e:
+            logger.error(f"Error broadcasting to chat client: {e}")
+            disconnected.append(connection)
+
+    # Clean up disconnected clients
+    for connection in disconnected:
+        if connection in chat_connections:
+            chat_connections.remove(connection)
+
+
+@app.websocket("/ws/chat")
+async def chat_websocket(websocket: WebSocket):
+    """
+    WebSocket endpoint for bidirectional chat communication.
+
+    Clients connect to this endpoint to send and receive chat messages
+    in real-time with agents.
+    """
+    await websocket.accept()
+    chat_connections.append(websocket)
+    logger.info(f"Chat WebSocket connected. Total connections: {len(chat_connections)}")
+
+    # Send welcome message and chat history
+    await websocket.send_json(
+        {
+            "type": "connection_established",
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "message": "Chat verbunden - Sie können jetzt mit Agenten kommunizieren",
+        }
+    )
+
+    # Send recent chat history
+    load_chat_history()
+    if chat_messages:
+        await websocket.send_json(
+            {"type": "chat_history", "messages": chat_messages[-50:]}
+        )
+
+    try:
+        while True:
+            # Receive message from client
+            data = await websocket.receive_text()
+            message = json.loads(data)
+
+            # Store message
+            chat_messages.append(message)
+            save_chat_history()
+
+            # Broadcast to other clients
+            await broadcast_to_chat_clients(message)
+
+            if message.get("target_agent") and message.get("target_agent") != "all":
+                agent_response = _create_agent_message(
+                    target_agent=message.get("target_agent", "Agent"),
+                    user_content=message.get("content", ""),
+                )
+                chat_messages.append(agent_response)
+                save_chat_history()
+                await broadcast_to_chat_clients(agent_response)
+
+    except WebSocketDisconnect:
+        chat_connections.remove(websocket)
+        logger.info(
+            f"Chat WebSocket disconnected. Total connections: {len(chat_connections)}"
+        )
+    except Exception as e:
+        logger.error(f"Chat WebSocket error: {e}")
+        if websocket in chat_connections:
+            chat_connections.remove(websocket)
+
+
+# Load chat history on startup
+@app.on_event("startup")
+async def startup_event():
+    """Load chat history on application startup."""
+    load_chat_history()
+    logger.info("Application started, chat history loaded")
 
 
 if __name__ == "__main__":
