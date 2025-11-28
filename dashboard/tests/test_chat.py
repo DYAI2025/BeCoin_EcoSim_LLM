@@ -7,6 +7,7 @@ agents, covering REST and WebSocket interactions plus persistence behavior.
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 def test_get_chat_history_empty(client):
     """Test getting chat history when no messages exist."""
     response = client.get("/api/chat/history")

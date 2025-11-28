@@ -44,4 +44,3 @@ def client():
     from dashboard.server import app
 
     return TestClient(app)
-

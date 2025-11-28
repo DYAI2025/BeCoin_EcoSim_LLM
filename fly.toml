@@ -8,6 +8,10 @@ primary_region = 'fra'
 
 [build]
 
+[deploy]
+  # Run post-deployment script to initialize dashboard data
+  release_command = "python scripts/fly_post_deploy.py"
+
 [http_service]
   internal_port = 3000
   force_https = true
