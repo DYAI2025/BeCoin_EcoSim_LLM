@@ -54,12 +54,12 @@ This will:
 ```bash
 # Dry run (no actual execution)
 python3 autonomous_agents/orchestrator.py \
-  docs/plans/2025-11-06-schema-driven-dashboard-production.md \
+  docs/plans/2025-11-05-ceo-dashboard-integration.md \
   --dry-run
 
 # Actual execution
 python3 autonomous_agents/orchestrator.py \
-  docs/plans/2025-11-06-schema-driven-dashboard-production.md
+  docs/plans/2025-11-05-ceo-dashboard-integration.md
 ```
 
 ### 3. Monitor Progress (Optional)
@@ -71,7 +71,7 @@ In a separate terminal:
 python3 autonomous_agents/monitor.py -f
 
 # View specific log
-python3 autonomous_agents/monitor.py --log-file autonomous_agents/logs/execution_20251106_120000.log
+python3 autonomous_agents/monitor.py --log-file autonomous_agents/logs/execution_20251123_120000.log
 ```
 
 ## How It Works
@@ -215,10 +215,10 @@ curl http://localhost:11434/api/tags
 ### Log Format
 
 ```
-[2025-11-06 12:00:00] [INFO] 📖 Loading plan from docs/plans/example.md
-[2025-11-06 12:00:01] [INFO] ✅ Loaded 7 tasks
-[2025-11-06 12:00:02] [INFO] 🚀 Executing Task 1: Add Error Boundaries
-[2025-11-06 12:00:10] [INFO] ✅ Task 1 completed successfully
+[2025-11-23 12:00:00] [INFO] 📖 Loading plan from docs/plans/2025-11-23-interactive-agent-chat-system.md
+[2025-11-23 12:00:01] [INFO] ✅ Loaded 7 tasks
+[2025-11-23 12:00:02] [INFO] 🚀 Executing Task 1: Add Error Boundaries
+[2025-11-23 12:00:10] [INFO] ✅ Task 1 completed successfully
 ```
 
 ### Log Locations
@@ -254,7 +254,7 @@ python3 monitor.py --help
 ```bash
 # Test parsing and personality assignment without execution
 python3 autonomous_agents/orchestrator.py \
-  docs/plans/2025-11-06-autonomous-agents-one-click-setup.md \
+  docs/plans/2025-11-23-interactive-agent-chat-system.md \
   --dry-run
 ```
 
@@ -358,7 +358,7 @@ The orchestrator can generate code for the BeCoin simulation:
 ```bash
 # Create a plan for new simulation features
 python3 autonomous_agents/orchestrator.py \
-  docs/plans/becoin-add-market-volatility.md
+  docs/plans/2025-11-23-interactive-agent-chat-system.md
 ```
 
 ### With Schema-Driven Dashboard
@@ -367,7 +367,7 @@ Use autonomous agents to implement dashboard features:
 
 ```bash
 python3 autonomous_agents/orchestrator.py \
-  docs/plans/2025-11-06-schema-driven-dashboard-production.md
+  docs/plans/2025-11-05-ceo-dashboard-integration.md
 ```
 
 ## Development
