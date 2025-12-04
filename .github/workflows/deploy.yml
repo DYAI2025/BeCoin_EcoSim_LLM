@@ -1,0 +1,78 @@
+name: Deploy and Start BeCoin System
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deployment target'
+        required: true
+        default: 'fly'
+        type: choice
+        options:
+          - fly
+          - server
+
+jobs:
+  # First run CI checks
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  # Deploy to Fly.io
+  deploy-fly:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_target == 'fly')
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          sleep 10
+          flyctl status
+          flyctl checks list
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  # Deploy to server (SSH-based deployment)
+  deploy-server:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_target == 'server'
+
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ${{ secrets.SERVER_PROJECT_PATH }}
+            git pull origin main
+            ./post_deploy.sh --service
+
+  # Post-deployment notification
+  notify:
+    needs: [deploy-fly, deploy-server]
+    runs-on: ubuntu-latest
+    if: always() && (needs.deploy-fly.result == 'success' || needs.deploy-server.result == 'success')
+
+    steps:
+      - name: Deployment successful
+        run: |
+          echo "BeCoin system deployed and started successfully!"
+          echo "Dashboard: https://becoin-ecosim-llm-dqfelw.fly.dev/"

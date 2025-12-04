@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY becoin_economy/ /app/becoin_economy/
 COPY dashboard/ /app/dashboard/
+COPY scripts/ /app/scripts/
 
 # Create directory for discovery sessions (optional, can be overridden by volume mount)
 RUN mkdir -p /app/.claude-flow/discovery-sessions

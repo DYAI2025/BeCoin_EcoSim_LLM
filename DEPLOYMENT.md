@@ -56,13 +56,20 @@ fly secrets set AUTH_PASSWORD="your_secure_password_here"
 
 ### 4. Create a Persistent Volume (Optional)
 
-If you want to persist discovery session data across deployments:
+If you want to persist discovery session data across deployments, create a volume and
+add a mount to `fly.toml`:
 
 ```bash
-fly volumes create becoin_data --size 1 --region iad
+fly volumes create becoin_data --size 1 --region fra
 ```
 
-**Note**: The region (`iad` = US East) should match `primary_region` in `fly.toml`.
+Then add:
+
+```toml
+[mounts]
+  source = "becoin_data"
+  destination = "/app/.claude-flow"
+```
 
 ### 5. Deploy Your Application
 
@@ -141,10 +148,10 @@ fly scale vm shared-cpu-2x
 ### Resource Configuration
 
 Current defaults (in `fly.toml`):
-- **VM Size**: `shared-cpu-1x`
-- **Memory**: 256MB
-- **Region**: `iad` (US East - Virginia)
-- **Min Machines**: 1
+- **CPU**: shared with 4 vCPUs
+- **Memory**: 2048MB
+- **Region**: `fra`
+- **Min Machines**: 0 (auto start/stop enabled)
 
 Adjust these in `fly.toml` before deployment or via CLI:
 
@@ -166,7 +173,10 @@ Once deployed, your dashboard exposes:
 - `GET /api/ceo/patterns?type=<type>` - Operational patterns
 - `GET /api/ceo/pain-points` - Identified issues
 - `GET /api/ceo/history?limit=10` - Historical sessions
-- `WS /ws/ceo` - WebSocket for real-time updates
+- `GET /api/chat/history` - Persisted chat transcript
+- `POST /api/chat/send` - Send a chat message to agents
+- `WS /ws/ceo` - WebSocket for discovery updates
+- `WS /ws/chat` - Bidirectional agent chat
 
 ## Monitoring
 
@@ -278,18 +288,17 @@ After making code changes:
 
 ### CORS
 
-Current configuration allows all origins (`allow_origins=["*"]`). For production:
+- ✅ By default the dashboard server now whitelists the local dev URLs and Fly.io domains:
+  `http://localhost:3000`, `http://127.0.0.1:3000`, `https://becoin-ecosim-llm.fly.dev`, `https://becoin-ecosystem.fly.dev`.
+- 🔒 Cookies/credentials are only sent when the origin is explicitly whitelisted.
 
-1. Edit `dashboard/server.py`
-2. Replace `allow_origins=["*"]` with specific domains:
-   ```python
-   allow_origins=[
-       "https://your-frontend.com",
-       "https://dashboard.your-company.com"
-   ]
-   ```
+Override the list via the `DASHBOARD_ALLOW_ORIGINS` environment variable (comma-separated list):
 
-3. Redeploy: `fly deploy`
+```bash
+export DASHBOARD_ALLOW_ORIGINS="https://my-dashboard.company,https://app.fly.dev"
+```
+
+Redeploy after adjusting the env var: `fly deploy`
 
 ### Recommendations
 
