@@ -1,0 +1,373 @@
+[
+  {
+    "type": "user_message",
+    "content": "Hello Agent!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:07.023898Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello Agent!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:07.026737Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello everyone!",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.030556Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 0",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.036377Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 1",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.040234Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 2",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.043659Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 3",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.047079Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 4",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.050434Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello via WebSocket!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:07.064517Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello via WebSocket!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:07.065485Z",
+    "sender": "agent-nami"
+  },
+  {
+    "type": "user_message",
+    "content": "Persistent message",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:07.325673Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Persistent message'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:07.328489Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Broadcast test",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:07.355031Z",
+    "sender": "User1"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello Agent!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:26.231487Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello Agent!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:26.233886Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello everyone!",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.236787Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 0",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.241237Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 1",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.244309Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 2",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.246866Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 3",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.249668Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 4",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.252737Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello via WebSocket!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:26.264453Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello via WebSocket!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:26.265089Z",
+    "sender": "agent-nami"
+  },
+  {
+    "type": "user_message",
+    "content": "Persistent message",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:26.472949Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Persistent message'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:26.475285Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Broadcast test",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:26.497046Z",
+    "sender": "User1"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello via WebSocket!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:46.887271Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello via WebSocket!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:46.887917Z",
+    "sender": "agent-nami"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello Agent!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:55.137458Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello Agent!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:55.139949Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello everyone!",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.142903Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 0",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.147387Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 1",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.150575Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 2",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.153507Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 3",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.156414Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 4",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:50:55.159335Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello via WebSocket!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:55.172023Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello via WebSocket!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:50:55.172890Z",
+    "sender": "agent-nami"
+  },
+  {
+    "type": "user_message",
+    "content": "Persistent message",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:55.180472Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Persistent message'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:50:55.182518Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello Agent!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:51:15.444373Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello Agent!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:51:15.447188Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello everyone!",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.450309Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 0",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.456186Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 1",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.460079Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 2",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.463231Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 3",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.466420Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Test message 4",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.469744Z",
+    "sender": "User"
+  },
+  {
+    "type": "user_message",
+    "content": "Hello via WebSocket!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:51:15.483480Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Hello via WebSocket!'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-nami",
+    "timestamp": "2025-11-20T02:51:15.484385Z",
+    "sender": "agent-nami"
+  },
+  {
+    "type": "user_message",
+    "content": "Persistent message",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:51:15.492778Z",
+    "sender": "User"
+  },
+  {
+    "type": "agent_message",
+    "content": "Nachricht erhalten: 'Persistent message'. Agent-Antworten werden bald implementiert!",
+    "target_agent": "agent-helio",
+    "timestamp": "2025-11-20T02:51:15.495301Z",
+    "sender": "agent-helio"
+  },
+  {
+    "type": "user_message",
+    "content": "Broadcast test",
+    "target_agent": "all",
+    "timestamp": "2025-11-20T02:51:15.525598Z",
+    "sender": "User1"
+  }
+]

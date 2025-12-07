@@ -1,34 +1,27 @@
-# CI Workflow: Lint and Test
-# Runs Black (check), flake8, and pytest on pull requests and pushes to main
-
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -36,13 +29,13 @@ jobs:
           if [ -f dashboard/requirements.txt ]; then
             pip install -r dashboard/requirements.txt
           fi
-          pip install black flake8
+          pip install pytest flake8 black
 
-      - name: Check formatting with Black
+      - name: Run Black (check)
         run: black --check .
 
-      - name: Lint with flake8
+      - name: Run flake8
         run: flake8 .
 
-      - name: Run tests with pytest
+      - name: Run pytest
         run: pytest -q becoin_economy
