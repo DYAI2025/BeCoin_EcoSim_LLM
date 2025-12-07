@@ -555,6 +555,94 @@
             color: #000;
         }
 
+        /* Service Controls */
+        #service-panel {
+            max-width: 1400px;
+            margin: 15px auto 0 auto;
+            padding: 0 20px;
+        }
+
+        #service-panel h2 {
+            font-size: 16px;
+            color: #00ff88;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+        }
+
+        .service-card {
+            background: #0f3460;
+            border: 4px solid #0f3460;
+            box-shadow: 4px 4px 0 #000;
+            padding: 12px;
+            min-height: 140px;
+        }
+
+        .service-title {
+            color: #00ff88;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .service-description {
+            font-size: 10px;
+            color: #ccc;
+            min-height: 40px;
+            line-height: 1.4;
+        }
+
+        .service-footer {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-status {
+            padding: 6px 8px;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0 #000;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .service-status.running {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .service-status.stopped {
+            background: #ff0055;
+            color: #000;
+        }
+
+        .service-btn {
+            background: #00b2ff;
+            color: #000;
+            border: 3px solid #000;
+            padding: 8px 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #000;
+            text-transform: uppercase;
+        }
+
+        .service-btn:disabled {
+            background: #666;
+            color: #ccc;
+            cursor: not-allowed;
+            box-shadow: 0 0 0 #000;
+        }
+
         /* Chat Section */
         #agent-chat-section {
             position: fixed;
@@ -920,6 +1008,11 @@
         </div>
     </div>
 
+    <section id="service-panel" class="pixel-text">
+        <h2>🛰️ Laufende Dienste</h2>
+        <div class="service-grid" id="service-grid"></div>
+    </section>
+
     <section id="customer-exchange" class="pixel-text">
         <div class="exchange-header">
             <h2>🤝 CUSTOMER EXCHANGE</h2>
@@ -1070,6 +1163,8 @@
 
     <script>
         const API_BASE = './becoin-economy/';
+        const API_HOST = window.location.origin.startsWith('http') ? window.location.origin : 'http://localhost:3000';
+        const SERVICE_API_BASE = `${API_HOST}/api`;
 
         const AGENT_AVATARS = {
             'agent-helio': '💼',
@@ -1077,6 +1172,70 @@
             'agent-atlas': '💰',
             'agent-circe': '⚡'
         };
+
+        async function loadServices() {
+            const grid = document.getElementById('service-grid');
+            if (!grid) return;
+
+            grid.innerHTML = '<div class="loading pixel-text">Lade Dienste…</div>';
+
+            try {
+                const response = await fetch(`${SERVICE_API_BASE}/services`);
+                if (!response.ok) {
+                    throw new Error(`Service API ${response.status}`);
+                }
+                const services = await response.json();
+                renderServices(services);
+            } catch (error) {
+                grid.innerHTML = '<div style="color:#ff0055;font-size:10px;">Service API nicht erreichbar.</div>';
+                console.error('Service load failed', error);
+            }
+        }
+
+        function renderServices(services = []) {
+            const grid = document.getElementById('service-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                const statusClass = service.status === 'running' ? 'running' : 'stopped';
+                const buttonDisabled = service.status === 'running';
+
+                card.innerHTML = `
+                    <div class="service-title">${service.name}</div>
+                    <div class="service-description">${service.description}</div>
+                    <div class="service-footer">
+                        <span class="service-status ${statusClass}">${service.status}</span>
+                        <button class="service-btn" ${buttonDisabled ? 'disabled' : ''} onclick="startService('${service.id}', this)">START</button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        async function startService(serviceId, button) {
+            if (button) {
+                button.disabled = true;
+                button.textContent = '...';
+            }
+
+            try {
+                const response = await fetch(`${SERVICE_API_BASE}/services/${serviceId}/start`, { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error(`Start fehlgeschlagen (${response.status})`);
+                }
+                const service = await response.json();
+                showNotification(`${service.name} bereit (${service.status})`);
+            } catch (error) {
+                console.error('Service start failed', error);
+                showNotification(`Fehler beim Starten: ${error.message}`);
+            } finally {
+                await loadServices();
+            }
+        }
 
         async function loadData() {
             try {
@@ -1592,10 +1751,12 @@
 
         // Auto-refresh every 2 seconds for real-time feel
         setInterval(loadData, 2000);
+        setInterval(loadServices, 5000);
         setInterval(updateCEODiscovery, 3000); // CEO Discovery polling (3s baseline)
 
         // Initial load
         loadData();
+        loadServices();
         updateCEODiscovery();
         connectCEOWebSocket();
 
