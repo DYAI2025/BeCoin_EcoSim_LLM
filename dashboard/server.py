@@ -20,7 +20,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from typing import List, Optional, Dict
+from typing import Callable, Dict, List, Optional
+import subprocess
+import time
+import urllib.request
+import shutil
 from pydantic import BaseModel
 import logging
 import os
@@ -123,6 +127,205 @@ chat_connections: List[WebSocket] = []
 # Use chat_lock to protect all accesses (reads/writes) to chat_messages for concurrency safety.
 chat_lock = asyncio.Lock()
 
+
+def _ping_ollama() -> bool:
+    """Return True if an Ollama instance responds on the default port."""
+
+    try:
+        with urllib.request.urlopen(
+            "http://localhost:11434/api/tags", timeout=1
+        ) as response:
+            return response.status == 200
+    except Exception:
+        return False
+
+
+def _start_ollama() -> bool:
+    """Attempt to start Ollama locally."""
+
+    if _ping_ollama():
+        return True
+
+    if not shutil.which("ollama"):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Ollama binary not available in PATH",
+        )
+
+    subprocess.Popen(
+        ["ollama", "serve"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    time.sleep(2)
+    return _ping_ollama()
+
+
+def _write_economy_snapshot() -> bool:
+    """Generate dashboard payload files using the economy engine."""
+
+    from becoin_economy import (  # type: ignore
+        Agent,
+        BecoinEconomy,
+        Project,
+        Treasury,
+        build_dashboard_payload,
+    )
+
+    treasury = Treasury(start_capital=10000, balance=8500)
+    agents = [
+        Agent(
+            id="agent-001",
+            name="Frontend Developer",
+            role="Frontend",
+            status="active",
+            equity_share=0.25,
+        ),
+        Agent(
+            id="agent-002",
+            name="Backend Architect",
+            role="Backend",
+            status="active",
+            equity_share=0.25,
+        ),
+        Agent(
+            id="agent-003",
+            name="AI Engineer",
+            role="AI/ML",
+            status="idle",
+            equity_share=0.25,
+        ),
+        Agent(
+            id="agent-004",
+            name="DevOps Automator",
+            role="DevOps",
+            status="active",
+            equity_share=0.25,
+        ),
+    ]
+    projects = [
+        Project(
+            id="proj-001",
+            name="Dashboard Redesign",
+            stage="active",
+            cost=2000,
+            value=3000,
+            impact_score=85,
+            team=["agent-001"],
+        ),
+        Project(
+            id="proj-002",
+            name="API Integration",
+            stage="completed",
+            cost=1500,
+            value=2500,
+            impact_score=92,
+            team=["agent-002"],
+        ),
+        Project(
+            id="proj-003",
+            name="CI/CD Pipeline",
+            stage="active",
+            cost=1800,
+            value=2700,
+            impact_score=78,
+            team=["agent-004"],
+        ),
+        Project(
+            id="proj-004",
+            name="LLM Integration",
+            stage="pipeline",
+            cost=2500,
+            value=4000,
+            impact_score=95,
+            team=[],
+        ),
+    ]
+
+    economy = BecoinEconomy(
+        treasury=treasury,
+        agents=agents,
+        projects=projects,
+        baseline_hourly_burn=120.0,
+    )
+
+    payload = build_dashboard_payload(economy)
+    STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+    for filename, data in payload.items():
+        with open(STATIC_DIR / filename, "w") as fh:
+            json.dump(data, fh, indent=2)
+
+    return True
+
+
+def _economy_payload_present() -> bool:
+    """Check whether the dashboard payload exists."""
+
+    required_files = [
+        STATIC_DIR / "treasury.json",
+        STATIC_DIR / "agent-roster.json",
+        STATIC_DIR / "projects.json",
+        STATIC_DIR / "impact-ledger.json",
+        STATIC_DIR / "orchestrator-status.json",
+    ]
+    return all(path.exists() for path in required_files)
+
+
+def _warm_autonomous_agents() -> bool:
+    """Ensure autonomous agent modules are importable."""
+
+    import autonomous_agents.orchestrator  # noqa: F401
+
+    return True
+
+
+def _ensure_chat_storage() -> bool:
+    """Make sure chat history persistence is available."""
+
+    CHAT_HISTORY_FILE.touch(exist_ok=True)
+    load_chat_history()
+    return True
+
+
+ServiceChecker = Callable[[], bool]
+
+
+SERVICES: Dict[str, Dict[str, object]] = {
+    "becoin-server": {
+        "name": "BeCoin Server",
+        "description": "FastAPI-Dashboard mit Discovery- und Chat-Endpunkten.",
+        "status_fn": lambda: True,
+        "start_fn": lambda: True,
+    },
+    "ollama-llm": {
+        "name": "Lokaler LLM (Ollama)",
+        "description": "LLM-Endpunkt für autonome Agents über Ollama.",
+        "status_fn": _ping_ollama,
+        "start_fn": _start_ollama,
+    },
+    "becoin-economy": {
+        "name": "BeCoin Economy Export",
+        "description": "Schreibt aktuelle Treasury-, Agenten- und Projekt-Snapshots ins Dashboard.",
+        "status_fn": _economy_payload_present,
+        "start_fn": _write_economy_snapshot,
+    },
+    "autonomous-agents": {
+        "name": "Autonome Agents",
+        "description": "Persönlichkeiten und Orchestrator-Modul laden.",
+        "status_fn": _warm_autonomous_agents,
+        "start_fn": _warm_autonomous_agents,
+    },
+    "agent-chat": {
+        "name": "Agent Chat",
+        "description": "Speichert Chatverlauf und WebSocket-Kommunikation.",
+        "status_fn": _ensure_chat_storage,
+        "start_fn": _ensure_chat_storage,
+    },
+}
+
+
 # Configure CORS
 DEFAULT_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -198,6 +401,55 @@ async def health_check():
         "service": "ceo-discovery-dashboard",
         "version": __version__,
     }
+
+
+def _service_payload(service_id: str) -> Dict:
+    """Return a serializable payload for a configured service."""
+
+    service = SERVICES.get(service_id)
+    if not service:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown service")
+
+    status_fn: ServiceChecker = service["status_fn"]  # type: ignore[assignment]
+    is_running = bool(status_fn())
+
+    return {
+        "id": service_id,
+        "name": service.get("name", service_id),
+        "description": service.get("description", ""),
+        "status": "running" if is_running else "stopped",
+        "startable": True,
+    }
+
+
+@app.get("/api/services")
+async def list_services(username: str = Depends(verify_credentials)):
+    """List configured runtime services with their current status."""
+
+    return [_service_payload(service_id) for service_id in SERVICES]
+
+
+@app.post("/api/services/{service_id}/start")
+async def start_service(service_id: str, username: str = Depends(verify_credentials)):
+    """Start a supported service if it is not already running."""
+
+    service = SERVICES.get(service_id)
+    if not service:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown service")
+
+    start_fn: ServiceChecker = service["start_fn"]  # type: ignore[assignment]
+    try:
+        start_fn()
+    except HTTPException:
+        raise
+    except Exception as exc:  # pragma: no cover - defensive catch for runtime ops
+        logger.error("Failed to start %s: %s", service_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Service {service_id} could not be started: {exc}",
+        ) from exc
+
+    return _service_payload(service_id)
 
 
 # CEO Discovery Endpoints
