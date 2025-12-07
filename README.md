@@ -63,6 +63,18 @@ prevents catastrophic overspending.
 
 ## 🧪 Testing & Quality Gates
 
+### CI Pipeline
+
+The project uses GitHub Actions for continuous integration. On every push to `main` and on pull requests, the CI workflow:
+
+1. **Black** – Checks code formatting (`black --check .`)
+2. **flake8** – Lints for style and potential errors
+3. **pytest** – Runs the test suite (`pytest -q becoin_economy`)
+
+See `.github/workflows/ci.yml` for the full configuration.
+
+### Test Coverage
+
 Every critical handover is covered by automated tests:
 
 - `test_engine_transactions.py` validates project kick-off, completion, payroll, and
