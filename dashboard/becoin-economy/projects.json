@@ -1,0 +1,47 @@
+{
+  "active": [],
+  "pipeline": [
+    {
+      "id": "IDEA-003",
+      "name": "Review: Founder Insights Dashboard",
+      "stage": "pipeline",
+      "value": 1500,
+      "impactScore": 88,
+      "roi": 160,
+      "customer": "Founding Customer (You)",
+      "team": ["agent-helio", "agent-circe"]
+    }
+  ],
+  "completed": [
+    {
+      "id": "proj-001",
+      "name": "Dashboard Redesign",
+      "stage": "completed",
+      "value": 3000,
+      "impactScore": 85,
+      "team": [
+        "agent-001"
+      ]
+    },
+    {
+      "id": "proj-002",
+      "name": "API Integration",
+      "stage": "completed",
+      "value": 1800,
+      "impactScore": 92,
+      "team": [
+        "agent-002"
+      ]
+    },
+    {
+      "id": "proj-003",
+      "name": "CI/CD Pipeline",
+      "stage": "completed",
+      "value": 2700,
+      "impactScore": 78,
+      "team": [
+        "agent-004"
+      ]
+    }
+  ]
+}

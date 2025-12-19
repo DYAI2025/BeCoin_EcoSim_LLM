@@ -4,6 +4,7 @@ Test suite for CEO Discovery REST API endpoints.
 This test ensures the API endpoints correctly expose
 CEO Discovery data through the FastAPI server.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,6 +13,7 @@ def test_api_imports():
     """Test that server module can be imported"""
     try:
         from dashboard.server import app
+
         assert app is not None
     except ImportError:
         pytest.fail("Failed to import server app")

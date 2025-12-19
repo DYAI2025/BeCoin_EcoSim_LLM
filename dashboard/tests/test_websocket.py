@@ -4,6 +4,7 @@ Test suite for WebSocket Manager.
 This test ensures WebSocket connections work correctly for
 real-time CEO Discovery updates.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -12,6 +13,7 @@ def test_websocket_manager_imports():
     """Test that WebSocketManager can be imported"""
     try:
         from dashboard.websocket_manager import WebSocketManager
+
         assert WebSocketManager is not None
     except ImportError:
         pytest.fail("Failed to import WebSocketManager")
@@ -23,7 +25,7 @@ def test_websocket_manager_initialization():
 
     manager = WebSocketManager()
     assert manager is not None
-    assert hasattr(manager, 'active_connections')
+    assert hasattr(manager, "active_connections")
     assert len(manager.active_connections) == 0
 
 
@@ -40,6 +42,22 @@ def test_websocket_connection():
         assert data["type"] == "connection_established"
         assert "message" in data
         assert "timestamp" in data
+
+
+def test_websocket_streams_session_updates():
+    """WebSocket should push the latest CEO session snapshot on connect."""
+
+    from dashboard.server import app
+
+    client = TestClient(app)
+
+    with client.websocket_connect("/ws/ceo") as websocket:
+        websocket.receive_json()  # Connection established message
+        session_update = websocket.receive_json()
+
+        assert session_update["type"] == "session_update"
+        assert "session" in session_update
+        assert "timestamp" in session_update
 
 
 def test_websocket_multiple_connections():
@@ -93,11 +111,7 @@ async def test_websocket_broadcast_new_proposal():
     mock_ws.send_json = AsyncMock()
     manager.active_connections.append(mock_ws)
 
-    proposal = {
-        "id": "proposal-001",
-        "title": "Test Proposal",
-        "roi": 4.2
-    }
+    proposal = {"id": "proposal-001", "title": "Test Proposal", "roi": 4.2}
 
     await manager.broadcast_new_proposal(proposal)
 

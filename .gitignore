@@ -38,6 +38,11 @@ venv/
 ENV/
 .venv
 
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
 # Logs
 *.log
 logs/

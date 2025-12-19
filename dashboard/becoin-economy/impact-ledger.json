@@ -1,0 +1,18 @@
+{
+  "records": [
+    {
+      "projectId": "proj-001",
+      "impactScore": 85,
+      "roi": 1.5,
+      "notes": "Project Dashboard Redesign delivered",
+      "timestamp": "2025-11-07T22:39:48Z"
+    },
+    {
+      "projectId": "proj-003",
+      "impactScore": 78,
+      "roi": 1.5,
+      "notes": "Project CI/CD Pipeline delivered",
+      "timestamp": "2025-11-07T22:39:53Z"
+    }
+  ]
+}

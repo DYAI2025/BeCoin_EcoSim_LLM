@@ -4,10 +4,12 @@ Test suite for CEO Discovery Data Bridge.
 This test ensures the data bridge correctly reads and formats
 CEO Discovery session data for API consumption.
 """
-import pytest
+
 import json
 import tempfile
 from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture
@@ -20,7 +22,7 @@ def temp_discovery_dir():
 
         with open(sample_path) as f:
             data = json.load(f)
-        with open(dest_path, 'w') as f:
+        with open(dest_path, "w") as f:
             json.dump(data, f)
 
         yield tmpdir
@@ -30,6 +32,7 @@ def test_data_bridge_imports():
     """Test that data bridge module can be imported"""
     try:
         from dashboard.ceo_data_bridge import CEODataBridge
+
         assert CEODataBridge is not None
     except ImportError:
         pytest.fail("Failed to import CEODataBridge")
@@ -112,7 +115,7 @@ def test_invalid_json():
 
         # Create invalid JSON file
         invalid_path = Path(tmpdir) / "discovery-9999999999.json"
-        with open(invalid_path, 'w') as f:
+        with open(invalid_path, "w") as f:
             f.write("{ invalid json }")
 
         bridge = CEODataBridge(discovery_sessions_path=tmpdir)
@@ -120,3 +123,28 @@ def test_invalid_json():
 
         # Should fall back to empty session
         assert session["status"] == "idle"
+
+
+def test_session_cache_prevents_repeated_disk_reads(temp_discovery_dir, monkeypatch):
+    """Ensure the bridge caches the latest session for the cache TTL."""
+
+    import dashboard.ceo_data_bridge as bridge_module
+
+    bridge = bridge_module.CEODataBridge(
+        discovery_sessions_path=temp_discovery_dir, cache_ttl=60
+    )
+
+    original_load = bridge_module.json.load
+    load_count = {"calls": 0}
+
+    def tracked_load(*args, **kwargs):  # pragma: no cover - helper closure
+        load_count["calls"] += 1
+        return original_load(*args, **kwargs)
+
+    monkeypatch.setattr(bridge_module.json, "load", tracked_load)
+
+    first = bridge.get_current_session()
+    second = bridge.get_current_session()
+
+    assert first == second
+    assert load_count["calls"] == 1, "Second call should come from cache"

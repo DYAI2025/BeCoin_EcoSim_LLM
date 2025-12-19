@@ -1,350 +1,207 @@
-# 🎭 The Agency: 51 AI Specialists Ready to Transform Your Workflow
+# 🪙 BeCoin EcoSim
 
-> **A complete AI agency at your fingertips** - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.
+![CI Status](https://github.com/DYAI2025/becoin-ecosim-llm/actions/workflows/ci.yml/badge.svg)
 
-[![GitHub stars](https://img.shields.io/github/stars/msitarzewski/agency-agents?style=social)](https://github.com/msitarzewski/agency-agents)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+BeCoin EcoSim is a self-contained simulation of an autonomous startup economy. It
+models treasury health, agent productivity, project pipelines, and the CEO discovery
+workflow that surfaces proposals and operational patterns. A FastAPI dashboard exposes
+the evolving state while the economy engine enforces BeCoin accounting rules and
+prevents catastrophic overspending.
 
----
+## ✨ Key Capabilities
 
-## 🚀 What Is This?
+- **Deterministic economy core** – `becoin_economy` provides a treasury-aware engine
+  that tracks transactions, agent output, project lifecycle, and impact records.
+- **Dashboard-ready exports** – the exporter converts simulation snapshots into the
+  JSON payloads consumed by the pixel-art office UI.
+- **CEO discovery bridge** – the FastAPI server reads discovery sessions and streams
+  WebSocket updates so leadership can monitor new proposals in real time.
+- **Two-way chat** – REST and WebSocket chat endpoints let users talk to agents and
+  receive answers grounded in the latest discovery session data.
+- **Stress-tested safety rails** – randomized burn/payroll scenarios ensure the
+  treasury never silently drops below zero and that hand-offs between components are
+  verified by unit tests.
+- **Autonomous agents** – self-executing AI agents powered by local LLMs (Ollama) and
+  51 specialized personalities that can implement entire feature plans autonomously.
 
-Born from a Reddit thread and months of iteration, **The Agency** is a collection of 51 meticulously crafted AI agent personalities. Each agent is:
+## 🧱 Architecture Overview
 
-- **🎯 Specialized**: Deep expertise in their domain (not generic prompt templates)
-- **🧠 Personality-Driven**: Unique voice, communication style, and approach
-- **📋 Deliverable-Focused**: Real code, processes, and measurable outcomes
-- **✅ Production-Ready**: Battle-tested workflows and success metrics
-
-**Think of it as**: Assembling your dream team, except they're AI specialists who never sleep, never complain, and always deliver.
-
----
-
-## ⚡ Quick Start
-
-### Option 1: Use with Claude Code (Recommended)
-
-```bash
-# Copy agents to your Claude Code directory
-cp -r agency-agents/* ~/.claude/agents/
-
-# Now activate any agent in your Claude Code sessions:
-# "Hey Claude, activate Frontend Developer mode and help me build a React component"
+```
+┌────────────────┐     snapshot      ┌────────────────────┐     JSON files
+│ BecoinEconomy   ├───────────────▶  │ Dashboard Exporter │ ─────────────────▶ office-ui.html
+│  (engine.py)    │                  │  (exporter.py)     │
+└──────┬──────────┘                  └────────┬──────────┘
+       │ transactions & metrics               │ REST + WS
+       ▼                                      ▼
+┌────────────────┐                 ┌────────────────────┐
+│ Treasury /      │                 │ FastAPI Server      │
+│ Agent Models    │                 │ (dashboard/server) │
+└────────────────┘                 └────────────────────┘
 ```
 
-### Option 2: Use as Reference
-
-Each agent file contains:
-- Identity & personality traits
-- Core mission & workflows
-- Technical deliverables with code examples
-- Success metrics & communication style
+1. **Simulation** – `BecoinEconomy` coordinates treasury movements, agent activity,
+   and project status while guarding against overspending.
+2. **Export** – `build_dashboard_payload` turns a snapshot into the five JSON files
+   the dashboard expects (`treasury.json`, `agent-roster.json`, `projects.json`,
+   `impact-ledger.json`, `orchestrator-status.json`).
+3. **Presentation** – the FastAPI service exposes CEO discovery data over REST and
+   WebSockets; the static HTML dashboard reads both the generated JSON and live
+   discovery updates.
 
-Browse the agents below and copy/adapt the ones you need!
+## 📂 Code Map
 
----
+| Path | Purpose |
+|------|---------|
+| `becoin_economy/models.py` | Dataclasses for treasury, agents, projects, transactions, and immutable snapshots. |
+| `becoin_economy/engine.py` | Economy orchestration logic plus safeguards against overspending. |
+| `becoin_economy/exporter.py` | Converts economy snapshots into dashboard JSON payloads. |
+| `dashboard/server.py` | FastAPI app exposing CEO discovery endpoints and WebSocket broadcasts. |
+| `dashboard/ceo_data_bridge.py` | Reads discovery session JSON from `.claude-flow/discovery-sessions`. |
+| `dashboard/websocket_manager.py` | Manages WebSocket clients for live updates. |
+| `dashboard/tests/` | API, WebSocket, and data bridge tests. |
+| `becoin_economy/tests/` | Engine, exporter, and stress simulation tests. |
+| `autonomous_agents/` | Autonomous execution system with local LLMs and specialized agents. |
+| `autonomous_agents/orchestrator.py` | Main orchestrator that executes implementation plans autonomously. |
+| `autonomous_agents/personalities/` | Loads 51 specialized agent personalities from Agency_of_Agents. |
+| `docs/plans/` | Implementation plans in markdown format for autonomous execution. |
 
-## 🎨 The Agency Roster
-
-### 💻 Engineering Division (7 Agents)
-
-Building the future, one commit at a time.
-
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🎨 [Frontend Developer](engineering/engineering-frontend-developer.md) | React/Vue/Angular, UI implementation, performance | Modern web apps, pixel-perfect UIs, Core Web Vitals optimization |
-| 🏗️ [Backend Architect](engineering/engineering-backend-architect.md) | API design, database architecture, scalability | Server-side systems, microservices, cloud infrastructure |
-| 📱 [Mobile App Builder](engineering/engineering-mobile-app-builder.md) | iOS/Android, React Native, Flutter | Native and cross-platform mobile applications |
-| 🤖 [AI Engineer](engineering/engineering-ai-engineer.md) | ML models, deployment, AI integration | Machine learning features, data pipelines, AI-powered apps |
-| 🚀 [DevOps Automator](engineering/engineering-devops-automator.md) | CI/CD, infrastructure automation, cloud ops | Pipeline development, deployment automation, monitoring |
-| ⚡ [Rapid Prototyper](engineering/engineering-rapid-prototyper.md) | Fast POC development, MVPs | Quick proof-of-concepts, hackathon projects, fast iteration |
-| 💎 [Senior Developer](engineering/engineering-senior-developer.md) | Laravel/Livewire, advanced patterns | Complex implementations, architecture decisions |
-
-### 🎨 Design Division (6 Agents)
-
-Making it beautiful, usable, and delightful.
+## 🧪 Testing & Quality Gates
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🎯 [UI Designer](design/design-ui-designer.md) | Visual design, component libraries, design systems | Interface creation, brand consistency, component design |
-| 🔍 [UX Researcher](design/design-ux-researcher.md) | User testing, behavior analysis, research | Understanding users, usability testing, design insights |
-| 🏛️ [UX Architect](design/design-ux-architect.md) | Technical architecture, CSS systems, implementation | Developer-friendly foundations, implementation guidance |
-| 🎭 [Brand Guardian](design/design-brand-guardian.md) | Brand identity, consistency, positioning | Brand strategy, identity development, guidelines |
-| 📖 [Visual Storyteller](design/design-visual-storyteller.md) | Visual narratives, multimedia content | Compelling visual stories, brand storytelling |
-| ✨ [Whimsy Injector](design/design-whimsy-injector.md) | Personality, delight, playful interactions | Adding joy, micro-interactions, Easter eggs, brand personality |
+The codebase ships with end-to-end coverage for the economy engine and dashboard:
 
-### 📢 Marketing Division (8 Agents)
+- Engine tests validate project lifecycle, payroll, and treasury invariants.
+- Exporter tests keep dashboard payloads JSON-serializable.
+- Stress simulations ensure balances never go negative and transactions stay
+  chronological.
+- Dashboard tests cover REST APIs, WebSocket streaming, and chat persistence.
 
-Growing your audience, one authentic interaction at a time.
+### Continuous Integration
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🚀 [Growth Hacker](marketing/marketing-growth-hacker.md) | Rapid user acquisition, viral loops, experiments | Explosive growth, user acquisition, conversion optimization |
-| 📝 [Content Creator](marketing/marketing-content-creator.md) | Multi-platform content, editorial calendars | Content strategy, copywriting, brand storytelling |
-| 🐦 [Twitter Engager](marketing/marketing-twitter-engager.md) | Real-time engagement, thought leadership | Twitter strategy, LinkedIn campaigns, professional social |
-| 📱 [TikTok Strategist](marketing/marketing-tiktok-strategist.md) | Viral content, algorithm optimization | TikTok growth, viral content, Gen Z/Millennial audience |
-| 📸 [Instagram Curator](marketing/marketing-instagram-curator.md) | Visual storytelling, community building | Instagram strategy, aesthetic development, visual content |
-| 🤝 [Reddit Community Builder](marketing/marketing-reddit-community-builder.md) | Authentic engagement, value-driven content | Reddit strategy, community trust, authentic marketing |
-| 📱 [App Store Optimizer](marketing/marketing-app-store-optimizer.md) | ASO, conversion optimization, discoverability | App marketing, store optimization, app growth |
-| 🌐 [Social Media Strategist](marketing/marketing-social-media-strategist.md) | Cross-platform strategy, campaigns | Overall social strategy, multi-platform campaigns |
+The project uses GitHub Actions to run automated checks on all pull requests and pushes to `main`:
 
-### 📊 Product Division (3 Agents)
+- **Black** – Code formatting check (`black --check .`)
+- **flake8** – Linting for code quality
+- **pytest** – Automated test suite (`becoin_economy` tests)
 
-Building the right thing at the right time.
+The workflow is defined in `.github/workflows/ci.yml` and runs on Python 3.12 with pip caching for faster builds.
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🎯 [Sprint Prioritizer](product/product-sprint-prioritizer.md) | Agile planning, feature prioritization | Sprint planning, resource allocation, backlog management |
-| 🔍 [Trend Researcher](product/product-trend-researcher.md) | Market intelligence, competitive analysis | Market research, opportunity assessment, trend identification |
-| 💬 [Feedback Synthesizer](product/product-feedback-synthesizer.md) | User feedback analysis, insights extraction | Feedback analysis, user insights, product priorities |
+### Running Tests Locally
 
-### 🎬 Project Management Division (5 Agents)
+Run the full suite from the repository root:
 
-Keeping the trains running on time (and under budget).
+```bash
+pytest
+```
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🎬 [Studio Producer](project-management/project-management-studio-producer.md) | High-level orchestration, portfolio management | Multi-project oversight, strategic alignment, resource allocation |
-| 🐑 [Project Shepherd](project-management/project-management-project-shepherd.md) | Cross-functional coordination, timeline management | End-to-end project coordination, stakeholder management |
-| ⚙️ [Studio Operations](project-management/project-management-studio-operations.md) | Day-to-day efficiency, process optimization | Operational excellence, team support, productivity |
-| 🧪 [Experiment Tracker](project-management/project-management-experiment-tracker.md) | A/B tests, hypothesis validation | Experiment management, data-driven decisions, testing |
-| 👔 [Senior Project Manager](project-management/project-manager-senior.md) | Realistic scoping, task conversion | Converting specs to tasks, scope management |
+### Continuous Integration
 
-### 🧪 Testing Division (7 Agents)
+GitHub Actions run formatting, linting, and a focused engine test suite on every
+push and pull request:
 
-Breaking things so users don't have to.
+- **Formatting**: `black --check .`
+- **Linting**: `flake8 .`
+- **Unit tests**: `pytest -q becoin_economy`
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 📸 [Evidence Collector](testing/testing-evidence-collector.md) | Screenshot-based QA, visual proof | UI testing, visual verification, bug documentation |
-| 🔍 [Reality Checker](testing/testing-reality-checker.md) | Evidence-based certification, quality gates | Production readiness, quality approval, release certification |
-| 📊 [Test Results Analyzer](testing/testing-test-results-analyzer.md) | Test evaluation, metrics analysis | Test output analysis, quality insights, coverage reporting |
-| ⚡ [Performance Benchmarker](testing/testing-performance-benchmarker.md) | Performance testing, optimization | Speed testing, load testing, performance tuning |
-| 🔌 [API Tester](testing/testing-api-tester.md) | API validation, integration testing | API testing, endpoint verification, integration QA |
-| 🛠️ [Tool Evaluator](testing/testing-tool-evaluator.md) | Technology assessment, tool selection | Evaluating tools, software recommendations, tech decisions |
-| 🔄 [Workflow Optimizer](testing/testing-workflow-optimizer.md) | Process analysis, workflow improvement | Process optimization, efficiency gains, automation opportunities |
+See `.github/workflows/ci.yml` for the full pipeline.
 
-### 🛟 Support Division (6 Agents)
+## 🚀 Running the Dashboard
 
-The backbone of the operation.
+1. Install dashboard dependencies:
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 💬 [Support Responder](support/support-support-responder.md) | Customer service, issue resolution | Customer support, user experience, support operations |
-| 📊 [Analytics Reporter](support/support-analytics-reporter.md) | Data analysis, dashboards, insights | Business intelligence, KPI tracking, data visualization |
-| 💰 [Finance Tracker](support/support-finance-tracker.md) | Financial planning, budget management | Financial analysis, cash flow, business performance |
-| 🏗️ [Infrastructure Maintainer](support/support-infrastructure-maintainer.md) | System reliability, performance optimization | Infrastructure management, system operations, monitoring |
-| ⚖️ [Legal Compliance Checker](support/support-legal-compliance-checker.md) | Compliance, regulations, legal review | Legal compliance, regulatory requirements, risk management |
-| 📑 [Executive Summary Generator](support/support-executive-summary-generator.md) | C-suite communication, strategic summaries | Executive reporting, strategic communication, decision support |
+   ```bash
+   pip install -r dashboard/requirements.txt
+   ```
 
-### 🥽 Spatial Computing Division (6 Agents)
+2. Ensure data is available:
 
-Building the immersive future.
+   - CEO discovery sessions: place JSON files under `.claude-flow/discovery-sessions`
+     (or set `DISCOVERY_SESSIONS_PATH`).
+   - Economy snapshots: generate JSON under `dashboard/becoin-economy/` using
+     `build_dashboard_payload` or run `./autonomous_startup.sh` to produce demo data.
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🏗️ [XR Interface Architect](spatial-computing/xr-interface-architect.md) | Spatial interaction design, immersive UX | AR/VR/XR interface design, spatial computing UX |
-| 💻 [macOS Spatial/Metal Engineer](spatial-computing/macos-spatial-metal-engineer.md) | Swift, Metal, high-performance 3D | macOS spatial computing, Vision Pro native apps |
-| 🌐 [XR Immersive Developer](spatial-computing/xr-immersive-developer.md) | WebXR, browser-based AR/VR | Browser-based immersive experiences, WebXR apps |
-| 🎮 [XR Cockpit Interaction Specialist](spatial-computing/xr-cockpit-interaction-specialist.md) | Cockpit-based controls, immersive systems | Cockpit control systems, immersive control interfaces |
-| 🍎 [visionOS Spatial Engineer](spatial-computing/visionos-spatial-engineer.md) | Apple Vision Pro development | Vision Pro apps, spatial computing experiences |
-| 🔌 [Terminal Integration Specialist](spatial-computing/terminal-integration-specialist.md) | Terminal integration, command-line tools | CLI tools, terminal workflows, developer tools |
+3. Start the FastAPI server from the repo root:
 
-### 🎯 Specialized Division (3 Agents)
+   ```bash
+   uvicorn dashboard.server:app --host 0.0.0.0 --port 3000 --reload
+   ```
 
-The unique specialists who don't fit in a box.
+4. Open `http://localhost:3000/` to view the office UI. The page serves directly from
+   FastAPI, consumes the exported JSON files, and stays live via WebSocket updates and
+   the chat endpoints (`/api/chat/*` and `/ws/chat`).
 
-| Agent | Specialty | When to Use |
-|-------|-----------|-------------|
-| 🎭 [Agents Orchestrator](specialized/agents-orchestrator.md) | Multi-agent coordination, workflow management | Complex projects requiring multiple agent coordination |
-| 📊 [Data Analytics Reporter](specialized/data-analytics-reporter.md) | Business intelligence, data insights | Deep data analysis, business metrics, strategic insights |
-| 🔍 [LSP/Index Engineer](specialized/lsp-index-engineer.md) | Language Server Protocol, code intelligence | Code intelligence systems, LSP implementation, semantic indexing |
+## 🤖 Autonomous Agents
 
----
+The project includes an autonomous execution system that can implement entire feature
+plans independently using local LLMs and specialized agent personalities.
 
-## 🎯 Real-World Use Cases
+### Quick Start
 
-### Scenario 1: Building a Startup MVP
+```bash
+# One-click setup (installs Ollama, downloads Qwen2.5-Coder 7B, loads 51 agent personalities)
+./autonomous_agents/setup_autonomous_agents.sh
 
-**Your Team**:
-1. 🎨 **Frontend Developer** - Build the React app
-2. 🏗️ **Backend Architect** - Design the API and database
-3. 🚀 **Growth Hacker** - Plan user acquisition
-4. ⚡ **Rapid Prototyper** - Fast iteration cycles
-5. 🔍 **Reality Checker** - Ensure quality before launch
+# Execute a plan with dry-run (shows what would happen without executing)
+python3 autonomous_agents/orchestrator.py docs/plans/2025-11-05-ceo-dashboard-integration.md --dry-run
 
-**Result**: Ship faster with specialized expertise at every stage.
+# Execute a plan autonomously
+python3 autonomous_agents/orchestrator.py docs/plans/2025-11-05-ceo-dashboard-integration.md
 
----
+# Monitor progress in real-time (separate terminal)
+python3 autonomous_agents/monitor.py -f
+```
 
-### Scenario 2: Marketing Campaign Launch
+### Key Features
 
-**Your Team**:
-1. 📝 **Content Creator** - Develop campaign content
-2. 🐦 **Twitter Engager** - Twitter strategy and execution
-3. 📸 **Instagram Curator** - Visual content and stories
-4. 🤝 **Reddit Community Builder** - Authentic community engagement
-5. 📊 **Analytics Reporter** - Track and optimize performance
+- **51 Specialized Agents**: Frontend, Backend, AI/ML, DevOps, Testing, Design, Marketing, etc.
+- **Local LLM**: Runs Qwen2.5-Coder 7B via Ollama (no API keys needed)
+- **Plan-Based Execution**: Reads markdown implementation plans from `docs/plans/`
+- **Automatic Code Generation**: Generates and applies code changes to files
+- **Real-Time Monitoring**: Track execution progress with live log monitoring
+- **Task Routing**: Automatically assigns tasks to appropriate specialized agents
 
-**Result**: Multi-channel coordinated campaign with platform-specific expertise.
+See `autonomous_agents/README.md` for complete documentation.
 
----
+## 🛠️ Generating Dashboard Payloads
 
-### Scenario 3: Enterprise Feature Development
+The dashboard expects five JSON files located under `dashboard/becoin-economy/`
+(or any directory served alongside the HTML). Use the exporter to generate them from
+any economy instance:
 
-**Your Team**:
-1. 👔 **Senior Project Manager** - Scope and task planning
-2. 💎 **Senior Developer** - Complex implementation
-3. 🎨 **UI Designer** - Design system and components
-4. 🧪 **Experiment Tracker** - A/B test planning
-5. 📸 **Evidence Collector** - Quality verification
-6. 🔍 **Reality Checker** - Production readiness
+```python
+import json
 
-**Result**: Enterprise-grade delivery with quality gates and documentation.
+from becoin_economy import BecoinEconomy, Agent, Project, Treasury, build_dashboard_payload
 
----
+treasury = Treasury(start_capital=10000, balance=10000)
+agents = [...]  # list of Agent objects
+projects = [...]  # list of Project objects
+economy = BecoinEconomy(treasury=treasury, agents=agents, projects=projects)
 
-## 🤝 Contributing
+payload = build_dashboard_payload(economy)
+for name, data in payload.items():
+    with open(f"dashboard/becoin-economy/{name}", "w") as fh:
+        json.dump(data, fh, indent=2)
+```
 
-We welcome contributions! Here's how you can help:
+## 🧭 CEO Discovery Integration
 
-### Add a New Agent
+The FastAPI layer surfaces discovery insights stored as JSON in
+`.claude-flow/discovery-sessions/`. Endpoints include:
 
-1. Fork the repository
-2. Create a new agent file in the appropriate category
-3. Follow the agent template structure:
-   - Frontmatter with name, description, color
-   - Identity & Memory section
-   - Core Mission
-   - Critical Rules (domain-specific)
-   - Technical Deliverables with examples
-   - Workflow Process
-   - Success Metrics
-4. Submit a PR with your agent
+- `GET /api/ceo/status` – latest session overview
+- `GET /api/ceo/proposals` – ROI-filtered proposals
+- `GET /api/ceo/patterns` – operational patterns by type
+- `GET /api/ceo/pain-points` – aggregated issues
+- `GET /api/ceo/history` – session summaries
+- `WS /ws/ceo` – live push notifications for proposals, patterns, and status changes
 
-### Improve Existing Agents
+## 🧑‍💻 Development Workflow
 
-- Add real-world examples
-- Enhance code samples
-- Update success metrics
-- Improve workflows
+1. Update or extend the economy in `becoin_economy/engine.py`.
+2. Regenerate payloads via `build_dashboard_payload` if structure changes.
+3. Adjust the dashboard or FastAPI server to expose new insights.
+4. Run `pytest` to verify economy invariants and API contracts before committing.
 
-### Share Your Success Stories
+## 📄 License
 
-Have you used these agents successfully? Share your story in the [Discussions](https://github.com/msitarzewski/agency-agents/discussions)!
-
----
-
-## 📖 Agent Design Philosophy
-
-Each agent is designed with:
-
-1. **🎭 Strong Personality**: Not generic templates - real character and voice
-2. **📋 Clear Deliverables**: Concrete outputs, not vague guidance
-3. **✅ Success Metrics**: Measurable outcomes and quality standards
-4. **🔄 Proven Workflows**: Step-by-step processes that work
-5. **💡 Learning Memory**: Pattern recognition and continuous improvement
-
----
-
-## 🎁 What Makes This Special?
-
-### Unlike Generic AI Prompts:
-- ❌ Generic "Act as a developer" prompts
-- ✅ Deep specialization with personality and process
-
-### Unlike Prompt Libraries:
-- ❌ One-off prompt collections
-- ✅ Comprehensive agent systems with workflows and deliverables
-
-### Unlike AI Tools:
-- ❌ Black box tools you can't customize
-- ✅ Transparent, forkable, adaptable agent personalities
-
----
-
-## 🎨 Agent Personality Highlights
-
-> "I don't just test your code - I default to finding 3-5 issues and require visual proof for everything."
->
-> — **Evidence Collector** (Testing Division)
-
-> "You're not marketing on Reddit - you're becoming a valued community member who happens to represent a brand."
->
-> — **Reddit Community Builder** (Marketing Division)
-
-> "Every playful element must serve a functional or emotional purpose. Design delight that enhances rather than distracts."
->
-> — **Whimsy Injector** (Design Division)
-
-> "Let me add a celebration animation that reduces task completion anxiety by 40%"
->
-> — **Whimsy Injector** (during a UX review)
-
----
-
-## 📊 Stats
-
-- 🎭 **51 Specialized Agents** across 9 divisions
-- 📝 **10,000+ lines** of personality, process, and code examples
-- ⏱️ **Months of iteration** from real-world usage
-- 🌟 **Battle-tested** in production environments
-- 💬 **50+ requests** in first 12 hours on Reddit
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Interactive agent selector web tool
-- [ ] Multi-agent workflow examples
-- [ ] Video tutorials on agent design
-- [ ] Community agent marketplace
-- [ ] Agent "personality quiz" for project matching
-- [ ] Integration examples with popular tools
-- [ ] "Agent of the Week" showcase series
-
----
-
-## 📜 License
-
-MIT License - Use freely, commercially or personally. Attribution appreciated but not required.
-
----
-
-## 🙏 Acknowledgments
-
-Born from a Reddit discussion about AI agent specialization. Thanks to the community for the feedback, requests, and inspiration.
-
-Special recognition to the 50+ Redditors who requested this within the first 12 hours - you proved there's demand for real, specialized AI agent systems.
-
----
-
-## 💬 Community
-
-- **GitHub Discussions**: [Share your success stories](https://github.com/msitarzewski/agency-agents/discussions)
-- **Issues**: [Report bugs or request features](https://github.com/msitarzewski/agency-agents/issues)
-- **Reddit**: Join the conversation on r/ClaudeAI
-- **Twitter/X**: Share with #TheAgency
-
----
-
-## 🚀 Get Started
-
-1. **Browse** the agents above and find specialists for your needs
-2. **Copy** the agents to `~/.claude/agents/` for Claude Code integration
-3. **Activate** agents by referencing them in your Claude conversations
-4. **Customize** agent personalities and workflows for your specific needs
-5. **Share** your results and contribute back to the community
-
----
-
-<div align="center">
-
-**🎭 The Agency: Your AI Dream Team Awaits 🎭**
-
-[⭐ Star this repo](https://github.com/msitarzewski/agency-agents) • [🍴 Fork it](https://github.com/msitarzewski/agency-agents/fork) • [🐛 Report an issue](https://github.com/msitarzewski/agency-agents/issues)
-
-Made with ❤️ by the community, for the community
-
-</div>
+BeCoin EcoSim is released under the MIT License. See [`LICENSE`](LICENSE) for details.
