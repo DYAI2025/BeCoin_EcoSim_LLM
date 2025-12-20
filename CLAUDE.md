@@ -198,6 +198,48 @@ Git Push → GitHub Actions (.github/workflows/deploy.yml) → CI Tests → Fly.
    - Post-deployment script (`scripts/fly_post_deploy.py`) initializes dashboard data
    - Environment-based authentication via secrets (AUTH_USERNAME, AUTH_PASSWORD)
 
+## Deployment Scenarios
+
+### ⚠️ Important: LLM Functionality by Environment
+
+**Local Development (Full Features):**
+- ✅ Ollama with local LLM models (Qwen2.5-Coder 7B)
+- ✅ Interactive chat with AI agents (`chat_session.py`)
+- ✅ Autonomous code generation (`orchestrator.py`)
+- ✅ All 51 specialized agent personalities
+- ✅ Economy-aware context injection
+- **Requires**: ~8-16GB RAM, Ollama installed
+
+**Fly.io Production (Current State):**
+- ✅ FastAPI Dashboard with REST/WebSocket APIs
+- ✅ CEO Discovery data visualization
+- ✅ Chat UI and message persistence
+- ⚠️ **Chat responses use static Discovery data (NO real AI)**
+- ❌ Ollama NOT running (2GB RAM insufficient)
+- ❌ No autonomous agent execution
+- ❌ No LLM-based code generation
+
+### Enabling Real AI on Fly.io
+
+**See `docs/FLY_IO_LLM_INTEGRATION.md` for detailed options:**
+
+1. **Anthropic Claude API** (Recommended)
+   - Cost: ~$15-25/month
+   - Setup: ~4 hours
+   - Best code quality
+
+2. **Together.ai** (Budget Option)
+   - Cost: ~$5-10/month
+   - Setup: ~3-4 hours
+   - Good for prototyping
+
+3. **Ollama on Fly.io** (Privacy Option)
+   - Cost: ~$150-300/month
+   - Setup: ~8-12 hours
+   - Requires 8-16GB RAM machines
+
+**Current workaround:** Chat endpoint (`/api/chat/send`) returns context-based responses using Discovery session data, not real LLM inference.
+
 ## Testing Strategy
 
 - **Engine tests** (`becoin_economy/tests/`): Verify transaction logic, treasury safety, project lifecycle
@@ -233,15 +275,28 @@ All tests must pass before merging (`pytest` from repo root).
 - `DISCOVERY_SESSIONS_PATH`: Path to discovery sessions (default: `../.claude-flow/discovery-sessions`)
 - `CEO_DASHBOARD_WS_POLL_INTERVAL`: WebSocket polling interval in seconds (default: `5`)
 
+**LLM Provider Configuration** (see `docs/FLY_IO_LLM_INTEGRATION.md`):
+- `LLM_PROVIDER`: Provider to use (`ollama`, `anthropic`, `openai`, `together`) - default: `ollama`
+- `ANTHROPIC_API_KEY`: Anthropic API key (if using Claude)
+- `ANTHROPIC_MODEL`: Model name (default: `claude-sonnet-4-5-20250929`)
+- `OPENAI_API_KEY`: OpenAI API key (if using GPT)
+- `OPENAI_MODEL`: Model name (default: `gpt-4o`)
+- `TOGETHER_API_KEY`: Together.ai API key (if using Together)
+- `TOGETHER_MODEL`: Model name (default: `Qwen/Qwen2.5-Coder-32B-Instruct`)
+- `OLLAMA_ENDPOINT`: Ollama endpoint (default: `http://localhost:11434`)
+- `OLLAMA_MODEL`: Ollama model (default: `qwen2.5-coder:7b`)
+
 **Deployment** (Fly.io secrets):
 - Set via `fly secrets set AUTH_USERNAME="..." AUTH_PASSWORD="..."`
 - Secrets are encrypted and injected at runtime
+- For LLM providers: `fly secrets set LLM_PROVIDER="anthropic" ANTHROPIC_API_KEY="sk-ant-..."`
 - See `DEPLOYMENT.md` for full deployment guide
 
 **Local Development**:
 - Copy `.env.example` to `.env` for local configuration
 - Dashboard runs without auth by default (shows warning)
 - Enable auth by setting both USERNAME and PASSWORD
+- LLM defaults to Ollama on localhost (no API keys needed)
 
 ## Common Workflows
 
@@ -375,6 +430,7 @@ for filename, data in payload.items():
 - This file: `CLAUDE.md`
 - Contributing guide: `CONTRIBUTING.md`
 - Deployment guide: `DEPLOYMENT.md`
+- **LLM Integration on Fly.io**: `docs/FLY_IO_LLM_INTEGRATION.md` ⭐ NEW
 - Troubleshooting: `TROUBLESHOOTING.md`
 - Autonomous setup: `AUTONOMOUS_SETUP.md`
 - Deployment status: `DEPLOYMENT_STATUS.md`
