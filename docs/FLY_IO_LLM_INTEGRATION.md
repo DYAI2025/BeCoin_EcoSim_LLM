@@ -224,6 +224,7 @@ import requests
 
 class LLMClient:
     def __init__(self, provider: str = None):
+        self.provider = provider
         if provider == "together":
             self.api_key = os.getenv("TOGETHER_API_KEY")
             self.model = "Qwen/Qwen2.5-Coder-32B-Instruct"
