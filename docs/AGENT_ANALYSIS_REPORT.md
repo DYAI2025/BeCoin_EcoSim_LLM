@@ -22,7 +22,7 @@
 | **Autonomes Handeln** | 🟡 PARTIELL | Economy-Kontext vorhanden, aber keine echten Entscheidungen |
 | **Strategisches Denken** | 🔴 FEHLT | Keine CEO/Strategie-Agenten, nur Workflow-Management |
 
-**Kritisches Problem**: Das System hat **exzellente technische Infrastruktur** für autonome Agenten, aber **fehlt strategische Geschäftsführungs-Intelligenz**.
+**Kritisches Problem**: Das System hat **exzellente technische Infrastruktur** für autonome Agenten, aber es **fehlt an strategischer Geschäftsführungs-Intelligenz**.
 
 ---
 
