@@ -77,6 +77,9 @@ class LLMClient:
         elif self.provider == "ollama":
             # Existing curl-based Ollama call
             return self._call_ollama(prompt, system_prompt)
+
+        else:
+            raise ValueError(f"Unsupported LLM provider: {self.provider!r}")
 ```
 
 **Deployment:**
