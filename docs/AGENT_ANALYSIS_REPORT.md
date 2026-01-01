@@ -54,7 +54,7 @@ Analyse der Implementierungspläne (`docs/plans/`):
   → STATUS: Nur Vision, NICHT implementiert!
 ```
 
-**C) Economy Context wird injiziert, aber nicht genutzt**
+**C) Economy-Kontext wird injiziert, aber nicht genutzt**
 
 Die Agenten bekommen Economy-Kontext (`autonomous_agents/economy_context.py`):
 ```python
