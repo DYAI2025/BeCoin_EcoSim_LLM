@@ -209,7 +209,7 @@ CMD ollama serve & sleep 5 && uvicorn dashboard.server:app --host 0.0.0.0 --port
 
 **Nachteile:**
 - ❌ Weniger Mainstream als OpenAI/Claude
-- ❌ Potentiell variable Verfügbarkeit
+- ❌ potenziell variable Verfügbarkeit
 
 **Together.ai Kosten:**
 - Qwen 2.5 Coder 32B: ~$0.60/1M Tokens (Input), ~$0.60/1M (Output)
