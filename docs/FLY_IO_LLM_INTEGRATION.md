@@ -245,7 +245,20 @@ class LLMClient:
                     "max_tokens": 4096
                 }
             )
-            return response.json()["choices"][0]["message"]["content"]
+            try:
+                response.raise_for_status()
+            except requests.RequestException as exc:
+                raise RuntimeError(f"Together.ai request failed") from exc
+
+            try:
+                data = response.json()
+            except ValueError as exc:
+                raise RuntimeError("Together.ai response was not valid JSON") from exc
+
+            try:
+                return data["choices"][0]["message"]["content"]
+            except (KeyError, IndexError, TypeError) as exc:
+                raise RuntimeError("Unexpected Together.ai response format") from exc
 ```
 
 **Zeitaufwand:** ~3-4 Stunden
