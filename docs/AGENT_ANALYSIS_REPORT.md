@@ -4,7 +4,7 @@
 **Analyst**: Claude Code
 **Auftraggeber-Fragen**:
 1. Verhalten sich die Agenten so, dass sie die Firma leiten?
-2. Möchten sie herausfinden wie sie ihren Kunden zufriedenstellen?
+2. Möchten sie herausfinden, wie sie ihren Kunden zufriedenstellen?
 3. Handeln sie autonom im Sinne der Firma?
 
 ---
