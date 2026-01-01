@@ -100,7 +100,7 @@ segments = [
 | `product-trend-researcher` | Customer Alternatives Analysis | ✅ Definiert |
 | `marketing-growth-hacker` | Customer Acquisition | ✅ Definiert |
 
-**B) Kunden-Daten sind simuliert aber statisch**
+**B) Kunden-Daten sind simuliert, aber statisch**
 
 `dashboard/becoin-economy/customer-market.json`:
 ```json
