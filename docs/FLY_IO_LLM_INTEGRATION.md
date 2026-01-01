@@ -8,7 +8,7 @@
 
 ## Problemstellung
 
-Das BeCoin EcoSim System nutzt derzeit **Ollama** für LLM-Inferenz, was lokal gut funktioniert, aber auf Fly.io nicht läuft weil:
+Das BeCoin EcoSim System nutzt derzeit **Ollama** für LLM-Inferenz, was lokal gut funktioniert, aber auf Fly.io nicht läuft, weil:
 - Ollama benötigt ~8-16GB RAM für 7B Modelle
 - Aktuelle Fly.io Konfiguration: 2GB RAM, 4 vCPUs
 - Docker-Image enthält kein Ollama
