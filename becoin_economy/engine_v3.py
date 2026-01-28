@@ -44,7 +44,7 @@ class Treasury:
     start_capital: float
     balance: float
     transactions: List[dict] = field(default_factory=list)
-    
+
     def apply_transaction(self, tx_type: str, amount: float, description: str, metadata: dict = None):
         tx = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -55,13 +55,13 @@ class Treasury:
         }
         self.transactions.append(tx)
         self.balance = round(self.balance + amount, 2)
-    
-    def metrics(self) -> dict:
-        hourly_burn = self.calculate_burn_rate()
+
+    def metrics(self, hours_elapsed: int = None) -> dict:
+        hourly_burn = self.calculate_burn_rate(hours_elapsed)
         revenue = self.revenue_generated()
         start = self.start_capital
         current = self.balance
-        
+
         return {
             "burnRate": hourly_burn,
             "runwayHours": current / hourly_burn if hourly_burn > 0 else float('inf'),
@@ -71,26 +71,27 @@ class Treasury:
             "netProfit": current - start,
             "totalTransactions": len(self.transactions)
         }
-    
-    def calculate_burn_rate(self) -> float:
+
+    def calculate_burn_rate(self, hours_elapsed: int = None) -> float:
         if not self.transactions:
             return 60.0  # Reduced baseline
         ops_costs = sum(
-            t["amount"] * -1 for t in self.transactions 
+            t["amount"] * -1 for t in self.transactions
             if t["type"] == "OPERATIONS_COST" and t["amount"] < 0
         )
-        hours = max(1, self.hours_elapsed if hasattr(self, 'hours_elapsed') else 1)
-        return ops_costs / hours if hours > 0 else 60.0
-    
+        hours = max(1, hours_elapsed or 1)
+        hourly_rate = ops_costs / hours if hours > 0 else 60.0
+        return hourly_rate
+
     def tax_paid(self) -> float:
         return sum(
-            t["amount"] * -1 for t in self.transactions 
+            t["amount"] * -1 for t in self.transactions
             if t["type"] == "TAX_DEDUCTION" and t["amount"] < 0
         )
-    
+
     def revenue_generated(self) -> float:
         return sum(
-            t["amount"] for t in self.transactions 
+            t["amount"] for t in self.transactions
             if t["type"] == "PROJECT_REVENUE"
         )
 
@@ -149,14 +150,14 @@ class Lead:
     created_at: str = None
     probability: float = 0.5
     questions: List[str] = field(default_factory=list)
-    
+
 # ============================================================================
 # ECONOMY ENGINE
 # ============================================================================
 
 class BeCoinEconomy:
     """Complete self-sustaining economy system."""
-    
+
     # Economy Parameters - BALANCED FOR SUSTAINABILITY
     START_CAPITAL = 10_000
     BASELINE_BURN_PER_HOUR = 60.0  # Reduced from $120 to $60
@@ -169,7 +170,7 @@ class BeCoinEconomy:
     TAX_RATE = 0.15
     TOKEN_COST_PER_1K = 0.01  # Local Ollama is cheap!
     BONUS_POOL = 0.10  # 10% of project value
-    
+
     # Lead Generation Parameters
     LEAD_GENERATION_CHANCE = 0.25  # 25% chance per hour (20-30% range)
     LEAD_TYPES = [
@@ -182,17 +183,17 @@ class BeCoinEconomy:
         {"type": "E-commerce Platform", "budget_range": (3500, 7000), "timeline": "4-8 weeks"},
         {"type": "Chatbot Integration", "budget_range": (1500, 2500), "timeline": "1-2 weeks"},
     ]
-    
+
     def __init__(self, data_dir: str = "dashboard/becoin-economy"):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Initialize Treasury
         self.treasury = Treasury(
             start_capital=self.START_CAPITAL,
             balance=self.START_CAPITAL
         )
-        
+
         # Initialize Agents
         self.agents = {
             "agent-001": Agent(
@@ -220,7 +221,7 @@ class BeCoinEconomy:
                 hourly_rate=self.AGENT_COSTS["devops"]
             ),
         }
-        
+
         # Initialize Projects
         self.projects = {
             "proj-001": Project(
@@ -271,22 +272,26 @@ class BeCoinEconomy:
                 team=["agent-003", "agent-002"]
             ),
         }
-        
+
         # Initialize Leads Pipeline
         self.leads = {}
         self.pending_questions = []  # Questions CEO needs to answer
-        
+
         self.cycle_count = 0
         self.hours_elapsed = 0
         self.running = False
-        
+
         # Save initial state
         self.export_dashboard()
-    
+
+    def get_treasury_metrics(self) -> dict:
+        """Get treasury metrics with hours_elapsed"""
+        return self.treasury.metrics(self.hours_elapsed)
+
     # =========================================================================
     # PHASE 1: WORK ASSIGNMENT SYSTEM
     # =========================================================================
-    
+
     def assign_tasks_to_agents(self) -> dict:
         """
         Assign available projects to idle agents.
@@ -297,45 +302,44 @@ class BeCoinEconomy:
             "agents_activated": 0,
             "projects_updated": []
         }
-        
+
         # Find projects in pipeline that need team members
         pipeline_projects = [
-            (pid, p) for pid, p in self.projects.items() 
+            (pid, p) for pid, p in self.projects.items()
             if p.stage == "pipeline"
         ]
-        
+
         # Find idle agents
         idle_agents = [
-            (aid, a) for aid, a in self.agents.items() 
+            (aid, a) for aid, a in self.agents.items()
             if a.status == "idle"
         ]
-        
+
         # Assign pipeline projects to idle agents
         for proj_id, project in pipeline_projects:
             if not idle_agents:
                 break
-            
+
             # Determine required roles for project
             required_roles = self._determine_project_roles(project)
-            
+
             # Find matching idle agent
             for agent_id, agent in idle_agents[:]:
                 if agent.role in required_roles:
-                    # Activate agent and assign to project
-                    agent.status = "active"
-                    agent.current_task = f"Working on {project.name}"
+                    # Start work session for agent (this activates them)
+                    task_description = f"Working on {project.name}"
+                    self.start_work_session(agent_id, task_description)
                     agent.current_project = proj_id
-                    agent.work_session_start = datetime.now(timezone.utc).isoformat()
-                    
+
                     # Add to project team
                     if agent_id not in project.team:
                         project.team.append(agent_id)
-                    
-                    # Move project to active if team is complete
-                    if len(project.team) >= 2:  # Need at least 2 agents
+
+                    # Move project to active if team has at least 1 agent
+                    if len(project.team) >= 1:  # Need at least 1 agent to start
                         project.stage = "active"
                         report["projects_updated"].append(proj_id)
-                    
+
                     report["assignments"].append({
                         "agent_id": agent_id,
                         "agent_name": agent.name,
@@ -344,17 +348,17 @@ class BeCoinEconomy:
                         "timestamp": datetime.now(timezone.utc).isoformat()
                     })
                     report["agents_activated"] += 1
-                    
+
                     # Remove from idle list
                     idle_agents.remove((agent_id, agent))
-        
+
         return report
-    
+
     def _determine_project_roles(self, project: Project) -> List[str]:
         """Determine required roles for a project based on name."""
         name_lower = project.name.lower()
         roles = []
-        
+
         if "frontend" in name_lower or "dashboard" in name_lower or "ui" in name_lower:
             roles.append("frontend")
         if "backend" in name_lower or "api" in name_lower or "database" in name_lower:
@@ -363,36 +367,36 @@ class BeCoinEconomy:
             roles.append("ai")
         if "devops" in name_lower or "pipeline" in name_lower or "deploy" in name_lower:
             roles.append("devops")
-        
+
         # Default roles if none detected
         if not roles:
             roles = ["frontend", "backend", "devops"]
-        
+
         return roles
-    
+
     def start_work_session(self, agent_id: str, task_description: str) -> dict:
         """Start a work session for an agent."""
         agent = self.agents.get(agent_id)
         if not agent:
             return {"error": "Agent not found"}
-        
+
         agent.status = "active"
         agent.current_task = task_description
         agent.work_session_start = datetime.now(timezone.utc).isoformat()
-        
+
         return {
             "agent_id": agent_id,
             "agent_name": agent.name,
             "task": task_description,
             "started_at": agent.work_session_start
         }
-    
+
     def end_work_session(self, agent_id: str, subtask_completed: str = None) -> dict:
         """End a work session and update progress."""
         agent = self.agents.get(agent_id)
         if not agent:
             return {"error": "Agent not found"}
-        
+
         report = {
             "agent_id": agent_id,
             "agent_name": agent.name,
@@ -400,11 +404,11 @@ class BeCoinEconomy:
             "project": agent.current_project,
             "duration_hours": 1.0  # Simplified
         }
-        
+
         # Update agent stats
         agent.performance["hours_worked"] += 1
         agent.performance["tasks_completed"] += 1
-        
+
         # Update project progress
         if agent.current_project:
             project = self.projects.get(agent.current_project)
@@ -413,36 +417,36 @@ class BeCoinEconomy:
                 progress_per_agent = 10.0 / max(len(project.team), 1)
                 project.progress = min(100.0, project.progress + progress_per_agent)
                 project.metrics["hours_spent"] += 1
-                
+
                 report["project_progress"] = round(project.progress, 1)
-                
+
                 # Check for milestone completion
                 self._check_milestones(project)
-                
+
                 # Check if project is done
                 if project.progress >= 100:
                     self.complete_project(agent.current_project)
-        
-        # Reset agent
+
+        # Reset agent (but keep current_project if continuing work)
         agent.status = "idle"
         agent.current_task = None
-        agent.current_project = None
         agent.work_session_start = None
         agent.last_activity = datetime.now(timezone.utc).isoformat()
-        
+        # Note: current_project is kept for potential continuation
+
         return report
-    
+
     def _check_milestones(self, project: Project):
         """Check and update project milestones."""
         for milestone in project.milestones:
             if not milestone["completed"] and project.progress >= milestone["progress"]:
                 milestone["completed"] = True
                 milestone["completed_at"] = datetime.now(timezone.utc).isoformat()
-    
+
     # =========================================================================
     # PHASE 2: CUSTOMER ACQUISITION
     # =========================================================================
-    
+
     def generate_leads(self) -> dict:
         """
         Generate new leads with 20-30% chance per hour.
@@ -451,13 +455,13 @@ class BeCoinEconomy:
         # Random chance based on configured rate
         if random.random() > self.LEAD_GENERATION_CHANCE:
             return {"generated": False, "reason": "Random check failed"}
-        
+
         # Generate lead data
         lead_type = random.choice(self.LEAD_TYPES)
         lead_id = f"lead-{len(self.leads) + 1:03d}"
-        
+
         budget = random.randint(*lead_type["budget_range"])
-        
+
         lead = Lead(
             id=lead_id,
             company=f"Company {random.randint(100, 999)}",
@@ -472,9 +476,9 @@ class BeCoinEconomy:
             probability=random.uniform(0.4, 0.7),
             questions=self._generate_lead_questions(lead_type["type"])
         )
-        
+
         self.leads[lead_id] = lead
-        
+
         # Generate CEO question
         question = {
             "id": f"q-{len(self.pending_questions) + 1}",
@@ -487,7 +491,7 @@ class BeCoinEconomy:
             "answered": False
         }
         self.pending_questions.append(question)
-        
+
         return {
             "generated": True,
             "lead_id": lead_id,
@@ -497,7 +501,7 @@ class BeCoinEconomy:
             "timeline": lead.timeline,
             "question_id": question["id"]
         }
-    
+
     def _generate_lead_questions(self, project_type: str) -> List[str]:
         """Generate questions CEO needs to answer for a lead."""
         questions = {
@@ -535,20 +539,20 @@ class BeCoinEconomy:
             ]
         }
         return questions.get(project_type, ["What are the priorities?"])
-    
+
     def accept_lead(self, lead_id: str) -> dict:
         """Accept a lead and create a new project."""
         lead = self.leads.get(lead_id)
         if not lead:
             return {"error": "Lead not found"}
-        
+
         if lead.stage != "new":
             return {"error": "Lead already processed"}
-        
+
         # Calculate project values
         cost = lead.budget * 0.8  # 80% of budget for cost
         value = lead.budget  # Revenue equals budget
-        
+
         # Create project
         project_id = f"proj-{len(self.projects) + 1:03d}"
         project = Project(
@@ -566,18 +570,18 @@ class BeCoinEconomy:
                 {"name": "Delivery", "progress": 100, "completed": False}
             ]
         )
-        
+
         self.projects[project_id] = project
         lead.stage = "won"
         lead.project_id = project_id
-        
+
         # Mark question as answered
         for q in self.pending_questions:
             if q["lead_id"] == lead_id:
                 q["answered"] = True
                 q["answer"] = "accepted"
                 q["project_id"] = project_id
-        
+
         return {
             "lead_id": lead_id,
             "project_id": project_id,
@@ -585,33 +589,33 @@ class BeCoinEconomy:
             "budget": lead.budget,
             "timeline": lead.timeline
         }
-    
+
     def reject_lead(self, lead_id: str, reason: str = None) -> dict:
         """Reject a lead."""
         lead = self.leads.get(lead_id)
         if not lead:
             return {"error": "Lead not found"}
-        
+
         lead.stage = "lost"
         lead.rejection_reason = reason
-        
+
         # Mark question as answered
         for q in self.pending_questions:
             if q["lead_id"] == lead_id:
                 q["answered"] = True
                 q["answer"] = "rejected"
                 q["reason"] = reason
-        
+
         return {
             "lead_id": lead_id,
             "status": "rejected",
             "reason": reason
         }
-    
+
     # =========================================================================
     # PHASE 3 & 4: CORE OPERATIONS & BALANCED ECONOMICS
     # =========================================================================
-    
+
     def pay_hourly_agent_costs(self) -> dict:
         """Deduct hourly agent costs from treasury."""
         report = {
@@ -619,7 +623,7 @@ class BeCoinEconomy:
             "agent_payments": [],
             "total_cost": 0.0
         }
-        
+
         for agent_id, agent in self.agents.items():
             if agent.status == "active":
                 cost = agent.hourly_rate
@@ -629,13 +633,13 @@ class BeCoinEconomy:
                     description=f"Salary for {agent.name} (1h)",
                     metadata={"agent_id": agent_id, "rate": cost}
                 )
-                
+
                 # Performance tracking
                 agent.performance["hours_worked"] += 1
                 agent.performance["becoin_earned"] += cost
                 agent.performance["becoin_spent"] += cost
                 agent.last_activity = datetime.now(timezone.utc).isoformat()
-                
+
                 report["agent_payments"].append({
                     "agent": agent.name,
                     "role": agent.role,
@@ -643,15 +647,15 @@ class BeCoinEconomy:
                     "hours_total": agent.performance["hours_worked"]
                 })
                 report["total_cost"] += cost
-        
+
         return report
-    
+
     def deduct_tax(self) -> dict:
         """Daily tax deduction to 'Finanzamt'."""
         # Calculate daily burn (24 hours × reduced baseline)
         daily_burn = self.BASELINE_BURN_PER_HOUR * 24
         tax_amount = daily_burn * self.TAX_RATE
-        
+
         if self.treasury.balance > tax_amount:
             self.treasury.apply_transaction(
                 tx_type="TAX_DEDUCTION",
@@ -659,30 +663,30 @@ class BeCoinEconomy:
                 description=f"Daily tax deduction (15% of ${daily_burn}/day)",
                 metadata={"daily_burn": daily_burn, "tax_rate": self.TAX_RATE}
             )
-            
+
             return {
                 "tax_amount": round(tax_amount, 2),
                 "balance_after": self.treasury.balance,
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
         return {"tax_amount": 0, "message": "Insufficient funds for tax"}
-    
+
     def track_token_usage(self, agent_id: str, tokens: int) -> float:
         """Track LLM token usage and deduct cost."""
         cost = (tokens / 1000) * self.TOKEN_COST_PER_1K
-        
+
         if agent_id in self.agents:
             self.agents[agent_id].performance["tokens_consumed"] += tokens
-        
+
         self.treasury.apply_transaction(
             tx_type="TOKEN_COST",
             amount=-cost,
             description=f"Token usage: {tokens} tokens",
             metadata={"agent_id": agent_id, "tokens": tokens, "cost_per_1k": self.TOKEN_COST_PER_1K}
         )
-        
+
         return cost
-    
+
     def advance_time(self, hours: int = 1) -> dict:
         """
         Advance simulation time by hours.
@@ -700,20 +704,38 @@ class BeCoinEconomy:
             "projects_progress": {},
             "hours_elapsed": self.hours_elapsed
         }
-        
+
         self.hours_elapsed += hours
         self.cycle_count += 1
-        
-        # PHASE 1: Assign tasks to idle agents
+
+        # PHASE 1: Process existing work sessions and update progress
+        for agent_id, agent in self.agents.items():
+            if agent.status == "active":
+                # End current work session and update progress
+                session_report = self.end_work_session(agent_id)
+
+                proj_id = session_report.get("project")
+                if proj_id:
+                    report["projects_progress"][proj_id] = {
+                        "name": self.projects.get(proj_id, {}).name,
+                        "progress": session_report.get("project_progress", 0)
+                    }
+
+                # If project still active and agent still assigned, continue working
+                if agent.current_project and self.projects.get(agent.current_project, {}).stage == "active":
+                    self.start_work_session(agent_id, f"Continuing work on {self.projects[agent.current_project].name}")
+                    # Agent status is set to active by start_work_session
+
+        # PHASE 2: Assign tasks to idle agents
         assignment_report = self.assign_tasks_to_agents()
         report["assignments"] = assignment_report
-        
-        # PHASE 2: Generate leads (20-30% chance per hour)
+
+        # PHASE 3: Generate leads (20-30% chance per hour)
         for _ in range(hours):
             lead_result = self.generate_leads()
             if lead_result.get("generated"):
                 report["leads_generated"].append(lead_result)
-        
+
         # Deduct baseline operations cost (reduced from $120 to $60)
         burn = self.BASELINE_BURN_PER_HOUR * hours
         self.treasury.apply_transaction(
@@ -722,12 +744,12 @@ class BeCoinEconomy:
             description=f"Operations burn for {hours}h",
             metadata={"hours": hours, "rate": self.BASELINE_BURN_PER_HOUR}
         )
-        
+
         # Tax deduction every 24 hours
         if self.hours_elapsed % 24 == 0:
             report["tax_deducted"] = self.deduct_tax()
-        
-        # Process work sessions for active agents
+
+        # Update agent status report
         for agent_id, agent in self.agents.items():
             report["agents_status"][agent_id] = {
                 "name": agent.name,
@@ -735,40 +757,29 @@ class BeCoinEconomy:
                 "hours_worked": agent.performance["hours_worked"],
                 "current_task": agent.current_task
             }
-            
-            if agent.status == "active":
-                # End work session and update progress
-                session_report = self.end_work_session(agent_id)
-                
-                proj_id = session_report.get("project")
-                if proj_id:
-                    report["projects_progress"][proj_id] = {
-                        "name": self.projects.get(proj_id, {}).name,
-                        "progress": session_report.get("project_progress", 0)
-                    }
-        
+
         # Pay agent salaries
         payment_report = self.pay_hourly_agent_costs()
         report["agent_payments"] = payment_report
-        
+
         report["balance_after"] = self.treasury.balance
         report["hours_elapsed"] = self.hours_elapsed
-        
+
         # Export dashboard data
         self.export_dashboard()
-        
+
         return report
-    
+
     def complete_project(self, project_id: str) -> dict:
         """Complete a project and distribute rewards."""
         project = self.projects.get(project_id)
         if not project or project.stage != "active":
             return {"error": "Project not active"}
-        
+
         project.stage = "completed"
         project.completed_at = datetime.now(timezone.utc).isoformat()
         project.progress = 100.0
-        
+
         # Revenue to treasury
         self.treasury.apply_transaction(
             tx_type="PROJECT_REVENUE",
@@ -776,11 +787,11 @@ class BeCoinEconomy:
             description=f"Revenue from {project.name}",
             metadata={"project_id": project_id, "value": project.value}
         )
-        
+
         # Calculate bonuses
         bonus_pool = project.value * self.BONUS_POOL
         per_agent = bonus_pool / max(len(project.team), 1)
-        
+
         report = {
             "project": project.name,
             "project_id": project_id,
@@ -788,7 +799,7 @@ class BeCoinEconomy:
             "bonus_pool": bonus_pool,
             "agent_bonuses": []
         }
-        
+
         for agent_id in project.team:
             agent = self.agents.get(agent_id)
             if agent:
@@ -803,27 +814,27 @@ class BeCoinEconomy:
                 agent.status = "idle"
                 agent.current_task = None
                 agent.current_project = None
-                
+
                 report["agent_bonuses"].append({
                     "agent": agent.name,
                     "bonus": round(per_agent, 2)
                 })
-        
+
         return report
-    
+
     # =========================================================================
     # PHASE 3: DASHBOARD API
     # =========================================================================
-    
+
     def get_api_treasury(self) -> dict:
         """API endpoint: /api/treasury"""
         return {
             "balance": self.treasury.balance,
             "startCapital": self.treasury.start_capital,
-            "metrics": self.treasury.metrics(),
+            "metrics": self.get_treasury_metrics(),
             "transactions": self.treasury.transactions[-50:]  # Last 50
         }
-    
+
     def get_api_agents(self) -> dict:
         """API endpoint: /api/agents"""
         return {
@@ -848,7 +859,7 @@ class BeCoinEconomy:
                 "idle": sum(1 for a in self.agents.values() if a.status == "idle")
             }
         }
-    
+
     def get_api_projects(self) -> dict:
         """API endpoint: /api/projects"""
         return {
@@ -873,7 +884,7 @@ class BeCoinEconomy:
                 "completed": sum(1 for p in self.projects.values() if p.stage == "completed")
             }
         }
-    
+
     def get_api_pipeline(self) -> dict:
         """API endpoint: /api/pipeline - Sales pipeline"""
         return {
@@ -898,24 +909,24 @@ class BeCoinEconomy:
                 "lost": sum(1 for l in self.leads.values() if l.stage == "lost")
             }
         }
-    
+
     def get_api_questions(self) -> dict:
         """API endpoint: /api/questions - Questions CEO needs to answer"""
         return {
             "questions": self.pending_questions,
             "unanswered_count": sum(1 for q in self.pending_questions if not q["answered"])
         }
-    
+
     def get_agent_chat_reports(self) -> List[dict]:
         """Generate autonomous agent reports for chat."""
         reports = []
-        
+
         for agent_id, agent in self.agents.items():
             # Determine if agent needs input
             blockers = []
             questions = []
             recommendations = []
-            
+
             # Check current project
             if agent.current_project:
                 proj = self.projects.get(agent.current_project)
@@ -932,12 +943,12 @@ class BeCoinEconomy:
                         agent.performance["questions_asked"] += 1
                     else:
                         recommendations.append(f"{proj.name}: Final testing and deployment planning needed")
-            
+
             # Financial status
             earned = agent.performance["becoin_earned"]
             hours = agent.performance["hours_worked"]
             efficiency = earned / hours if hours > 0 else 0
-            
+
             report = {
                 "agent": {
                     "id": agent_id,
@@ -961,16 +972,16 @@ class BeCoinEconomy:
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
             reports.append(report)
-        
+
         return reports
-    
+
     def export_dashboard(self) -> dict:
         """Export all dashboard data as JSON files."""
         data = {
             "treasury": {
                 "balance": self.treasury.balance,
                 "startCapital": self.treasury.start_capital,
-                "metrics": self.treasury.metrics()
+                "metrics": self.get_treasury_metrics()
             },
             "agents": {
                 aid: {
@@ -1030,15 +1041,15 @@ class BeCoinEconomy:
                 }
             }
         }
-        
+
         # Write all JSON files
         for filename, content in data.items():
             filepath = self.data_dir / f"{filename}.json"
             with open(filepath, 'w') as f:
                 json.dump(content, f, indent=2)
-        
+
         return data
-    
+
     def get_status(self) -> dict:
         """Get complete system status."""
         return {
@@ -1046,7 +1057,7 @@ class BeCoinEconomy:
             "treasury": {
                 "balance": self.treasury.balance,
                 "start": self.treasury.start_capital,
-                **self.treasury.metrics()
+                **self.get_treasury_metrics()
             },
             "agents": {
                 "total": len(self.agents),
@@ -1077,14 +1088,14 @@ class BeCoinEconomy:
 
 if __name__ == "__main__":
     economy = BeCoinEconomy()
-    
+
     print("💰 BeCoin Economy System v3.0")
     print("=" * 50)
     print(f"Initial Balance: ${economy.treasury.balance}")
     print(f"Agents: {len(economy.agents)}")
     print(f"Projects: {len(economy.projects)}")
     print()
-    
+
     # Test one cycle
     report = economy.advance_time(hours=1)
     print(f"Hourly Report:")
@@ -1093,7 +1104,7 @@ if __name__ == "__main__":
     print(f"  Agent Payments: ${report['agent_payments']['total_cost']}")
     print(f"  Balance: ${report['balance_after']}")
     print()
-    
+
     # Agent chat reports
     print("🤖 Agent Reports:")
     for report in economy.get_agent_chat_reports():
@@ -1101,5 +1112,5 @@ if __name__ == "__main__":
         if report['questions']:
             for q in report['questions'][:1]:
                 print(f"    ❓ {q}")
-    
+
     print("\n✅ Dashboard exported to dashboard/becoin-economy/")

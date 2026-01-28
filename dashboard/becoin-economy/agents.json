@@ -31,8 +31,8 @@
     "performance": {
       "hours_worked": 0,
       "tokens_consumed": 0,
-      "projects_completed": 0,
-      "becoin_earned": 0.0,
+      "projects_completed": 1,
+      "becoin_earned": 200.0,
       "becoin_spent": 0.0,
       "questions_asked": 0,
       "blockers_encountered": 0,
@@ -49,14 +49,14 @@
     "current_project": null,
     "equity_share": 0.25,
     "performance": {
-      "hours_worked": 1,
+      "hours_worked": 40,
       "tokens_consumed": 0,
-      "projects_completed": 0,
-      "becoin_earned": 0.0,
-      "becoin_spent": 0.0,
+      "projects_completed": 1,
+      "becoin_earned": 900.0,
+      "becoin_spent": 700.0,
       "questions_asked": 0,
       "blockers_encountered": 0,
-      "tasks_completed": 1
+      "tasks_completed": 20
     }
   },
   "agent-004": {

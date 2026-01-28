@@ -1,4 +1,215 @@
 {
-  "leads": {},
-  "pending_questions": []
+  "leads": {
+    "lead-001": {
+      "id": "lead-001",
+      "company": "Company 191",
+      "project_type": "Dashboard",
+      "budget": 4075,
+      "timeline": "3-5 weeks",
+      "stage": "new",
+      "probability": 0.6938195664504416
+    },
+    "lead-002": {
+      "id": "lead-002",
+      "company": "Company 529",
+      "project_type": "Mobile App",
+      "budget": 4006,
+      "timeline": "4-8 weeks",
+      "stage": "new",
+      "probability": 0.6580554390510396
+    },
+    "lead-003": {
+      "id": "lead-003",
+      "company": "Company 505",
+      "project_type": "Database Migration",
+      "budget": 3191,
+      "timeline": "2-4 weeks",
+      "stage": "new",
+      "probability": 0.47577768549016525
+    },
+    "lead-004": {
+      "id": "lead-004",
+      "company": "Company 257",
+      "project_type": "AI Solution",
+      "budget": 4879,
+      "timeline": "4-6 weeks",
+      "stage": "new",
+      "probability": 0.42683918234456825
+    },
+    "lead-005": {
+      "id": "lead-005",
+      "company": "Company 148",
+      "project_type": "Chatbot Integration",
+      "budget": 2337,
+      "timeline": "1-2 weeks",
+      "stage": "new",
+      "probability": 0.4249388208155387
+    },
+    "lead-006": {
+      "id": "lead-006",
+      "company": "Company 941",
+      "project_type": "Dashboard",
+      "budget": 4342,
+      "timeline": "3-5 weeks",
+      "stage": "new",
+      "probability": 0.5950438651817146
+    },
+    "lead-007": {
+      "id": "lead-007",
+      "company": "Company 753",
+      "project_type": "E-commerce Platform",
+      "budget": 6130,
+      "timeline": "4-8 weeks",
+      "stage": "new",
+      "probability": 0.42987933041812026
+    },
+    "lead-008": {
+      "id": "lead-008",
+      "company": "Company 650",
+      "project_type": "Chatbot Integration",
+      "budget": 2163,
+      "timeline": "1-2 weeks",
+      "stage": "new",
+      "probability": 0.6948240948784257
+    },
+    "lead-009": {
+      "id": "lead-009",
+      "company": "Company 868",
+      "project_type": "Database Migration",
+      "budget": 3273,
+      "timeline": "2-4 weeks",
+      "stage": "new",
+      "probability": 0.5932964377421385
+    },
+    "lead-010": {
+      "id": "lead-010",
+      "company": "Company 255",
+      "project_type": "Dashboard",
+      "budget": 3025,
+      "timeline": "3-5 weeks",
+      "stage": "new",
+      "probability": 0.4790516478551172
+    },
+    "lead-011": {
+      "id": "lead-011",
+      "company": "Company 208",
+      "project_type": "Dashboard",
+      "budget": 2911,
+      "timeline": "3-5 weeks",
+      "stage": "new",
+      "probability": 0.4259088430699556
+    }
+  },
+  "pending_questions": [
+    {
+      "id": "q-1",
+      "lead_id": "lead-001",
+      "company": "Company 191",
+      "project_type": "Dashboard",
+      "budget": 4075,
+      "question": "New lead from Company 191: Dashboard project, budget $4075. Accept?",
+      "created_at": "2026-01-28T08:19:13.308744+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-2",
+      "lead_id": "lead-002",
+      "company": "Company 529",
+      "project_type": "Mobile App",
+      "budget": 4006,
+      "question": "New lead from Company 529: Mobile App project, budget $4006. Accept?",
+      "created_at": "2026-01-28T08:19:13.378322+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-3",
+      "lead_id": "lead-003",
+      "company": "Company 505",
+      "project_type": "Database Migration",
+      "budget": 3191,
+      "question": "New lead from Company 505: Database Migration project, budget $3191. Accept?",
+      "created_at": "2026-01-28T08:19:13.422225+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-4",
+      "lead_id": "lead-004",
+      "company": "Company 257",
+      "project_type": "AI Solution",
+      "budget": 4879,
+      "question": "New lead from Company 257: AI Solution project, budget $4879. Accept?",
+      "created_at": "2026-01-28T08:19:13.433022+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-5",
+      "lead_id": "lead-005",
+      "company": "Company 148",
+      "project_type": "Chatbot Integration",
+      "budget": 2337,
+      "question": "New lead from Company 148: Chatbot Integration project, budget $2337. Accept?",
+      "created_at": "2026-01-28T08:19:13.465396+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-6",
+      "lead_id": "lead-006",
+      "company": "Company 941",
+      "project_type": "Dashboard",
+      "budget": 4342,
+      "question": "New lead from Company 941: Dashboard project, budget $4342. Accept?",
+      "created_at": "2026-01-28T08:19:13.519343+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-7",
+      "lead_id": "lead-007",
+      "company": "Company 753",
+      "project_type": "E-commerce Platform",
+      "budget": 6130,
+      "question": "New lead from Company 753: E-commerce Platform project, budget $6130. Accept?",
+      "created_at": "2026-01-28T08:19:13.617455+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-8",
+      "lead_id": "lead-008",
+      "company": "Company 650",
+      "project_type": "Chatbot Integration",
+      "budget": 2163,
+      "question": "New lead from Company 650: Chatbot Integration project, budget $2163. Accept?",
+      "created_at": "2026-01-28T08:19:13.649970+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-9",
+      "lead_id": "lead-009",
+      "company": "Company 868",
+      "project_type": "Database Migration",
+      "budget": 3273,
+      "question": "New lead from Company 868: Database Migration project, budget $3273. Accept?",
+      "created_at": "2026-01-28T08:19:13.693381+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-10",
+      "lead_id": "lead-010",
+      "company": "Company 255",
+      "project_type": "Dashboard",
+      "budget": 3025,
+      "question": "New lead from Company 255: Dashboard project, budget $3025. Accept?",
+      "created_at": "2026-01-28T08:19:13.758455+00:00",
+      "answered": false
+    },
+    {
+      "id": "q-11",
+      "lead_id": "lead-011",
+      "company": "Company 208",
+      "project_type": "Dashboard",
+      "budget": 2911,
+      "question": "New lead from Company 208: Dashboard project, budget $2911. Accept?",
+      "created_at": "2026-01-28T08:19:13.823507+00:00",
+      "answered": false
+    }
+  ]
 }

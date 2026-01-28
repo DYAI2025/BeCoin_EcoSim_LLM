@@ -1,13 +1,13 @@
 {
-  "balance": 9940.0,
+  "balance": 10268.0,
   "startCapital": 10000,
   "metrics": {
     "burnRate": 60.0,
-    "runwayHours": 165.66666666666666,
-    "profitMargin": -0.6,
-    "taxPaid": 0,
-    "revenueGenerated": 0,
-    "netProfit": -60.0,
-    "totalTransactions": 1
+    "runwayHours": 171.13333333333333,
+    "profitMargin": 2.68,
+    "taxPaid": 432.0,
+    "revenueGenerated": 4000,
+    "netProfit": 268.0,
+    "totalTransactions": 75
   }
 }

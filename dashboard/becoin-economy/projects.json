@@ -91,17 +91,17 @@
   "proj-004": {
     "id": "proj-004",
     "name": "LLM Integration",
-    "stage": "active",
+    "stage": "completed",
     "cost": 2500,
     "value": 4000,
-    "progress": 5.0,
+    "progress": 100.0,
     "team": [
       "agent-003",
       "agent-002"
     ],
     "milestones": [],
     "metrics": {
-      "hours_spent": 1,
+      "hours_spent": 20,
       "tokens_used": 0,
       "cost_to_date": 0.0
     }
