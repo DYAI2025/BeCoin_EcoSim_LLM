@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeCoin Economy v3.0 - CEO Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header .subtitle { opacity: 0.9; font-size: 1.1em; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h3 { margin-bottom: 15px; color: #667eea; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .metric { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .metric .value { font-weight: bold; font-size: 1.2em; }
+        .status { padding: 5px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
+        .status.active { background: #4CAF50; color: white; }
+        .status.idle { background: #FF9800; color: white; }
+        .status.pipeline { background: #2196F3; color: white; }
+        .status.completed { background: #9C27B0; color: white; }
+        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.3s ease; }
+        .agent-list { max-height: 300px; overflow-y: auto; }
+        .agent-item { padding: 10px; border-bottom: 1px solid #f0f0f0; }
+        .agent-item:last-child { border-bottom: none; }
+        .question-card { background: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .question-card .question { font-weight: bold; margin-bottom: 10px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+        .btn-accept { background: #4CAF50; color: white; }
+        .btn-reject { background: #f44336; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .alert { background: #f44336; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .chart-container { height: 200px; margin: 20px 0; }
+        .lead-item { padding: 10px; background: #f8f9fa; border-radius: 5px; margin-bottom: 10px; }
+        .refresh-btn { position: fixed; top: 20px; right: 20px; background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .refresh-btn:hover { background: #5a6fd8; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <button class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>💰 BeCoin Economy v3.0</h1>
+            <div class="subtitle">CEO Dashboard - Autonomous Business Operations</div>
+        </div>
+
+        <!-- Treasury Overview -->
+        <div class="card">
+            <h3>💵 Treasury Overview</h3>
+            <div class="metric">
+                <span>Current Balance:</span>
+                <span class="value" id="balance">$10,000</span>
+            </div>
+            <div class="metric">
+                <span>Hourly Burn Rate:</span>
+                <span class="value" id="burn-rate">$60/h</span>
+            </div>
+            <div class="metric">
+                <span>Revenue Generated:</span>
+                <span class="value" id="revenue">$0</span>
+            </div>
+            <div class="metric">
+                <span>Net Profit:</span>
+                <span class="value" id="profit">$0</span>
+            </div>
+            <div class="metric">
+                <span>Runway Hours:</span>
+                <span class="value" id="runway">∞</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Agents Status -->
+            <div class="card">
+                <h3>👥 Agents Status</h3>
+                <div class="metric">
+                    <span>Total Agents:</span>
+                    <span class="value" id="agents-total">4</span>
+                </div>
+                <div class="metric">
+                    <span>Active:</span>
+                    <span class="value" id="agents-active">0</span>
+                </div>
+                <div class="metric">
+                    <span>Idle:</span>
+                    <span class="value" id="agents-idle">4</span>
+                </div>
+                <div class="agent-list" id="agents-list">
+                    <!-- Agents will be populated here -->
+                </div>
+            </div>
+
+            <!-- Projects Status -->
+            <div class="card">
+                <h3>📋 Projects Status</h3>
+                <div class="metric">
+                    <span>Total Projects:</span>
+                    <span class="value" id="projects-total">4</span>
+                </div>
+                <div class="metric">
+                    <span>Active:</span>
+                    <span class="value" id="projects-active">2</span>
+                </div>
+                <div class="metric">
+                    <span>Pipeline:</span>
+                    <span class="value" id="projects-pipeline">1</span>
+                </div>
+                <div class="metric">
+                    <span>Completed:</span>
+                    <span class="value" id="projects-completed">1</span>
+                </div>
+                <div id="projects-list">
+                    <!-- Projects will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CEO Questions -->
+        <div class="card">
+            <h3>❓ CEO Questions & Decisions</h3>
+            <div id="questions-container">
+                <div class="loading">No pending questions...</div>
+            </div>
+        </div>
+
+        <!-- Sales Pipeline -->
+        <div class="card">
+            <h3>🎯 Sales Pipeline</h3>
+            <div class="metric">
+                <span>Total Leads:</span>
+                <span class="value" id="leads-total">0</span>
+            </div>
+            <div class="metric">
+                <span>New Leads:</span>
+                <span class="value" id="leads-new">0</span>
+            </div>
+            <div class="metric">
+                <span>Pending Questions:</span>
+                <span class="value" id="questions-count">0</span>
+            </div>
+            <div id="pipeline-list">
+                <div class="loading">No leads in pipeline...</div>
+            </div>
+        </div>
+
+        <!-- Agent Chat Reports -->
+        <div class="card">
+            <h3>🤖 Agent Chat Reports</h3>
+            <div id="agent-reports">
+                <div class="loading">Loading agent reports...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = {};
+        const API_BASE = '/api'; // Adjust if needed
+
+        async function fetchData() {
+            try {
+                const [treasury, agents, projects, pipeline, questions] = await Promise.all([
+                    fetch(`${API_BASE}/treasury`).then(r => r.json()),
+                    fetch(`${API_BASE}/agents`).then(r => r.json()),
+                    fetch(`${API_BASE}/projects`).then(r => r.json()),
+                    fetch(`${API_BASE}/pipeline`).then(r => r.json()),
+                    fetch(`${API_BASE}/questions`).then(r => r.json())
+                ]);
+
+                data = { treasury, agents, projects, pipeline, questions };
+                updateDashboard();
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+        }
+
+        function updateDashboard() {
+            // Treasury
+            document.getElementById('balance').textContent = `$${data.treasury.balance.toLocaleString()}`;
+            document.getElementById('burn-rate').textContent = `$${data.treasury.metrics.burnRate.toFixed(2)}/h`;
+            document.getElementById('revenue').textContent = `$${data.treasury.metrics.revenueGenerated.toFixed(2)}`;
+            document.getElementById('profit').textContent = `$${data.treasury.metrics.netProfit.toFixed(2)}`;
+            document.getElementById('runway').textContent = isFinite(data.treasury.metrics.runwayHours) ? `${Math.round(data.treasury.metrics.runwayHours)}h` : '∞';
+
+            // Agents
+            document.getElementById('agents-total').textContent = data.agents.summary.total;
+            document.getElementById('agents-active').textContent = data.agents.summary.active;
+            document.getElementById('agents-idle').textContent = data.agents.summary.idle;
+
+            const agentsList = document.getElementById('agents-list');
+            agentsList.innerHTML = '';
+            Object.values(data.agents.agents).forEach(agent => {
+                const agentDiv = document.createElement('div');
+                agentDiv.className = 'agent-item';
+                agentDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><strong>${agent.name}</strong> (${agent.role})</span>
+                        <span class="status ${agent.status}">${agent.status.toUpperCase()}</span>
+                    </div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        Task: ${agent.current_task || 'None'}<br>
+                        Hours: ${agent.performance.hours_worked} | Projects: ${agent.performance.projects_completed}
+                    </div>
+                `;
+                agentsList.appendChild(agentDiv);
+            });
+
+            // Projects
+            document.getElementById('projects-total').textContent = data.projects.summary.total;
+            document.getElementById('projects-active').textContent = data.projects.summary.active;
+            document.getElementById('projects-pipeline').textContent = data.projects.summary.pipeline;
+            document.getElementById('projects-completed').textContent = data.projects.summary.completed;
+
+            const projectsList = document.getElementById('projects-list');
+            projectsList.innerHTML = '';
+            Object.values(data.projects.projects).forEach(project => {
+                const projectDiv = document.createElement('div');
+                projectDiv.style.marginBottom = '15px';
+                projectDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span><strong>${project.name}</strong></span>
+                        <span class="status ${project.stage}">${project.stage.toUpperCase()}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                    <div style="font-size: 0.9em; color: #666;">
+                        Progress: ${project.progress}% | Value: $${project.value} | Team: ${project.team.length} agents
+                    </div>
+                `;
+                projectsList.appendChild(projectDiv);
+            });
+
+            // Questions
+            document.getElementById('questions-count').textContent = data.questions.unanswered_count;
+
+            const questionsContainer = document.getElementById('questions-container');
+            questionsContainer.innerHTML = '';
+            if (data.questions.questions.filter(q => !q.answered).length === 0) {
+                questionsContainer.innerHTML = '<div class="loading">No pending questions...</div>';
+            } else {
+                data.questions.questions.filter(q => !q.answered).forEach(question => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question-card';
+                    questionDiv.innerHTML = `
+                        <div class="question">${question.question}</div>
+                        <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                            Company: ${question.company} | Budget: $${question.budget} | Type: ${question.project_type}
+                        </div>
+                        <button class="btn btn-accept" onclick="acceptLead('${question.lead_id}')">✅ Accept</button>
+                        <button class="btn btn-reject" onclick="rejectLead('${question.lead_id}')">❌ Reject</button>
+                    `;
+                    questionsContainer.appendChild(questionDiv);
+                });
+            }
+
+            // Pipeline
+            document.getElementById('leads-total').textContent = data.pipeline.summary.total_leads;
+            document.getElementById('leads-new').textContent = data.pipeline.summary.new;
+
+            const pipelineList = document.getElementById('pipeline-list');
+            pipelineList.innerHTML = '';
+            if (Object.keys(data.pipeline.leads).length === 0) {
+                pipelineList.innerHTML = '<div class="loading">No leads in pipeline...</div>';
+            } else {
+                Object.values(data.pipeline.leads).forEach(lead => {
+                    const leadDiv = document.createElement('div');
+                    leadDiv.className = 'lead-item';
+                    leadDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><strong>${lead.company}</strong> - ${lead.project_type}</span>
+                            <span class="status ${lead.stage}">${lead.stage.toUpperCase()}</span>
+                        </div>
+                        <div style="font-size: 0.9em; color: #666;">
+                            Budget: $${lead.budget} | Timeline: ${lead.timeline} | Probability: ${(lead.probability * 100).toFixed(0)}%
+                        </div>
+                    `;
+                    pipelineList.appendChild(leadDiv);
+                });
+            }
+        }
+
+        async function acceptLead(leadId) {
+            try {
+                const response = await fetch(`${API_BASE}/leads/${leadId}/accept`, { method: 'POST' });
+                if (response.ok) {
+                    refreshData();
+                } else {
+                    alert('Failed to accept lead');
+                }
+            } catch (error) {
+                console.error('Error accepting lead:', error);
+            }
+        }
+
+        async function rejectLead(leadId) {
+            const reason = prompt('Reason for rejection (optional):');
+            try {
+                const response = await fetch(`${API_BASE}/leads/${leadId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                if (response.ok) {
+                    refreshData();
+                } else {
+                    alert('Failed to reject lead');
+                }
+            } catch (error) {
+                console.error('Error rejecting lead:', error);
+            }
+        }
+
+        function refreshData() {
+            fetchData();
+        }
+
+        // Auto-refresh every 5 seconds
+        setInterval(refreshData, 5000);
+
+        // Initial load
+        fetchData();
+    </script>
+</body>
+</html>
