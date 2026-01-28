@@ -1,0 +1,19 @@
+{
+  "status": "stopped",
+  "cycles_completed": 1,
+  "hours_elapsed": 1,
+  "last_update": "2026-01-28T08:16:41.626417+00:00",
+  "config": {
+    "baseline_burn_per_hour": 60.0,
+    "agent_costs": {
+      "frontend": 25.0,
+      "backend": 30.0,
+      "ai": 35.0,
+      "devops": 25.0
+    },
+    "tax_rate": 0.15,
+    "token_cost_per_1k": 0.01,
+    "bonus_pool_percent": 10.0,
+    "lead_generation_chance": 0.25
+  }
+}

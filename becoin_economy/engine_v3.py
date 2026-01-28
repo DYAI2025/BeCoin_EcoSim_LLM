@@ -346,7 +346,7 @@ class BeCoinEconomy:
                     report["agents_activated"] += 1
                     
                     # Remove from idle list
-                    idle_agents.remove((agent_id, agent_id))
+                    idle_agents.remove((agent_id, agent))
         
         return report
     

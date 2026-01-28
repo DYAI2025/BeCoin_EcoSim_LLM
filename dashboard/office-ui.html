@@ -1,2027 +1,321 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏢 Becoin Economy - Office View</title>
+    <title>🤖 BeCoin Autonomous Economy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #1a1a2e;
-            color: #eee;
-            font-family: 'Courier New', monospace;
-            overflow-x: hidden;
-        }
-
-        /* Pixel Art Font */
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        .pixel-text {
-            font-family: 'Press Start 2P', cursive;
-            image-rendering: pixelated;
-        }
-
-        /* Header */
-        .header {
-            background: #0f3460;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 4px solid #16213e;
-            box-shadow: 0 4px 0 #000;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: #00ff88;
-            text-shadow: 3px 3px 0 #000;
-        }
-
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            background: #16213e;
-            padding: 10px 20px;
-            border: 3px solid #000;
-            box-shadow: 3px 3px 0 #000;
-            margin: 5px;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: #888;
-        }
-
-        .stat-value {
-            font-size: 16px;
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        /* Customer Exchange */
-        #customer-exchange {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px 20px 0 20px;
-        }
-
-        .exchange-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .exchange-header h2 {
-            font-size: 18px;
-            color: #00ff88;
-            text-shadow: 3px 3px 0 #000;
-        }
-
-        .customer-badge {
-            background: #0f3460;
-            border: 3px solid #00ff88;
-            padding: 10px 15px;
-            font-size: 10px;
-            text-transform: uppercase;
-            box-shadow: 3px 3px 0 #000;
-        }
-
-        .exchange-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .exchange-card {
-            background: #16213e;
-            border: 4px solid #0f3460;
-            box-shadow: 5px 5px 0 #000;
-            padding: 20px;
-            min-height: 180px;
-        }
-
-        .exchange-card h3 {
-            font-size: 14px;
-            color: #00ff88;
-            margin-bottom: 10px;
-        }
-
-        .exchange-stat {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-            font-size: 11px;
-        }
-
-        .exchange-stat-label {
-            color: #888;
-        }
-
-        .exchange-stat-value {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .idea-list {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .idea-item {
-            background: #0f3460;
-            border-left: 4px solid #00ff88;
-            padding: 10px;
-            font-size: 11px;
-        }
-
-        .idea-item .idea-title {
-            font-weight: bold;
-            color: #00ff88;
-            margin-bottom: 5px;
-        }
-
-        .idea-meta {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            color: #888;
-            font-size: 10px;
-        }
-
-        .idea-status {
-            padding: 3px 6px;
-            border: 2px solid #000;
-            box-shadow: 2px 2px 0 #000;
-            font-size: 9px;
-            text-transform: uppercase;
-        }
-
-        .idea-status.BUILDING {
-            background: #00ff88;
-            color: #000;
-        }
-
-        .idea-status.REVIEW {
-            background: #ffaa00;
-            color: #000;
-        }
-
-        .idea-status.ACCEPTED {
-            background: #00b2ff;
-            color: #000;
-        }
-
-        /* Office Layout */
-        .office {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Agent Card */
-        .agent-card {
-            background: #16213e;
-            border: 4px solid #0f3460;
-            box-shadow: 5px 5px 0 #000;
-            padding: 20px;
-            position: relative;
-            transition: transform 0.2s;
-        }
-
-        .agent-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 7px 7px 0 #000;
-        }
-
-        .agent-card.working {
-            border-color: #00ff88;
-            animation: pulse 2s infinite;
-        }
-
-        .agent-card.idle {
-            border-color: #666;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 5px 5px 0 #000; }
-            50% { box-shadow: 5px 5px 20px #00ff88; }
-        }
-
-        .agent-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #0f3460;
-            padding-bottom: 10px;
-        }
-
-        .agent-avatar {
-            font-size: 48px;
-            margin-right: 15px;
-            filter: drop-shadow(2px 2px 0 #000);
-        }
-
-        .agent-info h3 {
-            font-size: 14px;
-            color: #00ff88;
-            margin-bottom: 5px;
-        }
-
-        .agent-role {
-            font-size: 10px;
-            color: #888;
-        }
-
-        .agent-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin: 10px 0 0 0;
-        }
-
-        .meta-block {
-            background: #0f3460;
-            padding: 8px;
-            border: 2px solid #000;
-            font-size: 10px;
-        }
-
-        .meta-label {
-            color: #888;
-            display: block;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .meta-value {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .agent-tags {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .agent-tag {
-            background: #00ff88;
-            color: #000;
-            border: 2px solid #000;
-            padding: 4px 6px;
-            font-size: 9px;
-            text-transform: uppercase;
-            box-shadow: 2px 2px 0 #000;
-        }
-
-        .agent-tag.muted {
-            background: #444;
-            color: #ccc;
-        }
-
-        .agent-guardrail {
-            margin-top: 8px;
-            font-size: 10px;
-            color: #ffaa00;
-        }
-
-        .status-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 3px solid #000;
-            box-shadow: 2px 2px 0 #000;
-        }
-
-        .status-indicator.active {
-            background: #00ff88;
-            animation: blink 1s infinite;
-        }
-
-        .status-indicator.idle {
-            background: #666;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .agent-activity {
-            background: #0f3460;
-            padding: 10px;
-            border-left: 4px solid #00ff88;
-            margin: 10px 0;
-            font-size: 11px;
-        }
-
-        .agent-activity.idle {
-            border-left-color: #666;
-        }
-
-        .agent-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .agent-stat {
-            font-size: 10px;
-        }
-
-        .agent-stat-label {
-            color: #888;
-        }
-
-        .agent-stat-value {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        /* Projects Board */
-        .projects-board {
-            grid-column: 1 / -1;
-            background: #16213e;
-            border: 4px solid #0f3460;
-            box-shadow: 5px 5px 0 #000;
-            padding: 20px;
-        }
-
-        .board-title {
-            font-size: 18px;
-            color: #00ff88;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #0f3460;
-            padding-bottom: 10px;
-        }
-
-        .project-lanes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .project-lane {
-            background: #0f3460;
-            padding: 15px;
-            border: 3px solid #000;
-        }
-
-        .lane-title {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .project-card {
-            background: #1a1a2e;
-            border: 2px solid #00ff88;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 11px;
-        }
-
-        .project-card.pipeline {
-            border-color: #ffaa00;
-        }
-
-        .project-card.completed {
-            border-color: #666;
-            opacity: 0.7;
-        }
-
-        .project-name {
-            color: #00ff88;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .project-value {
-            color: #ffaa00;
-            font-size: 10px;
-        }
-
-        /* Loading Animation */
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 14px;
-            color: #00ff88;
-        }
-
-        .loading:after {
-            content: '...';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
-        /* Refresh Button */
-        .refresh-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #00ff88;
-            color: #000;
-            border: 4px solid #000;
-            padding: 15px 25px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            cursor: pointer;
-            box-shadow: 5px 5px 0 #000;
-            transition: transform 0.1s;
-        }
-
-        .refresh-btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 7px 7px 0 #000;
-        }
-
-        .refresh-btn:active {
-            transform: translate(0, 0);
-            box-shadow: 3px 3px 0 #000;
-        }
-
-        /* Console Log */
-        .console {
-            grid-column: 1 / -1;
-            background: #000;
-            border: 4px solid #00ff88;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            max-height: 200px;
-            overflow-y: auto;
-            box-shadow: 5px 5px 0 #000;
-        }
-
-        .console-line {
-            margin: 3px 0;
-            color: #00ff88;
-        }
-
-        .console-line.error {
-            color: #ff0055;
-        }
-
-        .console-line.warning {
-            color: #ffaa00;
-        }
-
-        /* Health Bar */
-        .health-bar {
-            background: #0f3460;
-            height: 30px;
-            border: 3px solid #000;
-            position: relative;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #00cc66);
-            transition: width 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #000;
-            font-weight: bold;
-        }
-
-        .health-fill.low {
-            background: linear-gradient(90deg, #ff0055, #cc0044);
-        }
-
-        .health-fill.medium {
-            background: linear-gradient(90deg, #ffaa00, #cc8800);
-        }
-
-        /* Dashboard Navigation */
-        .dashboard-nav {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .nav-btn {
-            background: #0f3460;
-            color: #00ff88;
-            border: 3px solid #00ff88;
-            padding: 10px 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            cursor: pointer;
-            box-shadow: 3px 3px 0 #000;
-            transition: transform 0.1s;
-        }
-
-        .nav-btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0 #000;
-        }
-
-        .nav-btn.active {
-            background: #00ff88;
-            color: #000;
-        }
-
-        /* Service Controls */
-        #service-panel {
-            max-width: 1400px;
-            margin: 15px auto 0 auto;
-            padding: 0 20px;
-        }
-
-        #service-panel h2 {
-            font-size: 16px;
-            color: #00ff88;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 10px;
-        }
-
-        .service-card {
-            background: #0f3460;
-            border: 4px solid #0f3460;
-            box-shadow: 4px 4px 0 #000;
-            padding: 12px;
-            min-height: 140px;
-        }
-
-        .service-title {
-            color: #00ff88;
-            font-size: 12px;
-            margin-bottom: 6px;
-        }
-
-        .service-description {
-            font-size: 10px;
-            color: #ccc;
-            min-height: 40px;
-            line-height: 1.4;
-        }
-
-        .service-footer {
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .service-status {
-            padding: 6px 8px;
-            border: 2px solid #000;
-            box-shadow: 2px 2px 0 #000;
-            font-size: 10px;
-            text-transform: uppercase;
-        }
-
-        .service-status.running {
-            background: #00ff88;
-            color: #000;
-        }
-
-        .service-status.stopped {
-            background: #ff0055;
-            color: #000;
-        }
-
-        .service-btn {
-            background: #00b2ff;
-            color: #000;
-            border: 3px solid #000;
-            padding: 8px 10px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
-            cursor: pointer;
-            box-shadow: 3px 3px 0 #000;
-            text-transform: uppercase;
-        }
-
-        .service-btn:disabled {
-            background: #666;
-            color: #ccc;
-            cursor: not-allowed;
-            box-shadow: 0 0 0 #000;
-        }
-
-        /* Chat Section */
-        #agent-chat-section {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 400px;
-            max-height: 600px;
-            background: #16213e;
-            border: 4px solid #00ff88;
-            box-shadow: 5px 5px 0 #000;
-            display: flex;
-            flex-direction: column;
-            z-index: 999;
-        }
-
-        #agent-chat-section.minimized {
-            max-height: 60px;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            background: #0f3460;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #000;
-            cursor: pointer;
-        }
-
-        .chat-header h3 {
-            font-size: 12px;
-            color: #00ff88;
-            margin: 0;
-        }
-
-        .chat-toggle {
-            background: none;
-            border: none;
-            color: #00ff88;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            max-height: 400px;
-            background: #1a1a2e;
-        }
-
-        .chat-message {
-            margin-bottom: 15px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-message .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 10px;
-        }
-
-        .chat-message .message-sender {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .chat-message.agent .message-sender {
-            color: #ffaa00;
-        }
-
-        .chat-message .message-time {
-            color: #666;
-        }
-
-        .chat-message .message-content {
-            background: #0f3460;
-            padding: 10px;
-            border-left: 4px solid #00ff88;
-            font-size: 11px;
-            line-height: 1.4;
-            color: #eee;
-        }
-
-        .chat-message.agent .message-content {
-            border-left-color: #ffaa00;
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 10px;
-            padding: 15px;
-            background: #0f3460;
-            border-top: 3px solid #000;
-        }
-
-        .agent-selector {
-            background: #1a1a2e;
-            color: #00ff88;
-            border: 2px solid #00ff88;
-            padding: 8px;
-            font-size: 10px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: #1a1a2e;
-            color: #eee;
-            border: 2px solid #00ff88;
-            padding: 8px;
-            font-size: 11px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .chat-send-btn {
-            background: #00ff88;
-            color: #000;
-            border: 3px solid #000;
-            padding: 8px 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            cursor: pointer;
-            box-shadow: 2px 2px 0 #000;
-        }
-
-        .chat-send-btn:hover {
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 #000;
-        }
-
-        .chat-send-btn:active {
-            transform: translate(0, 0);
-            box-shadow: 1px 1px 0 #000;
-        }
-
-        /* CEO Discovery Section */
-        #ceo-discovery-section {
-            grid-column: 1 / -1;
-            background: #16213e;
-            border: 4px solid #667eea;
-            box-shadow: 5px 5px 0 #000;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        #ceo-discovery-section h2 {
-            font-size: 18px;
-            color: #00ff88;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #0f3460;
-            padding-bottom: 10px;
-        }
-
-        .ceo-card {
-            background: #0f3460;
-            border: 3px solid #000;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 3px 3px 0 #000;
-        }
-
-        .ceo-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #16213e;
-        }
-
-        .ceo-card-header h3 {
-            font-size: 14px;
-            color: #00ff88;
-            margin: 0;
-        }
-
-        .ceo-status-badge {
-            padding: 5px 10px;
-            border: 2px solid #000;
-            font-size: 10px;
-            font-weight: bold;
-            box-shadow: 2px 2px 0 #000;
-        }
-
-        .ceo-status-badge.ACTIVE {
-            background: #00ff88;
-            color: #000;
-        }
-
-        .ceo-status-badge.idle {
-            background: #666;
-            color: #fff;
-        }
-
-        .ceo-stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            font-size: 11px;
-        }
-
-        .ceo-stat-label {
-            color: #888;
-        }
-
-        .ceo-stat-value {
-            color: #00ff88;
-            font-weight: bold;
-        }
-
-        .proposal-item, .pattern-item {
-            background: #1a1a2e;
-            border-left: 4px solid #667eea;
-            padding: 10px;
-            margin: 5px 0;
-            font-size: 11px;
-        }
-
-        .proposal-item h4, .pattern-item h4 {
-            color: #00ff88;
-            font-size: 12px;
-            margin: 0 0 5px 0;
-        }
-
-        .proposal-meta, .pattern-meta {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            font-size: 10px;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: #00ff88;
-            color: #000;
-            padding: 15px 20px;
-            border: 4px solid #000;
-            box-shadow: 5px 5px 0 #000;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            animation: slideInRight 0.3s ease-out;
-            z-index: 1000;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Organization Section */
-        #organization-section {
-            max-width: 1400px;
-            margin: 20px auto 0 auto;
-            padding: 0 20px;
-        }
-
-        #organization-section h2 {
-            font-size: 18px;
-            color: #00ff88;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #0f3460;
-            padding-bottom: 10px;
-        }
-
-        .organization-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 15px;
-        }
-
-        .organization-card {
-            background: #16213e;
-            border: 4px solid #0f3460;
-            box-shadow: 5px 5px 0 #000;
-            padding: 18px;
-            min-height: 160px;
-        }
-
-        .org-title {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .org-body {
-            font-size: 11px;
-            color: #00ff88;
-            line-height: 1.4;
-        }
-
-        .org-pill {
-            display: inline-block;
-            background: #0f3460;
-            border: 2px solid #00ff88;
-            padding: 4px 6px;
-            font-size: 9px;
-            text-transform: uppercase;
-            margin: 3px;
-        }
+        .gradient-bg { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0f3460 100%); }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .money { font-family: 'Courier New', monospace; }
     </style>
 </head>
-<body>
-    <!-- Dashboard Navigation -->
-    <div class="dashboard-nav pixel-text">
-        <button class="nav-btn active" onclick="switchDashboard('office')">OFFICE</button>
-        <button class="nav-btn" onclick="switchDashboard('analytics')">ANALYTICS</button>
-        <button class="nav-btn" onclick="switchDashboard('agents')">AGENTS</button>
-    </div>
-
-    <div class="header pixel-text">
-        <h1>🏢 BECOIN ECONOMY OFFICE</h1>
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-label">TREASURY</div>
-                <div class="stat-value" id="treasury">-</div>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- Header -->
+    <header class="border-b border-gray-700/50 p-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="text-4xl">💰</div>
+                <div>
+                    <h1 class="text-2xl font-bold">BeCoin Autonomous Economy</h1>
+                    <p class="text-gray-400 text-sm">Self-managing company simulation with AI agents</p>
+                </div>
             </div>
-            <div class="stat">
-                <div class="stat-label">BURN RATE</div>
-                <div class="stat-value" id="burnrate">-</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">REVENUE</div>
-                <div class="stat-value" id="revenue">-</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">CUSTOMER</div>
-                <div class="stat-value" id="customer">-</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">AGENTS</div>
-                <div class="stat-value" id="team">-</div>
+            <div class="text-right">
+                <div class="text-3xl font-bold money text-green-400" id="balance">$0</div>
+                <div class="text-sm text-gray-400" id="runway">0h runway</div>
             </div>
         </div>
-        <div class="health-bar">
-            <div class="health-fill" id="healthBar" style="width: 100%">
-                <span id="healthText">FINANCIAL HEALTH: 100%</span>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6">
+        
+        <!-- Status Bar -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="card rounded-xl p-4">
+                <div class="text-gray-400 text-sm">Treasury</div>
+                <div class="text-2xl font-bold money text-green-400" id="treasury-balance">$0</div>
+                <div class="text-xs text-gray-500">Start: $10,000</div>
             </div>
-        </div>
-    </div>
-
-    <section id="service-panel" class="pixel-text">
-        <h2>🛰️ Laufende Dienste</h2>
-        <div class="service-grid" id="service-grid"></div>
-    </section>
-
-    <section id="customer-exchange" class="pixel-text">
-        <div class="exchange-header">
-            <h2>🤝 CUSTOMER EXCHANGE</h2>
-            <div class="customer-badge" id="customer-badge">Waiting for data…</div>
-        </div>
-        <div class="exchange-grid">
-            <div class="exchange-card" id="customer-card">
-                <h3>Founding Customer</h3>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Relationship</span>
-                    <span class="exchange-stat-value" id="customer-relationship">-</span>
-                </div>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Negotiation</span>
-                    <span class="exchange-stat-value" id="customer-negotiation">-</span>
-                </div>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Next Review</span>
-                    <span class="exchange-stat-value" id="customer-next-review">-</span>
-                </div>
+            <div class="card rounded-xl p-4">
+                <div class="text-gray-400 text-sm">Agents</div>
+                <div class="text-2xl font-bold text-blue-400" id="agents-active">0/4</div>
+                <div class="text-xs text-gray-500">Active workers</div>
             </div>
-            <div class="exchange-card" id="currency-card">
-                <h3>Token Treasury</h3>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Available</span>
-                    <span class="exchange-stat-value" id="currency-available">-</span>
-                </div>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Locked</span>
-                    <span class="exchange-stat-value" id="currency-locked">-</span>
-                </div>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Circulating</span>
-                    <span class="exchange-stat-value" id="currency-circulation">-</span>
-                </div>
-                <div class="exchange-stat">
-                    <span class="exchange-stat-label">Token Rate</span>
-                    <span class="exchange-stat-value" id="currency-rate">-</span>
-                </div>
+            <div class="card rounded-xl p-4">
+                <div class="text-gray-400 text-sm">Projects</div>
+                <div class="text-2xl font-bold text-purple-400" id="projects-active">0/4</div>
+                <div class="text-xs text-gray-500">In progress</div>
             </div>
-            <div class="exchange-card" id="ideas-card">
-                <h3>Accepted Ideas</h3>
-                <div class="idea-list" id="idea-list"></div>
-            </div>
-        </div>
-    </section>
-
-    <div class="office" id="office">
-        <div class="loading pixel-text">LOADING OFFICE</div>
-    </div>
-
-    <section id="organization-section" class="pixel-text" style="display: none;">
-        <h2>🏗 ORGANISATIONSDESIGN</h2>
-        <div class="organization-grid" id="organization-grid"></div>
-    </section>
-
-    <!-- CEO Discovery Section -->
-    <section id="ceo-discovery-section" class="pixel-text">
-        <h2>🎯 CEO DISCOVERY SYSTEM</h2>
-
-        <!-- Status Card -->
-        <div id="ceo-status-card" class="ceo-card">
-            <div class="ceo-card-header">
-                <h3>Discovery Status</h3>
-                <span id="ceo-status-badge" class="ceo-status-badge idle">IDLE</span>
-            </div>
-            <div class="ceo-card-body">
-                <div class="ceo-stat">
-                    <span class="ceo-stat-label">Session ID:</span>
-                    <span id="ceo-session-id" class="ceo-stat-value">None</span>
-                </div>
-                <div class="ceo-stat">
-                    <span class="ceo-stat-label">Patterns Found:</span>
-                    <span id="ceo-patterns-count" class="ceo-stat-value">0</span>
-                </div>
-                <div class="ceo-stat">
-                    <span class="ceo-stat-label">Proposals Generated:</span>
-                    <span id="ceo-proposals-count" class="ceo-stat-value">0</span>
-                </div>
+            <div class="card rounded-xl p-4">
+                <div class="text-gray-400 text-sm">Simulation</div>
+                <div class="text-2xl font-bold text-yellow-400" id="hours-elapsed">0h</div>
+                <div class="text-xs text-gray-500" id="last-update">--</div>
             </div>
         </div>
 
-        <!-- Active Proposals -->
-        <div id="ceo-proposals-card" class="ceo-card">
-            <div class="ceo-card-header">
-                <h3>💡 Active Proposals</h3>
-            </div>
-            <div id="ceo-proposals-list">
-                <p style="color: #888; font-size: 10px;">No proposals generated yet.</p>
-            </div>
-        </div>
-
-        <!-- Identified Patterns -->
-        <div id="ceo-patterns-card" class="ceo-card">
-            <div class="ceo-card-header">
-                <h3>🧠 Identified Patterns</h3>
-            </div>
-            <div id="ceo-patterns-list">
-                <p style="color: #888; font-size: 10px;">No patterns identified yet.</p>
-            </div>
-        </div>
-
-        <!-- Performance Metrics -->
-        <div id="ceo-performance-card" class="ceo-card">
-            <div class="ceo-card-header">
-                <h3>📊 Performance Analytics</h3>
-            </div>
-            <div class="ceo-card-body">
-                <div class="ceo-stat">
-                    <span class="ceo-stat-label">Prediction Accuracy:</span>
-                    <span id="ceo-prediction-accuracy" class="ceo-stat-value">0%</span>
+        <!-- Main Grid -->
+        <div class="grid grid-cols-3 gap-6">
+            
+            <!-- Left: Agent Chat -->
+            <div class="col-span-2 space-y-4">
+                <h2 class="text-xl font-bold mb-4">🤖 Autonomous Agent Reports</h2>
+                <div id="agent-reports" class="space-y-4">
+                    <!-- Agents will report here -->
                 </div>
-                <div class="ceo-stat">
-                    <span class="ceo-stat-label">User Satisfaction:</span>
-                    <span id="ceo-user-satisfaction" class="ceo-stat-value">0%</span>
+            </div>
+
+            <!-- Right: Projects & Treasury -->
+            <div class="space-y-6">
+                
+                <!-- Projects -->
+                <div class="card rounded-xl p-4">
+                    <h3 class="font-bold mb-4">📋 Active Projects</h3>
+                    <div id="projects-list" class="space-y-3">
+                        <!-- Projects will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card rounded-xl p-4">
+                    <h3 class="font-bold mb-4">💸 Recent Transactions</h3>
+                    <div id="transactions" class="space-y-2 text-sm max-h-64 overflow-y-auto">
+                        <!-- Transactions will appear here -->
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <button class="refresh-btn pixel-text" onclick="loadData()">⟳ REFRESH</button>
-
-    <!-- Agent Chat Section -->
-    <section id="agent-chat-section" class="pixel-text">
-        <div class="chat-header" onclick="toggleChat()">
-            <h3>💬 AGENT CHAT</h3>
-            <button class="chat-toggle" id="chat-toggle-btn">▼</button>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-            <div class="chat-message agent">
-                <div class="message-header">
-                    <span class="message-sender">🤖 System</span>
-                    <span class="message-time">now</span>
-                </div>
-                <div class="message-content">
-                    Chat aktiviert! Wähle einen Agenten und starte die Unterhaltung. Alle Nachrichten werden gespeichert.
-                </div>
-            </div>
-        </div>
-        <div class="chat-input-area">
-            <select class="agent-selector" id="agent-selector">
-                <option value="all">Alle Agenten</option>
-            </select>
-            <input type="text" class="chat-input" id="chat-input" placeholder="Nachricht eingeben..." onkeypress="handleChatKeyPress(event)">
-            <button class="chat-send-btn" onclick="sendMessage()">SEND</button>
-        </div>
-    </section>
+    </main>
 
     <script>
-        const API_BASE = './becoin-economy/';
-        const API_HOST = window.location.origin.startsWith('http') ? window.location.origin : 'http://localhost:3000';
-        const SERVICE_API_BASE = `${API_HOST}/api`;
-
-        const AGENT_AVATARS = {
-            'agent-helio': '💼',
-            'agent-nami': '🛠️',
-            'agent-atlas': '💰',
-            'agent-circe': '⚡'
-        };
-
-        async function loadServices() {
-            const grid = document.getElementById('service-grid');
-            if (!grid) return;
-
-            grid.innerHTML = '<div class="loading pixel-text">Lade Dienste…</div>';
-
+        const API_URL = '.';
+        
+        async function loadDashboard() {
             try {
-                const response = await fetch(`${SERVICE_API_BASE}/services`);
-                if (!response.ok) {
-                    throw new Error(`Service API ${response.status}`);
-                }
-                const services = await response.json();
-                renderServices(services);
-            } catch (error) {
-                grid.innerHTML = '<div style="color:#ff0055;font-size:10px;">Service API nicht erreichbar.</div>';
-                console.error('Service load failed', error);
-            }
-        }
-
-        function renderServices(services = []) {
-            const grid = document.getElementById('service-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            services.forEach(service => {
-                const card = document.createElement('div');
-                card.className = 'service-card';
-                const statusClass = service.status === 'running' ? 'running' : 'stopped';
-                const buttonDisabled = service.status === 'running';
-
-                card.innerHTML = `
-                    <div class="service-title">${service.name}</div>
-                    <div class="service-description">${service.description}</div>
-                    <div class="service-footer">
-                        <span class="service-status ${statusClass}">${service.status}</span>
-                        <button class="service-btn" ${buttonDisabled ? 'disabled' : ''} onclick="startService('${service.id}', this)">START</button>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        async function startService(serviceId, button) {
-            if (button) {
-                button.disabled = true;
-                button.textContent = '...';
-            }
-
-            try {
-                const response = await fetch(`${SERVICE_API_BASE}/services/${serviceId}/start`, { method: 'POST' });
-                if (!response.ok) {
-                    throw new Error(`Start fehlgeschlagen (${response.status})`);
-                }
-                const service = await response.json();
-                showNotification(`${service.name} bereit (${service.status})`);
-            } catch (error) {
-                console.error('Service start failed', error);
-                showNotification(`Fehler beim Starten: ${error.message}`);
-            } finally {
-                await loadServices();
-            }
-        }
-
-        async function loadData() {
-            try {
-                const [
-                    treasury,
-                    roster,
-                    projects,
-                    ledger,
-                    orchestrator,
-                    customerMarket
-                ] = await Promise.all([
-                    fetch(API_BASE + 'treasury.json').then(r => r.json()),
-                    fetch(API_BASE + 'agent-roster.json').then(r => r.json()),
-                    fetch(API_BASE + 'projects.json').then(r => r.json()),
-                    fetch(API_BASE + 'impact-ledger.json').then(r => r.json()),
-                    fetch(API_BASE + 'orchestrator-status.json').then(r => r.json()).catch(() => null),
-                    fetch(API_BASE + 'customer-market.json').then(r => r.json())
+                const [treasuryRes, agentsRes, projectsRes] = await Promise.all([
+                    fetch(`${API_URL}/treasury.json`),
+                    fetch(`${API_URL}/agents.json`),
+                    fetch(`${API_URL}/projects.json`)
                 ]);
-
-                const normalizedProjects = orchestrator?.projects ?? projects;
-                const aggregatedAgents = orchestrator?.agents ?? [
-                    ...(roster.founders || []),
-                    ...(roster.employees || [])
-                ];
-
-                updateHeader(treasury, normalizedProjects, aggregatedAgents, customerMarket);
-                renderCustomerExchange(customerMarket, ledger, aggregatedAgents);
-                renderOffice(aggregatedAgents, normalizedProjects);
-                renderProjects(normalizedProjects);
-                renderOrganization(orchestrator);
-                renderConsole(treasury);
-            } catch (error) {
-                document.getElementById('office').innerHTML = `
-                    <div class="loading pixel-text" style="color: #ff0055;">
-                        ERROR: Could not load data<br>
-                        Make sure to run this from a web server!<br><br>
-                        Run: python3 -m http.server 8080<br>
-                        Then: http://localhost:8080/dashboard/office-ui.html
+                
+                const treasury = await treasuryRes.json();
+                const agents = await agentsRes.json();
+                const projects = await projectsRes.json();
+                
+                // Update header
+                document.getElementById('balance').textContent = 
+                    `$${treasury.balance.toLocaleString()}`;
+                document.getElementById('runway').textContent = 
+                    `${Math.floor(treasury.metrics.runwayHours)}h runway`;
+                
+                // Update status cards
+                const metrics = treasury.metrics;
+                document.getElementById('treasury-balance').textContent = 
+                    `$${treasury.balance.toLocaleString()}`;
+                
+                const agentCount = Object.values(agents).filter(a => a.status === 'active').length;
+                document.getElementById('agents-active').textContent = 
+                    `${agentCount}/${Object.keys(agents).length}`;
+                
+                const projCount = Object.values(projects).filter(p => p.stage === 'active').length;
+                document.getElementById('projects-active').textContent = 
+                    `${projCount}/${Object.keys(projects).length}`;
+                
+                // Update autonomous info
+                const autoData = agents.autonomous_loop || {};
+                document.getElementById('hours-elapsed').textContent = 
+                    `${autoData.hours_elapsed || 0}h`;
+                document.getElementById('last-update').textContent = 
+                    autoData.last_update ? new Date(autoData.last_update).toLocaleTimeString() : '--';
+                
+                // Render agent reports
+                renderAgentReports(agents);
+                
+                // Render projects
+                renderProjects(projects);
+                
+                // Render transactions
+                renderTransactions(treasury.transactions || []);
+                
+            } catch (e) {
+                console.error('Dashboard error:', e);
+            }
+        }
+        
+        function renderAgentReports(agents) {
+            const container = document.getElementById('agent-reports');
+            const agentList = Object.values(agents).filter(a => a.id);
+            
+            container.innerHTML = agentList.map(agent => {
+                const perf = agent.performance || {};
+                const statusColors = {
+                    'active': 'bg-green-500',
+                    'idle': 'bg-gray-500',
+                    'exhausted': 'bg-red-500'
+                };
+                
+                // Generate autonomous report
+                let questions = [];
+                let recommendations = [];
+                
+                if (agent.current_task && agent.status === 'active') {
+                    questions.push(`Should I prioritize features or refactor in ${agent.current_task}?`);
+                    recommendations.push(`${agent.current_task} is making good progress`);
+                } else {
+                    questions.push('Waiting for new tasks. Any priorities?');
+                    recommendations.push('Ready for new assignments');
+                }
+                
+                return `
+                    <div class="card rounded-xl p-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full ${statusColors[agent.status] || 'bg-gray-500'} flex items-center justify-center text-xl">
+                                ${agent.role === 'frontend' ? '🎨' : 
+                                  agent.role === 'backend' ? '⚙️' : 
+                                  agent.role === 'ai' ? '🧠' : '🚀'}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold">${agent.name}</h3>
+                                        <p class="text-sm text-gray-400">${agent.role}</p>
+                                    </div>
+                                    <span class="text-xs px-2 py-1 rounded ${statusColors[agent.status]}">${agent.status}</span>
+                                </div>
+                                
+                                <div class="grid grid-cols-4 gap-4 mt-3 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">Hours</div>
+                                        <div class="font-mono">${perf.hours_worked || 0}h</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-500">Tokens</div>
+                                        <div class="font-mono">${(perf.tokens_consumed || 0).toLocaleString()}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-500">BeCoins</div>
+                                        <div class="font-mono text-green-400">$${perf.becoin_earned?.toFixed(2) || '0.00'}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-500">Projects</div>
+                                        <div class="font-mono">${perf.projects_completed || 0}</div>
+                                    </div>
+                                </div>
+                                
+                                ${agent.current_task ? `
+                                    <div class="mt-3 p-2 bg-blue-900/30 rounded text-sm">
+                                        <span class="text-blue-400">📌 Current:</span> ${agent.current_task}
+                                    </div>
+                                ` : ''}
+                                
+                                ${questions.length ? `
+                                    <div class="mt-3 space-y-1">
+                                        ${questions.map(q => `
+                                            <div class="flex items-start gap-2 text-sm">
+                                                <span class="text-yellow-400">❓</span>
+                                                <span class="text-yellow-200">${q}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                
+                                ${recommendations.length ? `
+                                    <div class="mt-2 space-y-1">
+                                        ${recommendations.map(r => `
+                                            <div class="flex items-start gap-2 text-sm">
+                                                <span class="text-green-400">💡</span>
+                                                <span class="text-green-200">${r}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
-            }
+            }).join('');
         }
-
-        function updateHeader(treasury, projects, agents, customerMarket) {
-            const balance = treasury.balance ?? 0;
-            const burnRate = treasury.metrics?.burnRate ?? 0;
-            const revenue = treasury.metrics?.totalRevenue ?? 0;
-
-            document.getElementById('treasury').textContent =
-                `${balance.toLocaleString()} Bc`;
-            document.getElementById('burnrate').textContent =
-                `${burnRate.toLocaleString(undefined, { maximumFractionDigits: 1 })} Bc/h`;
-            document.getElementById('revenue').textContent =
-                `${revenue.toLocaleString()} Bc`;
-            document.getElementById('customer').textContent =
-                customerMarket?.customer?.name ?? 'YOU';
-            document.getElementById('team').textContent = agents.length;
-
-            const healthPercent = Math.max(0, Math.min(100, (balance / treasury.startCapital) * 100));
-            const healthBar = document.getElementById('healthBar');
-            const healthText = document.getElementById('healthText');
-
-            healthBar.style.width = healthPercent + '%';
-            healthText.textContent = `FINANCIAL HEALTH: ${Math.round(healthPercent)}%`;
-
-            if (healthPercent < 30) {
-                healthBar.className = 'health-fill low';
-            } else if (healthPercent < 60) {
-                healthBar.className = 'health-fill medium';
-            } else {
-                healthBar.className = 'health-fill';
-            }
-        }
-
-        function renderCustomerExchange(market, ledger, agents = []) {
-            const badge = document.getElementById('customer-badge');
-            if (!market) {
-                badge.textContent = 'Awaiting customer data';
-                return;
-            }
-
-            badge.textContent = `SOLE CLIENT • ${market.customer?.name ?? 'YOU'}`;
-            document.getElementById('customer-relationship').textContent = market.customer?.relationship ?? '-';
-            document.getElementById('customer-negotiation').textContent = market.customer?.negotiationWindow ?? '-';
-            document.getElementById('customer-next-review').textContent = market.customer?.nextReview ?? '-';
-
-            const reserve = market.currencyReserve ?? {};
-            document.getElementById('currency-available').textContent = `${(reserve.availableTokens ?? 0).toLocaleString()} Bc`;
-            document.getElementById('currency-locked').textContent = `${(reserve.lockedForIdeas ?? 0).toLocaleString()} Bc`;
-            document.getElementById('currency-circulation').textContent = `${(reserve.circulation ?? 0).toLocaleString()} Bc`;
-            document.getElementById('currency-rate').textContent = `${market.dealTerms?.tokenRate ?? 0} Bc / acceptance`;
-
-            const agentLookup = Object.fromEntries(agents.map(agent => [agent.id, agent.name]));
-            const ideaList = document.getElementById('idea-list');
-            ideaList.innerHTML = '';
-
-            (market.ideaPipeline || []).forEach(idea => {
-                const item = document.createElement('div');
-                item.className = 'idea-item';
-                const ownerName = idea.leadAgent ?? agentLookup[idea.owner] ?? 'Team';
-                const roiText = idea.roi != null ? `ROI ${idea.roi}%` : '';
-                const budgetText = idea.tokenBudget != null ? `Budget ${idea.tokenBudget} Bc` : '';
-                const statusClass = idea.status ? idea.status.toUpperCase() : 'PENDING';
-
-                item.innerHTML = `
-                    <div class="idea-title">${idea.title}</div>
-                    <div class="idea-meta">
-                        <span class="idea-status ${statusClass}">${statusClass}</span>
-                        ${roiText ? `<span>${roiText}</span>` : ''}
-                        ${budgetText ? `<span>${budgetText}</span>` : ''}
-                        <span>Lead: ${ownerName}</span>
-                    </div>
-                    <div style="color:#ccc;font-size:9px;margin-top:6px;">${idea.customerValue}</div>
-                `;
-                ideaList.appendChild(item);
-            });
-
-            if (!market.ideaPipeline?.length) {
-                ideaList.innerHTML = '<div style="color: #666; font-size: 10px;">Noch keine Ideen akzeptiert.</div>';
-            }
-
-            const policyText = market.dealTerms?.acceptanceRule;
-            const policyNode = document.getElementById('idea-policy');
-            if (policyNode) {
-                policyNode.remove();
-            }
-            if (policyText) {
-                const policy = document.createElement('div');
-                policy.id = 'idea-policy';
-                policy.style = 'font-size:9px;color:#ffaa00;margin-top:12px;line-height:1.4;';
-                policy.textContent = `Policy: ${policyText}`;
-                document.getElementById('ideas-card').appendChild(policy);
-            }
-
-            const impactNode = document.getElementById('idea-impact-score');
-            if (impactNode) {
-                impactNode.remove();
-            }
-            if (ledger?.totalImpactScore != null) {
-                const impact = document.createElement('div');
-                impact.id = 'idea-impact-score';
-                impact.style = 'font-size:9px;color:#00ff88;margin-top:6px;';
-                impact.textContent = `Impact Score: ${ledger.totalImpactScore}`;
-                document.getElementById('ideas-card').appendChild(impact);
-            }
-        }
-
-        function renderOffice(agents, projects) {
-            const office = document.getElementById('office');
-            office.innerHTML = '';
-
-            if (!agents.length) {
-                office.innerHTML = '<div class="loading pixel-text" style="color:#ffaa00;">Keine Agenten aktiv.</div>';
-                return;
-            }
-
-            const activeProjects = projects?.active ?? [];
-
-            agents.forEach(agent => {
-                const activeProject = activeProjects.find(p => p.team && p.team.includes(agent.id));
-                const card = createAgentCard(agent, activeProject);
-                office.appendChild(card);
-            });
-        }
-
-        function createAgentCard(agent, activeProject) {
-            const card = document.createElement('div');
-            const normalizedStatus = (agent.status || '').toString().toUpperCase();
-            const isActive = ['ACTIVE', 'BUILDING', 'NEGOTIATING', 'REVIEW'].includes(normalizedStatus) || !!activeProject;
-            const currentTask = agent.current_task || activeProject?.name;
-            const activityText = agent.activity || (currentTask ? `🔨 Build: ${currentTask}` : '💤 Wartet auf bestätigte Idee');
-            const guardrailText = agent.guardrails?.finance || agent.guardrail || 'Profit sichern & Burn decken';
-            const instanceText = agent.instance || 'Noch nicht zugewiesen';
-            const autonomyText = agent.autonomy || 'VOLL';
-            const keys = agent.focus_keys || agent.focusKeys || [];
-            const earned = Number(agent.performance?.becoinEarned ?? agent.metrics?.becoins_earned ?? 0);
-            const delivered = agent.performance?.projectsCompleted ?? agent.metrics?.projects_completed ?? 0;
-            const equity = agent.equityShare != null ? `${Math.round(agent.equityShare * 100)}%` : 'N/A';
-
-            const tagsHtml = keys.length
-                ? keys.map(k => `<span class="agent-tag">${k}</span>`).join('')
-                : '<span class="agent-tag muted">Wartet auf Fokus</span>';
-
-            card.className = 'agent-card ' + (isActive ? 'working' : 'idle');
-            const statusClass = isActive ? 'active' : 'idle';
-
-            card.innerHTML = `
-                <div class="status-indicator ${statusClass}"></div>
-                <div class="agent-header">
-                    <div class="agent-avatar">${AGENT_AVATARS[agent.id] || '👤'}</div>
-                    <div class="agent-info">
-                        <h3 class="pixel-text">${agent.name}</h3>
-                        <div class="agent-role">Agent: ${agent.agent_type || agent.role || 'Autonom'}</div>
-                    </div>
-                </div>
-                <div class="agent-activity ${isActive ? '' : 'idle'}">
-                    ${activityText}
-                </div>
-                <div class="agent-meta">
-                    <div class="meta-block">
-                        <span class="meta-label">Instanz</span>
-                        <span class="meta-value">${instanceText}</span>
-                    </div>
-                    <div class="meta-block">
-                        <span class="meta-label">Autonomie</span>
-                        <span class="meta-value">${autonomyText}</span>
-                    </div>
-                </div>
-                <div class="agent-guardrail">Guardrail: ${guardrailText}</div>
-                <div class="agent-tags">${tagsHtml}</div>
-                <div class="agent-stats">
-                    <div class="agent-stat">
-                        <div class="agent-stat-label">Equity</div>
-                        <div class="agent-stat-value">${equity}</div>
-                    </div>
-                    <div class="agent-stat">
-                        <div class="agent-stat-label">Earned</div>
-                        <div class="agent-stat-value">${earned.toLocaleString()} Bc</div>
-                    </div>
-                    <div class="agent-stat">
-                        <div class="agent-stat-label">Delivered</div>
-                        <div class="agent-stat-value">${delivered}</div>
-                    </div>
-                    <div class="agent-stat">
-                        <div class="agent-stat-label">Status</div>
-                        <div class="agent-stat-value">${normalizedStatus || 'IDLE'}</div>
-                    </div>
-                </div>
-            `;
-
-            return card;
-        }
-
+        
         function renderProjects(projects) {
-            const office = document.getElementById('office');
-
-            const board = document.createElement('div');
-            board.className = 'projects-board';
-            const active = projects.active || [];
-            const pipeline = projects.pipeline || [];
-            const completed = projects.completed || [];
-
-            board.innerHTML = `
-                <div class="board-title pixel-text">📦 DELIVERY BOARD – FOUNDING CUSTOMER</div>
-                <div class="project-lanes">
-                    <div class="project-lane">
-                        <div class="lane-title pixel-text">🔄 ACTIVE (${active.length})</div>
-                        <div id="active-lane"></div>
+            const container = document.getElementById('projects-list');
+            const projList = Object.values(projects).filter(p => p.id);
+            
+            container.innerHTML = projList.map(project => {
+                const stageColors = {
+                    'pipeline': 'bg-gray-600',
+                    'active': 'bg-blue-600',
+                    'completed': 'bg-green-600',
+                    'paused': 'bg-yellow-600'
+                };
+                
+                return `
+                    <div class="p-3 bg-gray-800/50 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-medium">${project.name}</div>
+                                <div class="text-xs text-gray-400">
+                                    Cost: $${project.cost} → Value: $${project.value}
+                                </div>
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded ${stageColors[project.stage]}">${project.stage}</span>
+                        </div>
+                        <div class="mt-2">
+                            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                <span>Progress</span>
+                                <span>${project.progress?.toFixed(0) || 0}%</span>
+                            </div>
+                            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 transition-all" style="width: ${project.progress || 0}%"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="project-lane">
-                        <div class="lane-title pixel-text">⏳ PIPELINE (${pipeline.length})</div>
-                        <div id="pipeline-lane"></div>
-                    </div>
-                    <div class="project-lane">
-                        <div class="lane-title pixel-text">✅ COMPLETED (${completed.length})</div>
-                        <div id="completed-lane"></div>
-                    </div>
-                </div>
-            `;
-
-            office.appendChild(board);
-
-            const activeLane = document.getElementById('active-lane');
-            const pipelineLane = document.getElementById('pipeline-lane');
-            const completedLane = document.getElementById('completed-lane');
-
-            active.forEach(p => {
-                activeLane.innerHTML += createProjectCard(p, 'active');
-            });
-
-            pipeline.forEach(p => {
-                pipelineLane.innerHTML += createProjectCard(p, 'pipeline');
-            });
-
-            completed.slice(-5).forEach(p => {
-                completedLane.innerHTML += createProjectCard(p, 'completed');
-            });
-
-            if (active.length === 0) {
-                activeLane.innerHTML = '<div style="color: #666; font-size: 10px;">Keine aktiven Builds</div>';
-            }
-            if (pipeline.length === 0) {
-                pipelineLane.innerHTML = '<div style="color: #666; font-size: 10px;">Pipeline leer</div>';
-            }
-            if (completed.length === 0) {
-                completedLane.innerHTML = '<div style="color: #666; font-size: 10px;">Noch nichts ausgeliefert</div>';
-            }
+                `;
+            }).join('');
         }
-
-        function createProjectCard(project, type) {
-            const impactBadge = project.impactScore
-                ? `<div style="color: ${project.impactScore > 70 ? '#00ff88' : '#ffaa00'}">Impact: ${project.impactScore}/100</div>`
-                : '';
-
-            const roi = project.roi != null ? `<div style="color:#00b2ff;font-size:10px;">ROI ${project.roi}%</div>` : '';
-            const customer = project.customer ? `<div style="color:#888;font-size:10px;">${project.customer}</div>` : '';
-
-            return `
-                <div class="project-card ${type}">
-                    <div class="project-name">${project.name || project.id}</div>
-                    <div class="project-value">💰 ${project.value || 0} Becoins</div>
-                    ${impactBadge}
-                    ${roi}
-                    ${customer}
-                </div>
-            `;
-        }
-
-        function renderOrganization(orchestrator) {
-            const section = document.getElementById('organization-section');
-            if (!orchestrator?.organizationalDesign) {
-                section.style.display = 'none';
+        
+        function renderTransactions(transactions) {
+            const container = document.getElementById('transactions');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">No transactions yet</p>';
                 return;
             }
-
-            section.style.display = 'block';
-            const grid = document.getElementById('organization-grid');
-            grid.innerHTML = '';
-            const design = orchestrator.organizationalDesign;
-
-            grid.innerHTML += `
-                <div class="organization-card">
-                    <div class="org-title">Operating Model</div>
-                    <div class="org-body">${design.coreModel}</div>
-                </div>
-            `;
-
-            if (design.structures?.length) {
-                const structures = design.structures.map(s => `
-                    <div style="margin-bottom:6px;">
-                        <span class="org-pill">${s.name}</span>
-                        <span style="color:#ccc;font-size:10px;">${s.focus}</span>
-                    </div>
-                `).join('');
-                grid.innerHTML += `
-                    <div class="organization-card">
-                        <div class="org-title">Struktur-Knoten</div>
-                        <div class="org-body">${structures}</div>
-                    </div>
-                `;
-            }
-
-            if (design.governance) {
-                grid.innerHTML += `
-                    <div class="organization-card">
-                        <div class="org-title">Governance</div>
-                        <div class="org-body">${design.governance}</div>
+            
+            const recent = transactions.slice(-10).reverse();
+            
+            container.innerHTML = recent.map(tx => {
+                const isIncome = tx.amount > 0;
+                const typeIcons = {
+                    'PROJECT_REVENUE': '💰',
+                    'AGENT_SALARY': '👤',
+                    'AGENT_BONUS': '🎁',
+                    'OPERATIONS_COST': '🏢',
+                    'TAX_DEDUCTION': '🏛️',
+                    'TOKEN_COST': '🧠'
+                };
+                
+                return `
+                    <div class="flex items-center gap-2 p-2 rounded hover:bg-gray-700/30">
+                        <span class="text-lg">${typeIcons[tx.type] || '💸'}</span>
+                        <div class="flex-1">
+                            <div class="text-xs text-gray-400">${tx.description?.slice(0, 30)}...</div>
+                            <div class="text-xs text-gray-500">${new Date(tx.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div class="font-mono ${isIncome ? 'text-green-400' : 'text-red-400'}">
+                            ${isIncome ? '+' : ''}$${Math.abs(tx.amount).toFixed(0)}
+                        </div>
                     </div>
                 `;
-            }
-
-            if (design.scalingNorthStar) {
-                grid.innerHTML += `
-                    <div class="organization-card">
-                        <div class="org-title">Scaling Focus</div>
-                        <div class="org-body">${design.scalingNorthStar}</div>
-                    </div>
-                `;
-            }
+            }).join('');
         }
-
-        function renderConsole(treasury) {
-            const office = document.getElementById('office');
-            const console = document.createElement('div');
-            console.className = 'console';
-            console.innerHTML = '<div style="color: #00ff88; margin-bottom: 10px;">📟 RECENT TRANSACTIONS</div>';
-
-            const transactions = treasury.transactions || [];
-            const recentTxs = transactions.slice(-5).reverse();
-            recentTxs.forEach(tx => {
-                const typeColor = tx.type.includes('REVENUE') ? '#00ff88' :
-                                 tx.type.includes('COST') ? '#ff0055' : '#ffaa00';
-                console.innerHTML += `
-                    <div class="console-line">
-                        <span style="color: #666">[${tx.timestamp.split('T')[0]}]</span>
-                        <span style="color: ${typeColor}">${tx.type}</span>
-                        <span style="color: #00ff88">${tx.amount} Bc</span>
-                        <span style="color: #888">- ${tx.description}</span>
-                    </div>
-                `;
-            });
-
-            office.appendChild(console);
-        }
-
-        // CEO Discovery Integration
-        const CEO_API_BASE = 'http://localhost:3000/api';
-        const WS_URL = 'ws://localhost:3000/ws/ceo';
-        let ws = null;
-
-        // Update CEO Discovery data
-        async function updateCEODiscovery() {
-            try {
-                // Fetch status
-                const statusRes = await fetch(`${CEO_API_BASE}/ceo/status`);
-                const status = await statusRes.json();
-
-                // Update status card
-                document.getElementById('ceo-session-id').textContent = status.session_id || 'None';
-                document.getElementById('ceo-patterns-count').textContent = status.patterns?.length || 0;
-                document.getElementById('ceo-proposals-count').textContent = status.proposals?.length || 0;
-
-                const badge = document.getElementById('ceo-status-badge');
-                badge.textContent = status.status.toUpperCase();
-                badge.className = `ceo-status-badge ${status.status}`;
-
-                // Fetch proposals
-                const proposalsRes = await fetch(`${CEO_API_BASE}/ceo/proposals?min_roi=0&limit=5`);
-                const proposals = await proposalsRes.json();
-                renderProposalsList(proposals);
-
-                // Fetch patterns
-                const patternsRes = await fetch(`${CEO_API_BASE}/ceo/patterns`);
-                const patterns = await patternsRes.json();
-                renderPatternsList(patterns);
-
-                // Performance placeholders (endpoint doesn't exist yet)
-                document.getElementById('ceo-prediction-accuracy').textContent = '0%';
-                document.getElementById('ceo-user-satisfaction').textContent = '0%';
-
-            } catch (error) {
-                console.error('Error updating CEO Discovery data:', error);
-            }
-        }
-
-        // Render proposals
-        function renderProposalsList(proposals) {
-            const container = document.getElementById('ceo-proposals-list');
-
-            if (proposals.length === 0) {
-                container.innerHTML = '<p style="color: #888; font-size: 10px;">No proposals generated yet.</p>';
-                return;
-            }
-
-            container.innerHTML = proposals.map(p => `
-                <div class="proposal-item">
-                    <h4>${p.title}</h4>
-                    <p style="color: #888; font-size: 10px;">${p.description}</p>
-                    <div class="proposal-meta">
-                        <span>💰 ${p.cost_becoins} Bc</span>
-                        <span>📈 ROI: ${p.roi.toFixed(1)}x</span>
-                        <span>🎯 Impact: ${p.impact_score}/100</span>
-                        <span>⏱️ ${p.time_saved_minutes_per_week}min/week</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Render patterns
-        function renderPatternsList(patterns) {
-            const container = document.getElementById('ceo-patterns-list');
-
-            if (patterns.length === 0) {
-                container.innerHTML = '<p style="color: #888; font-size: 10px;">No patterns identified yet.</p>';
-                return;
-            }
-
-            container.innerHTML = patterns.map(p => `
-                <div class="pattern-item">
-                    <h4>${p.type.toUpperCase()}: ${p.description}</h4>
-                    <div class="pattern-meta">
-                        <span>Frequency: ${p.frequency}</span>
-                        <span>Severity: ${(p.severity * 100).toFixed(0)}%</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // WebSocket connection for real-time updates
-        function connectCEOWebSocket() {
-            ws = new WebSocket(WS_URL);
-
-            ws.onopen = () => {
-                console.log('WebSocket connected to CEO Discovery');
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                console.log('WebSocket message:', data);
-
-                if (data.type === 'new_proposal') {
-                    showNotification('New proposal generated!');
-                    updateCEODiscovery();
-                } else if (data.type === 'pattern_discovered') {
-                    showNotification('New pattern identified!');
-                    updateCEODiscovery();
-                } else if (data.type === 'status_change') {
-                    updateCEODiscovery();
-                }
-            };
-
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket disconnected, using polling fallback');
-                // Fallback to polling continues via setInterval
-            };
-        }
-
-        // Show notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification pixel-text';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Auto-refresh every 2 seconds for real-time feel
-        setInterval(loadData, 2000);
-        setInterval(loadServices, 5000);
-        setInterval(updateCEODiscovery, 3000); // CEO Discovery polling (3s baseline)
-
-        // Initial load
-        loadData();
-        loadServices();
-        updateCEODiscovery();
-        connectCEOWebSocket();
-
-        // Chat WebSocket for bidirectional communication
-        let chatWs = null;
-        let chatMessages = [];
-        let availableAgents = [];
-
-        // Toggle chat minimize/maximize
-        function toggleChat() {
-            const chatSection = document.getElementById('agent-chat-section');
-            const toggleBtn = document.getElementById('chat-toggle-btn');
-
-            if (chatSection.classList.contains('minimized')) {
-                chatSection.classList.remove('minimized');
-                toggleBtn.textContent = '▼';
-            } else {
-                chatSection.classList.add('minimized');
-                toggleBtn.textContent = '▲';
-            }
-        }
-
-        // Handle Enter key in chat input
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // Send chat message
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const selector = document.getElementById('agent-selector');
-            const message = input.value.trim();
-            const targetAgent = selector.value;
-
-            if (!message) return;
-
-            const chatMessage = {
-                type: 'user_message',
-                content: message,
-                target_agent: targetAgent,
-                timestamp: new Date().toISOString(),
-                sender: 'User'
-            };
-
-            // Add message to UI immediately
-            addMessageToUI(chatMessage, 'user');
-
-            // Send via WebSocket if connected
-            if (chatWs && chatWs.readyState === WebSocket.OPEN) {
-                chatWs.send(JSON.stringify(chatMessage));
-            } else {
-                // Fallback: Send via REST API
-                sendMessageViaAPI(chatMessage);
-            }
-
-            // Store in local history
-            chatMessages.push(chatMessage);
-            saveChatHistory();
-
-            // Clear input
-            input.value = '';
-        }
-
-        // Send message via REST API (fallback)
-        async function sendMessageViaAPI(message) {
-            try {
-                const response = await fetch(`${CEO_API_BASE}/chat/send`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(message)
-                });
-
-                if (!response.ok) {
-                    console.error('Failed to send message via API');
-                }
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        }
-
-        // Add message to UI
-        function addMessageToUI(message, type) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${type}`;
-
-            const time = new Date(message.timestamp).toLocaleTimeString('de-DE', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            const senderName = type === 'agent'
-                ? `🤖 ${message.sender || 'Agent'}`
-                : `👤 ${message.sender || 'Du'}`;
-
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span class="message-sender">${senderName}</span>
-                    <span class="message-time">${time}</span>
-                </div>
-                <div class="message-content">${escapeHtml(message.content)}</div>
-            `;
-
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Connect to chat WebSocket
-        function connectChatWebSocket() {
-            // Dynamically construct WebSocket URL based on current location
-            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsHost = window.location.hostname;
-            const wsPort = window.location.port ? `:${window.location.port}` : '';
-            const chatWsUrl = `${wsProtocol}//${wsHost}${wsPort}/ws/chat`;
-            chatWs = new WebSocket(chatWsUrl);
-
-            chatWs.onopen = () => {
-                console.log('Chat WebSocket connected');
-            };
-
-            chatWs.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                console.log('Chat message received:', message);
-
-                if (message.type === 'agent_message') {
-                    addMessageToUI(message, 'agent');
-                    chatMessages.push(message);
-                    saveChatHistory();
-                    showNotification(`Neue Nachricht von ${message.sender}`);
-                } else if (message.type === 'chat_history') {
-                    // Load existing chat history
-                    loadChatHistory(message.messages);
-                }
-            };
-
-            chatWs.onerror = (error) => {
-                console.error('Chat WebSocket error:', error);
-            };
-
-            chatWs.onclose = () => {
-                console.log('Chat WebSocket disconnected, attempting reconnect...');
-                setTimeout(connectChatWebSocket, 5000);
-            };
-        }
-
-        // Load chat history from server
-        async function loadChatHistoryFromServer() {
-            try {
-                const response = await fetch(`${CEO_API_BASE}/chat/history`);
-                if (response.ok) {
-                    const data = await response.json();
-                    loadChatHistory(data.messages || []);
-                }
-            } catch (error) {
-                console.error('Error loading chat history:', error);
-                // Load from localStorage as fallback
-                loadChatHistoryFromLocalStorage();
-            }
-        }
-
-        // Load chat history into UI
-        function loadChatHistory(messages) {
-            chatMessages = messages;
-            const messagesContainer = document.getElementById('chat-messages');
-            // Clear existing messages except system message (if it exists)
-            const firstChild = messagesContainer.firstElementChild;
-            if (firstChild) {
-                // Preserve the first child (system message) and clear the rest
-                messagesContainer.innerHTML = firstChild.outerHTML;
-            } else {
-                // No children present; just clear the container
-                messagesContainer.innerHTML = '';
-            }
-
-            messages.forEach(msg => {
-                const type = msg.sender === 'User' ? 'user' : 'agent';
-                addMessageToUI(msg, type);
-            });
-        }
-
-        // Save chat history to localStorage
-        function saveChatHistory() {
-            try {
-                localStorage.setItem('becoin_chat_history', JSON.stringify(chatMessages));
-            } catch (error) {
-                console.error('Error saving chat history:', error);
-            }
-        }
-
-        // Load chat history from localStorage
-        function loadChatHistoryFromLocalStorage() {
-            try {
-                const stored = localStorage.getItem('becoin_chat_history');
-                if (stored) {
-                    const messages = JSON.parse(stored);
-                    loadChatHistory(messages);
-                }
-            } catch (error) {
-                console.error('Error loading chat history from localStorage:', error);
-            }
-        }
-
-        // Update agent selector with available agents
-        function updateAgentSelector(agents) {
-            availableAgents = agents;
-            const selector = document.getElementById('agent-selector');
-
-            // Keep "All Agents" option
-            selector.innerHTML = '<option value="all">Alle Agenten</option>';
-
-            // Add individual agents
-            agents.forEach(agent => {
-                const option = document.createElement('option');
-                option.value = agent.id;
-                option.textContent = `${AGENT_AVATARS[agent.id] || '👤'} ${agent.name}`;
-                selector.appendChild(option);
-            });
-        }
-
-        // Dashboard navigation
-        function switchDashboard(dashboard) {
-            // Update active button
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Handle dashboard switching
-            switch(dashboard) {
-                case 'office':
-                    // Already on office view
-                    showNotification('Office Dashboard');
-                    break;
-                case 'analytics':
-                    showNotification('Analytics Dashboard - Coming Soon!');
-                    // TODO: Load analytics dashboard
-                    break;
-                case 'agents':
-                    showNotification('Agents Dashboard - Coming Soon!');
-                    // TODO: Load agents dashboard
-                    break;
-            }
-        }
-
-        // Initialize chat on page load
-        connectChatWebSocket();
-        loadChatHistoryFromServer();
-
-        // Update agent selector when agents are loaded
-        const originalRenderOffice = renderOffice;
-        renderOffice = function(agents, projects) {
-            originalRenderOffice(agents, projects);
-            updateAgentSelector(agents);
-        };
+        
+        // Auto-refresh every 5 seconds
+        loadDashboard();
+        setInterval(loadDashboard, 5000);
     </script>
 </body>
 </html>

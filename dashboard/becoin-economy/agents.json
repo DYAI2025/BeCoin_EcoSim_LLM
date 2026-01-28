@@ -1,0 +1,82 @@
+{
+  "agent-001": {
+    "id": "agent-001",
+    "name": "Frontend Developer",
+    "role": "frontend",
+    "status": "idle",
+    "hourly_rate": 25.0,
+    "current_task": null,
+    "current_project": null,
+    "equity_share": 0.25,
+    "performance": {
+      "hours_worked": 0,
+      "tokens_consumed": 0,
+      "projects_completed": 0,
+      "becoin_earned": 0.0,
+      "becoin_spent": 0.0,
+      "questions_asked": 0,
+      "blockers_encountered": 0,
+      "tasks_completed": 0
+    }
+  },
+  "agent-002": {
+    "id": "agent-002",
+    "name": "Backend Architect",
+    "role": "backend",
+    "status": "idle",
+    "hourly_rate": 30.0,
+    "current_task": null,
+    "current_project": null,
+    "equity_share": 0.25,
+    "performance": {
+      "hours_worked": 0,
+      "tokens_consumed": 0,
+      "projects_completed": 0,
+      "becoin_earned": 0.0,
+      "becoin_spent": 0.0,
+      "questions_asked": 0,
+      "blockers_encountered": 0,
+      "tasks_completed": 0
+    }
+  },
+  "agent-003": {
+    "id": "agent-003",
+    "name": "AI Engineer",
+    "role": "ai",
+    "status": "idle",
+    "hourly_rate": 35.0,
+    "current_task": null,
+    "current_project": null,
+    "equity_share": 0.25,
+    "performance": {
+      "hours_worked": 1,
+      "tokens_consumed": 0,
+      "projects_completed": 0,
+      "becoin_earned": 0.0,
+      "becoin_spent": 0.0,
+      "questions_asked": 0,
+      "blockers_encountered": 0,
+      "tasks_completed": 1
+    }
+  },
+  "agent-004": {
+    "id": "agent-004",
+    "name": "DevOps Automator",
+    "role": "devops",
+    "status": "idle",
+    "hourly_rate": 25.0,
+    "current_task": null,
+    "current_project": null,
+    "equity_share": 0.25,
+    "performance": {
+      "hours_worked": 0,
+      "tokens_consumed": 0,
+      "projects_completed": 0,
+      "becoin_earned": 0.0,
+      "becoin_spent": 0.0,
+      "questions_asked": 0,
+      "blockers_encountered": 0,
+      "tasks_completed": 0
+    }
+  }
+}

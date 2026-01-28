@@ -1,47 +1,109 @@
 {
-  "active": [],
-  "pipeline": [
-    {
-      "id": "IDEA-003",
-      "name": "Review: Founder Insights Dashboard",
-      "stage": "pipeline",
-      "value": 1500,
-      "impactScore": 88,
-      "roi": 160,
-      "customer": "Founding Customer (You)",
-      "team": ["agent-helio", "agent-circe"]
+  "proj-001": {
+    "id": "proj-001",
+    "name": "Dashboard Redesign",
+    "stage": "active",
+    "cost": 2000,
+    "value": 3000,
+    "progress": 0.0,
+    "team": [
+      "agent-001",
+      "agent-004"
+    ],
+    "milestones": [
+      {
+        "name": "UI Design",
+        "progress": 25,
+        "completed": false
+      },
+      {
+        "name": "Frontend Dev",
+        "progress": 50,
+        "completed": false
+      },
+      {
+        "name": "Integration",
+        "progress": 75,
+        "completed": false
+      },
+      {
+        "name": "Testing",
+        "progress": 100,
+        "completed": false
+      }
+    ],
+    "metrics": {
+      "hours_spent": 0,
+      "tokens_used": 0,
+      "cost_to_date": 0.0
     }
-  ],
-  "completed": [
-    {
-      "id": "proj-001",
-      "name": "Dashboard Redesign",
-      "stage": "completed",
-      "value": 3000,
-      "impactScore": 85,
-      "team": [
-        "agent-001"
-      ]
-    },
-    {
-      "id": "proj-002",
-      "name": "API Integration",
-      "stage": "completed",
-      "value": 1800,
-      "impactScore": 92,
-      "team": [
-        "agent-002"
-      ]
-    },
-    {
-      "id": "proj-003",
-      "name": "CI/CD Pipeline",
-      "stage": "completed",
-      "value": 2700,
-      "impactScore": 78,
-      "team": [
-        "agent-004"
-      ]
+  },
+  "proj-002": {
+    "id": "proj-002",
+    "name": "API Integration",
+    "stage": "completed",
+    "cost": 1500,
+    "value": 2500,
+    "progress": 0.0,
+    "team": [
+      "agent-002"
+    ],
+    "milestones": [],
+    "metrics": {
+      "hours_spent": 0,
+      "tokens_used": 0,
+      "cost_to_date": 0.0
     }
-  ]
+  },
+  "proj-003": {
+    "id": "proj-003",
+    "name": "CI/CD Pipeline",
+    "stage": "active",
+    "cost": 1800,
+    "value": 2700,
+    "progress": 0.0,
+    "team": [
+      "agent-004"
+    ],
+    "milestones": [
+      {
+        "name": "Setup Pipeline",
+        "progress": 33,
+        "completed": false
+      },
+      {
+        "name": "Add Tests",
+        "progress": 66,
+        "completed": false
+      },
+      {
+        "name": "Deploy",
+        "progress": 100,
+        "completed": false
+      }
+    ],
+    "metrics": {
+      "hours_spent": 0,
+      "tokens_used": 0,
+      "cost_to_date": 0.0
+    }
+  },
+  "proj-004": {
+    "id": "proj-004",
+    "name": "LLM Integration",
+    "stage": "active",
+    "cost": 2500,
+    "value": 4000,
+    "progress": 5.0,
+    "team": [
+      "agent-003",
+      "agent-002"
+    ],
+    "milestones": [],
+    "metrics": {
+      "hours_spent": 1,
+      "tokens_used": 0,
+      "cost_to_date": 0.0
+    }
+  }
 }
