@@ -121,7 +121,7 @@ To understand this “survival-financed intelligence” arc quickly:
 
 1. Start with `beCoinCycle.md` to see the core economic problem statement.
 2. Continue with `SPEX.md` to follow design reasoning and solution framing.
-3. Review `becoin_economy/engine_v3.py` and `engine_v31.py` to see balancing logic in code.
+3. Review `becoin_economy/engine_v3.py` and `becoin_economy/engine_v31.py` to see balancing logic in code.
 4. Open the dashboard and observe how operational signals map to treasury dynamics.
 5. Inspect autonomous orchestration files to see how agent behavior is routed into economic outcomes.
 
